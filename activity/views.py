@@ -62,7 +62,7 @@ LINKS = {
 
 
 def _zone():
-    return zoneinfo.ZoneInfo(request.general_settings.timezone)
+    return timezone.get_current_timezone()
 
 
 def _today():

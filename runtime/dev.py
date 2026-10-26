@@ -48,7 +48,9 @@ elif args.command=='up':
     else:raise SystemExit('Local startup failed; inspect this stack logs.')
 elif args.command=='stop':run('stop')
 elif args.command=='status':run('ps')
-elif args.command=='test':app('python','manage.py','test','local','--noinput','-v','2')
+elif args.command=='test':
+    app('python','manage.py','collectstatic','--noinput')
+    app('python','manage.py','test','local','--noinput','-v','2')
 elif args.command=='business':
     app('python','tests/bootstrap_disposable.py')
     app('python','tests/suite/run_all.py')
