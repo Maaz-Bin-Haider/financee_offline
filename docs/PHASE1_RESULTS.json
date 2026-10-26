@@ -1,0 +1,35 @@
+{
+  "build": "0.1.0-phase1",
+  "core_commit": "85dbfc842d277fa40a86098156d208873eaf9e40",
+  "image_id": "sha256:ac24994b508e6e4e47979ea12b11cd01fb665f520166e3aa456394c939c3f069",
+  "architecture": "linux/arm64",
+  "review_url": "http://127.0.0.1:18766/setup/",
+  "first_run": {
+    "product": "Financee_Offline",
+    "build": "0.1.0-phase1",
+    "schema": 1,
+    "setup_complete": false
+  },
+  "verification": {
+    "local_core_tests": 20,
+    "business_assertions": 328,
+    "business_modules": 11,
+    "business_xfail_xpass_skips": 0,
+    "frontend_assertions": 41,
+    "retained_source_sql_functions": 190,
+    "removed_email_functions": 12,
+    "new_profile_guards": 2,
+    "django_check": "passed",
+    "migration_drift": "none"
+  },
+  "release_certifications": {
+    "cold_disconnected_workflows": "pending Phase 3",
+    "backup_restore": "pending Phase 4",
+    "launcher": "pending Phase 5",
+    "windows10_x64": "pending Phase 6 real device/runtime verification",
+    "windows11_x64": "pending Phase 6 real device verification",
+    "apple_silicon_dmg": "pending Phase 7 signing and real installer tests",
+    "linux_amd64_payload": "not built at this gate",
+    "upgrade_recovery": "pending Phase 8"
+  }
+}

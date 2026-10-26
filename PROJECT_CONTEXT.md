@@ -26,6 +26,7 @@ Automated tests use financee_offline_test only, plus temporary test DBs within i
 DB/cache have no host ports and no app container mounts Docker's socket.
 No source credentials, application images or live databases were used.
 
+Local-core verification: 20/20 tests; frontend checks: 41/41.
 Evidence: ported business suite 328/328 assertions across 11 modules; independent
 Decimal journal/revenue/COGS/serial-return invariants; all retained screen templates;
 local auth, singleton, currency lock, activity append-only, private attachment and

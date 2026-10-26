@@ -16,3 +16,12 @@ Backups/*
 build/
 dist/
 .DS_Store
+
+# Generated distribution payloads
+*.tar
+*.tar.gz
+*.dmg
+*.exe
+*.msi
+*.pkg
+*.app/
