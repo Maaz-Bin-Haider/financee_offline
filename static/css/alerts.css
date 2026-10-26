@@ -1,0 +1,86 @@
+/* ============================================================================
+ * alerts.css — animations + theming for the unified alert layer (alerts.js)
+ * ----------------------------------------------------------------------------
+ * Keyframe classes are referenced from alerts.js via SweetAlert2's
+ * showClass/hideClass. Positioning and buttons live in alerts.js; the visual
+ * polish (motion, per-type accent) lives here.
+ * ========================================================================== */
+
+/* ---- entrance / exit: top-right toast family ----------------------------- */
+@keyframes alertsSlideInRight {
+  from { opacity: 0; transform: translateX(48px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes alertsSlideOutRight {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(48px); }
+}
+.alerts-anim-in-right  { animation: alertsSlideInRight  .28s cubic-bezier(.22,.61,.36,1) both; }
+.alerts-anim-out-right { animation: alertsSlideOutRight .20s ease-in both; }
+
+/* ---- entrance / exit: bottom-center warning ------------------------------ */
+@keyframes alertsSlideInUp {
+  from { opacity: 0; transform: translateY(48px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes alertsSlideOutDown {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(48px); }
+}
+.alerts-anim-in-up    { animation: alertsSlideInUp   .28s cubic-bezier(.22,.61,.36,1) both; }
+.alerts-anim-out-down { animation: alertsSlideOutDown .20s ease-in both; }
+
+/* ---- entrance / exit: centered modal (confirm / loading / dialog) --------- */
+@keyframes alertsZoomIn {
+  from { opacity: 0; transform: scale(.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes alertsZoomOut {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(.96); }
+}
+.alerts-anim-zoom-in  { animation: alertsZoomIn  .20s ease-out both; }
+.alerts-anim-zoom-out { animation: alertsZoomOut .15s ease-in both; }
+
+/* ---- error emphasis: slide in from the right, then a brief shake ---------- */
+@keyframes alertsShake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+.alerts-anim-shake {
+  animation:
+    alertsSlideInRight .28s cubic-bezier(.22,.61,.36,1) both,
+    alertsShake .40s .28s ease both;
+}
+
+/* ---- per-type accent (a restrained left border on toasts) ---------------- */
+.alerts-toast {
+  border-left: 4px solid transparent;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, .12);
+}
+.alerts-toast--success { border-left-color: #16a34a; }
+.alerts-toast--error   { border-left-color: #dc2626; }
+.alerts-toast--warning { border-left-color: #d97706; }
+.alerts-toast--notify  { border-left-color: #2563eb; }
+
+/* Give the manual-close (error) toast a slightly clearer close affordance. */
+.alerts-toast--error .swal2-close { color: var(--ink-red, #b91c1c); }
+
+/* ---- centered modal polish ----------------------------------------------- */
+.alerts-modal { box-shadow: 0 18px 48px rgba(15, 23, 42, .22); }
+
+/* ---- accessibility: honor reduced-motion --------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .alerts-anim-in-right,
+  .alerts-anim-out-right,
+  .alerts-anim-in-up,
+  .alerts-anim-out-down,
+  .alerts-anim-zoom-in,
+  .alerts-anim-zoom-out,
+  .alerts-anim-shake {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

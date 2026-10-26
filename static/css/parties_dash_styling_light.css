@@ -1,0 +1,140 @@
+/* ============================================================
+   PARTIES HUB — companion styles for the Accounts-Reports look
+   (works alongside accounts_reports.css)
+   ============================================================ */
+
+/* ── Form grid (Add / Update party) ── */
+.party-form-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.party-form-grid .filter-field { flex: 1 1 220px; min-width: 200px; }
+.party-form-grid .filter-field.full { flex: 1 1 100%; }
+
+.party-form-grid label {
+  font-size: 0.69rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin: 0 0 4px;
+  display: block;
+}
+.party-form-grid label small {
+  text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--text-tertiary);
+}
+
+.party-form-grid input[type="text"],
+.party-form-grid input[type="number"],
+.party-form-grid select,
+.party-form-grid textarea {
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--radius-md);
+  background: var(--input-bg);
+  color: var(--input-text);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.party-form-grid textarea { resize: vertical; min-height: 42px; }
+.party-form-grid input:focus,
+.party-form-grid select:focus,
+.party-form-grid textarea:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+  background: var(--bg-surface);
+}
+
+/* keyboard-highlighted suggestion */
+#suggestions div.active-suggestion {
+  background: var(--brand-primary-light);
+  color: var(--ink-blue);
+}
+
+.section-head { display: flex; align-items: center; gap: 8px; margin: 0 0 2px; }
+.section-head h3 { margin: 0; font-size: 1.02rem; font-weight: 700; letter-spacing: -0.01em; color: var(--text-primary); }
+.section-head .sub { font-size: 0.76rem; color: var(--text-tertiary); margin: 0; }
+
+.form-actions { margin-top: 14px; }
+
+.added-by-note {
+  font-size: 0.8rem; color: var(--text-tertiary);
+  margin: 2px 0 12px; display: flex; align-items: center; gap: 6px;
+}
+
+.update-empty {
+  color: var(--text-tertiary); font-size: 0.86rem;
+  padding: 1.6rem 0.5rem; text-align: center;
+}
+
+/* ── All Parties table ── */
+.parties-table-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap; margin-bottom: 10px;
+}
+.parties-table-toolbar .count-pill {
+  font-size: 0.73rem; color: var(--text-tertiary);
+  background: var(--bg-surface-alt); border: 1px solid var(--border-color);
+  border-radius: 20px; padding: 2px 10px; white-space: nowrap;
+}
+.parties-search-wrap { position: relative; max-width: 280px; flex: 1; }
+.parties-search-wrap i {
+  position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
+  color: var(--text-tertiary); font-size: 0.75rem; pointer-events: none;
+}
+#partiesListSearch {
+  width: 100%; padding: 0.4rem 0.7rem 0.4rem 2rem;
+  border: 1.5px solid var(--border-color); border-radius: var(--radius-md);
+  background: var(--bg-surface); color: var(--text-primary);
+  font-size: 0.81rem; outline: none;
+}
+#partiesListSearch:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 3px var(--input-focus-ring); }
+
+.parties-table-container {
+  background: var(--bg-surface); border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color); overflow-x: auto; box-shadow: var(--shadow-sm);
+}
+#partiesTable { width: 100%; border-collapse: collapse; font-size: 0.81rem; font-family: var(--font-sans); }
+#partiesTable thead tr { background: var(--gray-800); }
+#partiesTable thead th {
+  padding: 8px 11px; color: #e2e8f0; font-size: 0.69rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.07em; white-space: nowrap; text-align: left;
+}
+#partiesTable tbody td { padding: 7px 11px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); vertical-align: top; white-space: nowrap; }
+#partiesTable tbody tr:last-child td { border-bottom: none; }
+#partiesTable tbody tr:nth-child(even) { background: var(--bg-surface-alt); }
+#partiesTable tbody tr:hover { background: var(--brand-primary-light) !important; }
+#partiesTable tbody tr.filtered-out { display: none; }
+#partiesTable .no-data { text-align: center; color: var(--text-tertiary); padding: 2.2rem 1rem; font-style: italic; white-space: normal; }
+
+.type-pill {
+  display: inline-flex; align-items: center;
+  font-size: 0.68rem; font-weight: 600; border-radius: 20px; padding: 2px 9px;
+  background: var(--brand-primary-light); color: var(--ink-blue); border: 1px solid transparent;
+}
+.type-pill.type-expense { background: var(--tint-amber); color: var(--ink-amber); }
+
+.by-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.68rem; font-weight: 600; color: var(--ink-blue);
+  background: var(--tint-blue); border: 1px solid var(--brand-primary-border); border-radius: 20px; padding: 2px 8px;
+}
+.by-pill .fa-user-pen { color: var(--ink-blue); font-size: 0.6rem; }
+.by-pill.by-unknown { color: var(--text-tertiary); background: var(--bg-surface-alt); border-color: var(--border-color); }
+
+.row-edit-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--bg-surface); color: var(--ink-blue);
+  border: 1.5px solid var(--border-color); padding: 0.28rem 0.7rem;
+  border-radius: var(--radius-md); font-size: 0.74rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.row-edit-btn:hover { border-color: var(--brand-primary); background: var(--brand-primary-light); }
+
+#pupdate_placeholder{
+  margin-top: 10px;
+}

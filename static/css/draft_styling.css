@@ -1,0 +1,816 @@
+/*
+ * Draft Invoices (Proforma) — only what is genuinely new.
+ *
+ * Ported from the sibling Accounting-Plus-Inventory-System (feature commit
+ * 80e8f8a). The card, the meta grid, the line-item rows, their responsive
+ * collapse and the buttons all come from purchasing_styling.css (the Sale
+ * screen's shell), which the three document screens reuse class for class; the
+ * Pending Drafts report reuses accounts_reports.css. This file adds what those
+ * screens have no concept of: the status badge, the explainer and hint, the
+ * conversion picker, the draft-return rows, the history popups, the summary
+ * chips and the warning banner.
+ *
+ * Tokens come from base_styling.css :root, including the --tint-* / --ink-*
+ * scales, which flip in dark mode. Inks are still written
+ * var(--ink-x, <light value>). The dark-mode specificity overrides are at the
+ * end of this file ("Colours that must win against dark_mode.css").
+ *
+ * This file is also linked from the dashboard for the "Stock Reserved on
+ * Drafts" card, so every selector here is scoped to a draft-specific class.
+ */
+
+/* ── Status badge ─────────────────────────────────────────────────────── */
+
+.draft-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 8px;
+  padding: 2px 11px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface-alt);
+  color: var(--text-primary);
+}
+
+/* Open is the working state and reads calm; the other three each say
+   something has happened and are tinted accordingly. */
+.draft-status-badge.status-open {
+  background: var(--brand-primary-light);
+  border-color: var(--brand-primary-border);
+  color: var(--ink-blue, #1e40af);
+}
+
+.draft-status-badge.status-partially-converted {
+  background: var(--tint-amber);  /* not --brand-warning-light: it stays #fffbeb in dark mode */
+  border-color: var(--brand-warning);
+  color: var(--ink-amber, #92400e);
+}
+
+.draft-status-badge.status-converted {
+  background: var(--brand-success-light);
+  border-color: var(--brand-success);
+  color: var(--ink-green, #166534);
+}
+
+.draft-status-badge.status-cancelled {
+  background: var(--brand-danger-light);
+  border-color: var(--brand-danger);
+  color: var(--ink-red, #991b1b);
+}
+
+.draft-entry-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 10px;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface-alt);
+  color: var(--text-secondary);
+}
+
+.draft-entry-badge i {
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+/* ── The explainer, and the hint ──────────────────────────────────────── */
+
+/* On the page rather than in a tooltip: an operator who does not know that a
+   draft holds stock without selling it will misread everything below it. */
+.draft-explainer {
+  /* A top margin, because this box sits directly under the card header and
+     without one the two read as a single block. */
+  margin: 16px 18px 4px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--brand-primary-border);
+  background: var(--brand-primary-light);
+  color: var(--ink-blue, #1e40af);
+  font-size: 0.84rem;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.draft-explainer i {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+/* The caution variant: what a screen is NOT for. */
+.draft-explainer.draft-explainer-note {
+  border-color: var(--brand-warning);
+  background: var(--tint-amber);  /* not --brand-warning-light: it stays #fffbeb in dark mode */
+  color: var(--ink-amber, #92400e);
+  margin-top: 8px;
+}
+
+.draft-explainer.draft-explainer-note a {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.draft-explainer.draft-explainer-note a:hover {
+  opacity: 0.78;
+}
+
+.draft-hint {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  opacity: 0.85;
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.5;
+}
+
+.draft-hint i {
+  color: var(--ink-blue, #1e40af);
+  flex-shrink: 0;
+}
+
+.sale-field-optional {
+  opacity: 0.6;
+  font-weight: 400;
+}
+
+/* ── Layout ───────────────────────────────────────────────────────────── */
+
+/* Two fields, not the sale screen's three: a draft has no Credit/Cash
+   selector, because it always reserves for a named customer. */
+.draft-meta-grid {
+  grid-template-columns: 2fr 1fr;
+}
+
+.draft-description-group {
+  margin-top: 14px;
+}
+
+/* Confirm Draft's "Draft Invoices" topbar button is a link: it must not
+   pick up the anchor underline the base styles give every <a>. */
+.sale-topbar a.custom-btn,
+.sale-topbar a.custom-btn:hover {
+  text-decoration: none;
+}
+
+/* A disabled action must LOOK disabled. The conversion button correctly
+   refuses to fire while a selected line has no agreed rate, and a locked draft
+   disables Save, Delete, Release and Cancel; full-strength colour would invite
+   the click none of them will honour. */
+.sale-page-wrapper .sale-actions button:disabled,
+.sale-page-wrapper .items-action-bar button:disabled,
+.sale-page-wrapper .row-actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.55);
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── Phone and touch, last in the section ─────────────────────────────── */
+
+@media (max-width: 640px) {
+  .draft-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .draft-explainer {
+    margin: 12px 12px 4px;
+    font-size: 0.8rem;
+  }
+
+  .draft-status-badge,
+  .draft-entry-badge {
+    margin-left: 0;
+    margin-top: 6px;
+  }
+}
+
+/* ── Conversion screen (Confirm Draft) ────────────────────────────────── */
+/*
+ * The tranche picker. One card per item line, each holding its agreed rate and
+ * the serials still reserved on it.
+ */
+
+.convert-line {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.convert-line-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.convert-line-item {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+}
+
+.convert-line-count {
+  font-weight: 400;
+  font-size: 0.78rem;
+  opacity: 0.7;
+}
+
+.convert-line-rate {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 190px;
+}
+
+.convert-rate-hint {
+  font-size: 0.72rem;
+  opacity: 0.65;
+}
+
+.convert-serials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* The whole chip is the label, so the tap target is the chip rather than the
+   14px box inside it. */
+.convert-serial {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 11px;
+  min-height: 44px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-alt);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.convert-serial:has(.serial-tick:checked) {
+  border-color: var(--brand-primary);
+  background: var(--brand-primary-light);
+}
+
+.convert-serial-no {
+  font-family: var(--font-mono);
+}
+
+.convert-serial-cost {
+  font-size: 0.72rem;
+  opacity: 0.65;
+  white-space: nowrap;
+}
+
+/* Below cost is a warning, never a block: stock does sometimes sell at a loss
+   and the operator is the one who knows whether this is that. */
+.convert-below-cost {
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--brand-warning);
+  background: var(--tint-amber);  /* not --brand-warning-light: it stays #fffbeb in dark mode */
+  color: var(--ink-amber, #92400e);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .convert-line-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .convert-line-rate {
+    min-width: 0;
+  }
+
+  .convert-serial {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* ── The draft picker (Choose a Draft popup) and the search box ───────── */
+
+.draft-picker {
+  max-height: 58vh;
+  overflow-y: auto;
+  text-align: left;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.draft-picker-row {
+  display: grid;
+  grid-template-columns: 74px 1fr 110px 92px;
+  gap: 12px;
+  align-items: center;
+  padding: 11px 14px;
+  min-height: 44px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  transition: background-color var(--transition);
+}
+
+.draft-picker-row:last-child { border-bottom: none; }
+.draft-picker-row:hover      { background: var(--brand-primary-light); }
+
+.draft-picker-head {
+  cursor: default;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--bg-surface-alt);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.draft-picker-head:hover { background: var(--bg-surface-alt); }
+
+.draft-picker-id       { font-family: var(--font-mono); font-weight: 700; }
+.draft-picker-customer { font-weight: 600; }
+
+.draft-picker-meta {
+  font-size: 0.74rem;
+  opacity: 0.75;
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+/* Ageing draws the eye without shouting; it is a nudge, not an error. The
+   threshold is the company's DRAFT_AGE_WARNING_DAYS, set by the page. */
+.draft-picker-row.is-aged .draft-picker-meta,
+.draft-suggestion.is-aged .draft-picker-meta {
+  color: var(--ink-amber, #92400e);
+  opacity: 1;
+}
+
+.draft-picker-empty {
+  padding: 22px 14px;
+  text-align: center;
+  opacity: 0.7;
+}
+
+/* The search box on the conversion screen sits over its suggestion list, so
+   the list needs somewhere to sit. */
+.draft-search-wrap { position: relative; }
+
+.draft-suggestions {
+  display: none;
+  position: absolute;
+  z-index: 40;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.draft-suggestion {
+  display: grid;
+  /* Four columns for four spans. */
+  grid-template-columns: 62px 1fr 92px 74px;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 13px;
+  min-height: 44px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.draft-suggestion:last-child      { border-bottom: none; }
+.draft-suggestion:hover,
+.draft-suggestion.active          { background: var(--brand-primary-light); }
+
+@media (max-width: 640px) {
+  .draft-picker-row {
+    grid-template-columns: 62px 1fr;
+    row-gap: 4px;
+  }
+  .draft-picker-meta { grid-column: 2; }
+}
+
+/* ── Confirmed draft return screen ─────────────────────────────────────── */
+
+.dr-col-headers {
+  display: grid;
+  grid-template-columns: 1.2fr 1.6fr 1fr 0.8fr auto;
+  gap: 10px;
+  padding: 0 14px 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  color: var(--text-primary);
+}
+
+.dr-serial-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1.6fr 1fr 0.8fr auto;
+  gap: 10px;
+  align-items: center;
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  transition: border-color var(--transition);
+}
+
+.dr-serial-row:focus-within {
+  border-color: var(--brand-primary);
+}
+
+.dr-serial-row input {
+  padding: 9px 12px;
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  color: var(--input-text);
+  font-size: 0.87rem;
+  width: 100%;
+  outline: none;
+}
+
+.dr-serial-row input:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 2px var(--input-focus-ring);
+}
+
+/* A readonly field here is a fact the database supplied, not a field somebody
+   forgot to fill. It reads as settled rather than as disabled. */
+.dr-serial-row input[readonly] {
+  background: transparent;
+  border-color: transparent;
+  cursor: default;
+}
+
+.dr-serial-row .dr-serial {
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+.dr-serial-row .dr-draft {
+  font-family: var(--font-mono);
+  opacity: 0.75;
+}
+
+@media (max-width: 640px) {
+  .dr-col-headers {
+    display: none;
+  }
+
+  .dr-serial-row {
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+  }
+
+  /* Without the header row above them, each value has to say what it is. */
+  .dr-serial-row input[readonly]:not(:placeholder-shown) {
+    border: 1px dashed var(--border-color);
+    background: var(--bg-surface);
+  }
+
+  .dr-serial-row .remove-serial {
+    grid-row: 1;
+    grid-column: 2;
+  }
+}
+
+/* ── History popups (Draft History, Return History) ───────────────────── */
+/*
+ * The Sale history popup's shape, moved out of an inline <style> block into
+ * the stylesheet and onto tokens.
+ */
+
+.draft-history { text-align: left; }
+
+.draft-history .sh-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.draft-history .sh-search {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  padding: 9px 14px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 9px;
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+  background: var(--card-bg);
+  color: var(--text-primary);
+}
+
+.draft-history .sh-search:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 2px var(--input-focus-ring);
+}
+
+.draft-history .sh-pdf {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-surface-alt);
+  color: var(--text-primary);
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.draft-history .sh-pdf:hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+}
+
+.draft-history .sh-wrap {
+  max-height: 400px;
+  overflow-y: auto;
+  border-radius: 8px;
+}
+
+.draft-history .sh-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.draft-history .sh-table th {
+  background: var(--brand-primary-light);
+  font-weight: 700;
+  color: var(--ink-blue, #1e40af);
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--border-color);
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.draft-history .sh-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.draft-history .sh-table tbody tr { cursor: pointer; }
+
+.draft-history .sh-table tbody tr:hover td {
+  background: var(--brand-primary-light);
+  color: var(--ink-blue, #1e40af);
+}
+
+.draft-history .sh-table .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.draft-history .sh-table td.mono {
+  font-family: var(--font-mono);
+}
+
+/* ── Date-range dialog (By Date Range) ────────────────────────────────── */
+
+.draft-range {
+  text-align: left;
+  margin: 8px 0;
+}
+
+.draft-range label {
+  display: block;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.draft-range .swal2-input {
+  width: 100%;
+  margin: 4px 0 12px;
+}
+
+/* ── Pending Drafts report page ───────────────────────────────────────── */
+
+/* The title bar every report page carries above its panel, as classes
+   rather than the inline styles the older report templates use. */
+.draft-title-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1.1rem;
+}
+
+.draft-title-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--brand-primary-light);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-primary);
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.draft-title-text {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.draft-title-sub {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+
+/* The report panel already spaces its children; the card margins the
+   explainer needs under a document header would double that here. */
+.right-panel > .draft-explainer {
+  margin: 0;
+}
+
+/* The Days Open cell of a draft past the age threshold. */
+#reportTable tbody td.draft-aged-cell {
+  color: var(--ink-amber, #92400e);
+  font-weight: 700;
+}
+
+/* ── Summary chips and the warning banner ─────────────────────────────── */
+/*
+ * Used by the Pending Drafts report and by the dashboard's "Stock Reserved on
+ * Drafts" card. Without these rules the chips render as bare run-together
+ * text: "Open Drafts1Customers1Reserved Units2".
+ */
+
+.draft-summary-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+
+.draft-chip {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 14px;
+  min-width: 108px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-alt);
+}
+
+.draft-chip-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  color: var(--text-secondary);
+}
+
+/* The currency lives in the label, never beside the figure: Intl separates
+   them with a NO-BREAK SPACE, which leaves the browser no legal break point
+   and makes it split the digits instead. */
+.draft-chip-value {
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.draft-warning {
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--brand-warning);
+  background: var(--tint-amber);  /* not --brand-warning-light: it stays #fffbeb in dark mode */
+  color: var(--ink-amber, #92400e);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.draft-warning div + div {
+  margin-top: 4px;
+}
+
+/* A chip, the chip row or the banner switched off with the hidden attribute
+   must stay off even though its own rule sets a display. */
+.draft-summary-chips[hidden],
+.draft-chip[hidden],
+.draft-warning[hidden] {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .draft-chip {
+    flex: 1 1 calc(50% - 10px);
+    min-width: 0;
+  }
+}
+
+
+/* ── Colours that must win against dark_mode.css ──────────────────────────
+ *
+ * dark_mode.css carries
+ *     body.dark-mode p, body.dark-mode span, body.dark-mode div
+ *         { color: var(--text-primary); }
+ * at specificity (0,1,2). A plain `.draft-explainer` is (0,1,0) and loses to
+ * it in dark mode -- no error, no warning, the colour simply never applies.
+ * The doubled classes below are (0,2,0), which beats (0,1,2) on class count;
+ * descendants are named explicitly for the same reason. (Ported with the
+ * rest of the dark mode from the sibling project's draft_styling.css.)
+ * ---------------------------------------------------------------------- */
+
+.draft-status-badge.draft-status-badge {
+  color: var(--text-primary);
+}
+
+.draft-status-badge.draft-status-badge.status-open {
+  color: var(--ink-blue);
+}
+
+.draft-status-badge.draft-status-badge.status-partially-converted {
+  color: var(--ink-amber);
+}
+
+.draft-status-badge.draft-status-badge.status-converted {
+  color: var(--ink-green);
+}
+
+.draft-status-badge.draft-status-badge.status-cancelled {
+  color: var(--ink-red);
+}
+
+.draft-entry-badge.draft-entry-badge {
+  color: var(--text-secondary, var(--text-primary));
+}
+
+.draft-explainer.draft-explainer {
+  color: var(--ink-blue);
+}
+
+.draft-explainer.draft-explainer-note,
+.draft-explainer.draft-explainer-note span,
+.draft-explainer.draft-explainer-note strong,
+.draft-explainer.draft-explainer-note i {
+  color: var(--ink-amber);
+}
+
+.draft-hint.draft-hint {
+  color: var(--text-secondary, var(--text-primary));
+}
+
+.convert-line-item.convert-line-item {
+  color: var(--text-primary);
+}
+
+.convert-below-cost.convert-below-cost {
+  color: var(--ink-amber);
+}
+
+.dr-col-headers.dr-col-headers {
+  color: var(--text-primary);
+}

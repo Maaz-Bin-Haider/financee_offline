@@ -1,0 +1,448 @@
+.smart-description-shell {
+  --sd-accent: #3b82f6;
+  --sd-accent-strong: var(--ink-blue);
+  --sd-accent-soft: var(--tint-blue);
+  --sd-ink: var(--text-primary);
+  --sd-muted: var(--text-tertiary);
+  --sd-border: var(--brand-primary-border);
+  --sd-surface: var(--card-bg);
+  position: relative;
+  border: 1px solid var(--sd-border);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, var(--tint-blue), transparent 38%),
+    var(--sd-surface);
+  padding: 8px;
+  box-shadow: 0 10px 24px rgba(30, 64, 175, 0.06);
+  overflow: hidden;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.smart-description-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.78), transparent);
+  opacity: 0;
+  transform: translateX(-110%);
+  pointer-events: none;
+}
+
+.smart-description-shell:focus-within {
+  border-color: var(--sd-accent);
+  box-shadow:
+    0 12px 28px rgba(37, 99, 235, 0.12),
+    0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.smart-description-shell.has-value {
+  border-color: var(--brand-primary-border);
+}
+
+.smart-description-shell.has-table {
+  animation: smart-description-pop 520ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.smart-description-shell.has-table::before {
+  animation: smart-description-shine 850ms ease;
+}
+
+.smart-description-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.smart-description-meta {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  gap: 7px;
+  color: var(--sd-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.smart-description-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--sd-accent-strong);
+  background: var(--sd-accent-soft);
+  border: 1px solid var(--brand-primary-border);
+  border-radius: 8px;
+  padding: 4px 7px;
+  white-space: nowrap;
+}
+
+.smart-description-count {
+  white-space: nowrap;
+}
+
+.smart-description-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.smart-description-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 30px;
+  height: 28px;
+  border: 1px solid var(--brand-primary-border);
+  border-radius: 8px;
+  color: var(--sd-accent-strong);
+  background: var(--tint-blue);
+  padding: 0 8px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  cursor: pointer;
+  overflow: hidden;
+  transition: color 150ms ease, background 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+.smart-description-btn::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.24);
+  opacity: 0;
+  transform: scale(0);
+}
+
+.smart-description-btn:hover {
+  color: #ffffff;
+  background: var(--sd-accent);
+  border-color: var(--sd-accent);
+  transform: translateY(-1px);
+}
+
+.smart-description-btn.is-active {
+  color: #ffffff;
+  background: var(--sd-accent-strong);
+  border-color: var(--sd-accent-strong);
+}
+
+.smart-description-btn.is-copied {
+  animation: smart-description-copy 420ms ease;
+}
+
+.smart-description-btn.is-copied::after {
+  animation: smart-description-ripple 520ms ease;
+}
+
+.smart-description-shell textarea {
+  width: 100% !important;
+  min-height: 48px;
+  max-height: 150px;
+  resize: vertical;
+  border: 1px solid var(--input-border) !important;
+  border-radius: 8px !important;
+  background: var(--input-bg) !important;
+  color: var(--sd-ink) !important;
+  padding: 9px 10px !important;
+  line-height: 1.45;
+  box-shadow: none !important;
+  transition: min-height 180ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.smart-description-shell textarea:focus {
+  border-color: var(--sd-accent) !important;
+  background: var(--bg-surface) !important;
+  box-shadow: none !important;
+}
+
+.smart-description-shell.is-expanded textarea {
+  min-height: 132px;
+  max-height: 260px;
+}
+
+.smart-description-shell.has-table:not(.is-raw-visible) textarea {
+  position: absolute;
+  width: 1px !important;
+  height: 1px !important;
+  min-height: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.smart-description-preview {
+  display: none;
+  margin-top: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--card-bg);
+  overflow: hidden;
+}
+
+.smart-description-shell.has-table .smart-description-preview {
+  display: block;
+}
+
+.smart-description-table-scroll {
+  max-height: 190px;
+  overflow: auto;
+}
+
+.smart-description-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.76rem;
+}
+
+.smart-description-table th,
+.smart-description-table td {
+  border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  padding: 7px 8px;
+  text-align: left;
+  vertical-align: top;
+  white-space: pre-wrap;
+}
+
+.smart-description-table th:last-child,
+.smart-description-table td:last-child {
+  border-right: none;
+}
+
+.smart-description-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  color: var(--ink-blue);
+  background: var(--tint-blue);
+  font-weight: 900;
+}
+
+.smart-description-table th:focus,
+.smart-description-table td:focus {
+  outline: 2px solid #60a5fa;
+  outline-offset: -2px;
+  background: var(--tint-blue);
+}
+
+.smart-description-table tr:last-child td {
+  border-bottom: none;
+}
+
+.smart-description-table td {
+  color: var(--text-secondary);
+  font-weight: 650;
+}
+
+.smart-description-preview-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid var(--border-color);
+  padding: 6px 8px;
+  color: var(--sd-muted);
+  background: var(--tint-blue);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.smart-description-modal {
+  border-radius: 10px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid var(--brand-primary-border) !important;
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.24) !important;
+}
+
+.smart-description-modal-title {
+  margin: 0 !important;
+  padding: 18px 22px 8px !important;
+  color: var(--text-primary) !important;
+  font-size: 1.05rem !important;
+  font-weight: 900 !important;
+}
+
+.smart-description-modal-html {
+  margin: 0 !important;
+  padding: 0 18px 16px !important;
+}
+
+.smart-description-modal-body {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background:
+    linear-gradient(135deg, var(--tint-blue), transparent 42%),
+    var(--card-bg);
+  padding: 12px;
+}
+
+.smart-description-modal-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: var(--ink-blue);
+  font-size: 0.78rem;
+  font-weight: 850;
+  text-align: left;
+}
+
+.smart-description-modal-table-scroll {
+  max-height: min(58vh, 520px);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--card-bg);
+}
+
+.smart-description-modal-table {
+  font-size: 0.84rem;
+}
+
+.smart-description-modal-table th,
+.smart-description-modal-table td {
+  padding: 9px 10px;
+}
+
+.smart-description-modal-textarea {
+  width: 100%;
+  min-height: min(52vh, 440px);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--input-text);
+  padding: 12px;
+  font: inherit;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  resize: vertical;
+  outline: none;
+}
+
+.smart-description-modal-textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.smart-description-modal-actions {
+  margin: 0 !important;
+  padding: 0 18px 18px !important;
+}
+
+.smart-description-modal-in {
+  animation: smart-description-modal-rise 260ms cubic-bezier(0.18, 0.89, 0.32, 1.18) both !important;
+}
+
+.smart-description-modal-out {
+  animation: smart-description-modal-fade 180ms ease both !important;
+}
+
+@keyframes smart-description-pop {
+  0% {
+    transform: scale(0.985);
+  }
+  45% {
+    transform: scale(1.01);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes smart-description-shine {
+  0% {
+    opacity: 0;
+    transform: translateX(-110%);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(135%);
+  }
+}
+
+@keyframes smart-description-copy {
+  0%,
+  100% {
+    transform: translateY(-1px) scale(1);
+  }
+  45% {
+    transform: translateY(-1px) scale(0.94);
+  }
+}
+
+@keyframes smart-description-ripple {
+  0% {
+    opacity: 0.8;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(7);
+  }
+}
+
+@keyframes smart-description-modal-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes smart-description-modal-fade {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smart-description-shell,
+  .smart-description-shell::before,
+  .smart-description-btn,
+  .smart-description-btn::after,
+  .smart-description-shell textarea,
+  .smart-description-modal-in,
+  .smart-description-modal-out {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .smart-description-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .smart-description-actions {
+    width: 100%;
+  }
+
+  .smart-description-btn {
+    flex: 1;
+  }
+}
+
+/* ── Dark mode ──
+   The panel, table, textarea and modal colours above come from the theme
+   tokens in base_styling.css. Only the white shimmer sweep needs a dark
+   value: at full strength it reads as a bright bar across a dark panel. */
+:root.dark-mode .smart-description-shell::before {
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+}

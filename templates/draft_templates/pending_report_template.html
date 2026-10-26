@@ -1,0 +1,95 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Pending Drafts{% endblock title %}
+
+{% block SeperateCssFile %}
+{% comment %}
+The report shell, reused rather than rebuilt: accounts_reports.css already
+carries the panel, the filter card, #reportTable and the export toolbar, which
+is why this screen needs almost no CSS of its own. draft_styling.css adds the
+title bar, the explainer, the warning banner and the summary chips.
+{% endcomment %}
+<link rel="stylesheet" href="{% static 'css/accounts_reports.css' %}">
+<link rel="stylesheet" href="{% static 'css/draft_styling.css' %}">
+{% endblock SeperateCssFile %}
+
+{% block body %}
+
+<div class="draft-title-bar">
+  <div class="draft-title-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+  <div>
+    <h2 class="draft-title-text">Pending Draft Invoices</h2>
+    <p class="draft-title-sub">Stock reserved for customers on drafts not yet converted or released</p>
+  </div>
+</div>
+
+<div class="reports-wrapper">
+
+  <div class="right-panel">
+
+    <p class="draft-explainer">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>Every draft with serials still reserved. These goods are held for a
+      customer and cannot be sold to anyone else until the draft is converted
+      or released.</span>
+    </p>
+
+    <div id="report-form-container">
+      <form onsubmit="runPendingReport(event)" class="filter-form">
+        <div class="filter-field">
+          <label for="from_date">From</label>
+          <input type="date" id="from_date">
+        </div>
+        <div class="filter-field">
+          <label for="to_date">To</label>
+          <input type="date" id="to_date">
+        </div>
+        <button type="submit" class="generate-btn">
+          <i class="fa-solid fa-play"></i> Generate
+        </button>
+        <button type="button" class="generate-btn" onclick="runPendingReport(null, true)">
+          <i class="fa-solid fa-list"></i> All Open Drafts
+        </button>
+      </form>
+    </div>
+
+    {% comment %}
+    The warning banner. A draft's rate is optional by design, so an indicative
+    total that omits unpriced lines is the NORMAL case here rather than an edge
+    case -- which is exactly why it has to be stated above the table rather
+    than inferred from a column.
+    {% endcomment %}
+    <div id="pendingWarning" class="draft-warning" hidden></div>
+
+    <div id="summaryChips" class="draft-summary-chips" hidden></div>
+
+    <div class="table-container">
+      <table id="reportTable">
+        <thead id="reportHead"></thead>
+        <tbody id="reportBody"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+{% comment %}
+The company's base currency (the Indicative column and chip) and
+DRAFT_AGE_WARNING_DAYS (the ageing mark on Days Open), read by
+draft_reports.js and pending_drafts_page.js.
+
+jsPDF, then autotable, in the body: the autotable copy in base.html's head runs
+before window.jspdf exists, so it has no jsPDF to attach to and
+doc.autoTable would never be defined.
+{% endcomment %}
+<script>
+  window.FINANCEE_CURRENCY = "{{ currency|default:'PKR'|escapejs }}";
+  window.DRAFT_AGE_WARNING_DAYS = Number("{{ age_warning_days|default:30|escapejs }}") || 30;
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="{% static 'js/report_pdf.js' %}"></script>
+<script src="{% static 'js/draft_reports.js' %}"></script>
+<script src="{% static 'js/pending_drafts_page.js' %}"></script>
+{% endblock body %}

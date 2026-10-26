@@ -1,0 +1,264 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Payments{% endblock title %}
+
+{% block SeperateCssFile %}
+  <link rel="stylesheet" href="{% static 'css/payment.css' %}">
+  <link rel="stylesheet" href="{% static 'css/smart_description.css' %}">
+  <link rel="stylesheet" href="{% static 'css/document_attachments.css' %}">
+{% endblock SeperateCssFile %}
+
+
+{% block body %}
+<div class="page-wrapper">
+
+  <!-- ====== PAGE HEADER ====== -->
+  <div class="page-header">
+    <div class="page-title">
+      <div class="page-title-icon">
+        <i class="fa-solid fa-credit-card"></i>
+      </div>
+      <div>
+        <h2>Payments</h2>
+        <div id="entryByBadge" style="display:none;" title="Last modified by">
+          <i class="fa-solid fa-user-pen"></i>
+          <span id="entryByName">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="action-bar">
+      <button class="action-btn" id="btnOldPayments" title="View last 20 payments">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        History
+      </button>
+      <button class="action-btn" id="btnVendorPayments" title="Filter payments by date range">
+        <i class="fa-solid fa-calendar-days"></i>
+        Date-Wise
+      </button>
+      <button class="btn-new-entry" id="btnNewEntry" title="Start a new payment entry (Ctrl+N)" type="button">
+        <i class="fa-solid fa-plus"></i>
+        New
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ====== FORM CARD ====== -->
+  <div class="form-card">
+
+    <!-- Status bar -->
+    <div class="form-status-bar" id="formStatusBar">
+      <div class="status-mode mode-new" id="statusMode">
+        <span class="status-dot"></span>
+        <span id="statusText">New Entry</span>
+      </div>
+      <span class="shortcut-hint">
+        <kbd>↑</kbd><kbd>↓</kbd> navigate fields &nbsp;·&nbsp;
+        <kbd>Enter</kbd> next field &nbsp;·&nbsp;
+        <kbd>Alt</kbd>+<kbd>←</kbd><kbd>→</kbd> browse records
+      </span>
+    </div>
+
+    <div class="form-card-body">
+      <form method="post" id="paymentForm" autocomplete="off" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <!-- Row 1: Date + Party -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="payment_date">
+              <i class="fa-regular fa-calendar" style="margin-right:4px;"></i>
+              Payment Date
+            </label>
+            <input type="date" id="payment_date" name="payment_date"
+                   value="{{ payment_date }}" required>
+          </div>
+
+          <div class="form-group autocomplete-container">
+            <label for="search_name">
+              <i class="fa-solid fa-building" style="margin-right:4px;"></i>
+              Party Name
+            </label>
+            <input type="text" id="search_name" name="search_name"
+                   placeholder="Type to search party…"
+                   autocomplete="off"
+                   data-autocomplete-url="{% url 'parties:autocomplete_party' %}"
+                   value="{{ party_name }}">
+            <div id="suggestions" style="display:none;"></div>
+            <div id="partyBalanceDisplay" style="display:none;"></div>
+          </div>
+        </div>
+
+        <!-- Row 2: Amount + Method -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="amount">
+              <i class="fa-solid fa-coins" style="margin-right:4px;"></i>
+              Amount
+            </label>
+            <input type="number" id="amount" name="amount"
+                   step="0.0001" min="0"
+                   placeholder="0.00"
+                   value="{{ amount }}" required>
+          </div>
+
+          <div class="form-group">
+            <label for="method">
+              <i class="fa-solid fa-wallet" style="margin-right:4px;"></i>
+              Payment Method
+            </label>
+            <input type="text" id="method" name="method" value="Cash" readonly>
+          </div>
+        </div>
+
+        <!-- Row 3: Description -->
+        <div class="form-group">
+          <label for="description">
+            <i class="fa-regular fa-note-sticky" style="margin-right:4px;"></i>
+            Description <span style="font-weight:400;color:var(--text-tertiary);">(optional)</span>
+          </label>
+          <textarea id="description" name="description" data-smart-description maxlength="1000"
+                    placeholder="Add a note or reference for this payment…">{{ description }}</textarea>
+        </div>
+
+        {% if features.attachments.enabled %}
+        {% include "components/document_attachments.html" %}
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="btn-row">
+          <button type="submit" name="action" value="submit"
+                  class="save-and-update-btn" id="submitBtn">
+            <i class="fa-solid fa-floppy-disk"></i>
+            Save Payment
+          </button>
+
+          <button type="submit" name="action" value="delete"
+                  class="delete-btn" id="deleteBtn">
+            <i class="fa-solid fa-trash-can"></i>
+            Delete
+          </button>
+        </div>
+
+      </form><!-- /paymentForm -->
+    </div><!-- /form-card-body -->
+  </div><!-- /form-card -->
+
+
+  <!-- Hidden payment id -->
+  <input type="hidden" id="current_payment_id" name="current_id"
+         value="{{ payment_id }}" form="paymentForm">
+
+  <!-- ====== NAVIGATION BUTTONS ====== -->
+  <div class="nav-btn-group">
+    <button class="nav-btn" type="button" onclick="navigatePayment('previous')"
+            title="Previous record (Alt+←)">
+      <i class="fa-solid fa-chevron-left"></i>
+      Previous
+    </button>
+
+    <span class="record-id-chip" id="recordIdChip">
+      {% if payment_id %}#{{ payment_id }}{% else %}New{% endif %}
+    </span>
+
+    <button class="nav-btn" type="button" onclick="navigatePayment('next')"
+            title="Next record (Alt+→)">
+      Next
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+  </div>
+
+</div><!-- /page-wrapper -->
+
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Payments JS -->
+<script src="{% static 'js/smart_description.js' %}"></script>
+<script src="{% static 'js/document_attachments.js' %}"></script>
+<script src="{% static 'js/payments_page.js' %}"></script>
+
+
+<!-- New Entry button -->
+<script>
+  document.getElementById("btnNewEntry").addEventListener("click", function () {
+    clearPaymentForm();
+  });
+
+  function clearPaymentForm() {
+    document.getElementById("payment_date").valueAsDate = new Date();
+    document.getElementById("search_name").value = "";
+    document.getElementById("amount").value = "";
+    document.getElementById("method").value = "Cash";
+    document.getElementById("description").value = "";
+    if (window.SmartDescriptions) SmartDescriptions.refreshAll();
+    document.getElementById("current_payment_id").value = "";
+    document.getElementById("entryByName").textContent = "—";
+    document.getElementById("entryByBadge").style.display = "none";
+    if (window.DocumentAttachments) DocumentAttachments.reset();
+    setFormMode("new");
+    document.getElementById("search_name").focus();
+  }
+
+  // Keyboard shortcut Ctrl+N for new entry
+  document.addEventListener("keydown", function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === "n") {
+      e.preventDefault();
+      clearPaymentForm();
+    }
+    // Alt+← Previous, Alt+→ Next
+    if (e.altKey && e.key === "ArrowLeft")  { e.preventDefault(); navigatePayment("previous"); }
+    if (e.altKey && e.key === "ArrowRight") { e.preventDefault(); navigatePayment("next"); }
+  });
+</script>
+
+
+<!-- Django Messages -->
+{% if messages %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    {% for message in messages %}
+      {% if message.tags == 'success' %}
+      // Swal.fire({
+      //   title: "Done!",
+      //   text: "{{ message|escapejs }}",
+      //   icon: "success",
+      //   timer: 2500,
+      //   showConfirmButton: false,
+      //   timerProgressBar: true,
+      //   toast: true,
+      //   position: "top-end",
+      //   didOpen: (popup) => {
+      //     popup.addEventListener("mouseenter", Swal.stopTimer);
+      //     popup.addEventListener("mouseleave", Swal.resumeTimer);
+      //   }
+      // });
+      Alerts.success("{{ message|escapejs }}", { title: "Done!" });
+      {% elif message.tags == 'error' %}
+      // Swal.fire({
+      //   title: "Error",
+      //   text: "{{ message|escapejs }}",
+      //   icon: "error",
+      //   confirmButtonColor: "#dc2626",
+      //   confirmButtonText: "OK"
+      // });
+      Alerts.error("{{ message|escapejs }}");
+      {% else %}
+      // Swal.fire({
+      //   title: "Notice",
+      //   text: "{{ message|escapejs }}",
+      //   icon: "info",
+      //   confirmButtonColor: "#2563eb",
+      //   confirmButtonText: "OK"
+      // });
+      Alerts.notify("{{ message|escapejs }}", { title: "Notice" });
+      {% endif %}
+    {% endfor %}
+  });
+</script>
+{% endif %}
+
+{% endblock body %}

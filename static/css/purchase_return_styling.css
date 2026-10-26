@@ -1,0 +1,114 @@
+/* ---------- SERIAL NUMBERS SECTION ---------- */
+
+.serials-container {
+  background: none;
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-top: 20px;
+  width: 98%;
+  max-width: 90vw;
+  margin-left: auto;
+  margin-right: auto;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+
+/* ---------- SERIAL INPUT FIELDS ---------- */
+
+#serials {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#serials input[type="text"] {
+  padding: 10px 14px;
+  border-radius: 12px;
+  outline: none;
+  transition: 0.2s;
+  font-size: 0.95rem;
+}
+
+#serials input[type="text"]:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+}
+
+/* ---------- ADD SERIAL BUTTON ---------- */
+
+.add-serial {
+  margin-top: 16px;
+  width: 50%;
+  background-color: var(--ink-blue);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.add-serial:hover {
+  background-color: #1e4ed8;
+}
+
+/* ---------- TOTAL COUNT ---------- */
+
+#totalBox {
+  text-align: right;
+  margin-top: 10px;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+/* ---------- SERIAL ROWS WITH ITEM NAME ---------- */
+
+.serial-row {
+  display: grid;
+  grid-template-columns: 2fr 2.5fr 1.3fr 0.5fr;
+  gap: 12px;
+}
+
+.item-input,
+.serial-input {
+  padding: 10px 14px;
+  border-radius: 12px;
+  outline: none;
+  transition: 0.2s;
+  font-size: 0.95rem;
+}
+
+.item-input:focus,
+.serial-input:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+}
+
+.item-input[readonly] {
+  background-color: var(--bg-surface-alt);
+  color: var(--text-primary);
+  
+}
+/* ---------- REMOVE BTN FOR ROWS ---------- */
+.remove-btn {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  border: none;
+  background-color: #f87171; /* red-400 */
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.remove-btn:hover {
+  background-color: #da4545; /* red-600 */
+}
+

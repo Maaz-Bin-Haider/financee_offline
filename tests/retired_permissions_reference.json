@@ -1,0 +1,25 @@
+{
+  "_comment": "Frozen record of the 14 retired quantity permissions exactly as the authentication migrations 0022-0025 created them. Those migration files were deleted in checkpoint 4B, so this file preserves the independent cross-reference that the Phase 3 audit and Phase 3B cleanup catalogues are checked against. Extracted from the migration sources at commit b0a3970 before deletion. Do not edit.",
+  "source_migrations": [
+    "authentication/migrations/0022_add_quantity_warehouse_permissions.py",
+    "authentication/migrations/0023_add_quantity_transfer_permissions.py",
+    "authentication/migrations/0024_add_quantity_count_adjustment_permissions.py",
+    "authentication/migrations/0025_add_quantity_platform_permissions.py"
+  ],
+  "permissions": {
+    "approve_inventory_adjustment": "Can approve and post inventory adjustments",
+    "create_physical_count": "Can create quantity physical counts",
+    "create_warehouse": "Can create quantity warehouses",
+    "create_warehouse_transfer": "Can create quantity warehouse transfers",
+    "delete_warehouse": "Can delete unreferenced quantity warehouses",
+    "delete_warehouse_transfer": "Can reverse quantity warehouse transfers",
+    "manage_quantity_attachments": "Can manage quantity document attachments",
+    "reverse_inventory_adjustment": "Can reverse posted inventory adjustments",
+    "update_warehouse": "Can update quantity warehouses",
+    "update_warehouse_transfer": "Can update quantity warehouse transfers",
+    "view_physical_count": "Can view quantity physical counts",
+    "view_quantity_audit": "Can view quantity audit events",
+    "view_warehouse": "Can view quantity warehouses",
+    "view_warehouse_transfer": "Can view quantity warehouse transfers"
+  }
+}

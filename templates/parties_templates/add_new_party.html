@@ -1,0 +1,139 @@
+{% extends "base/base.html" %}
+
+
+
+
+{% load static %}
+
+{% block title %}Add New Party{% endblock title %}
+
+{% block SeperateCssFile %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/party_forms.css' %}">
+{% endblock SeperateCssFile %}
+
+{% block body %}
+
+<div class="party-page-wrapper">
+
+  <!-- ── Page Header ── -->
+  <div class="party-page-header">
+    <div class="page-eyebrow">
+      <span class="dot"></span>
+      Party Management
+    </div>
+    <h1>Add <span>New Party</span></h1>
+    <p>Register a new customer, supplier, or expense account</p>
+  </div>
+
+  <!-- ── Form Card ── -->
+  <div class="party-card">
+    <form id="create_party_form" method="post" autocomplete="off">
+      {% csrf_token %}
+
+      <div class="form-grid">
+
+        <!-- Section: Identity -->
+        <div class="section-label">Party Identity</div>
+
+        <!-- Party Name -->
+        <div class="form-group full-width">
+          <label for="party_name">
+            <span class="lbl-icon">◈</span> Party Name
+          </label>
+          <input
+            type="text"
+            id="party_name"
+            name="party_name"
+            placeholder="e.g. AHMED TRADERS"
+            required
+          >
+        </div>
+
+        <!-- Party Type -->
+        <div class="form-group">
+          <label for="party_type">
+            <span class="lbl-icon">◈</span> Party Type
+          </label>
+          <div class="select-wrapper">
+            <select id="party_type" name="party_type">
+              <option value="Both">Both</option>
+              <option value="Expense">Expense</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="form-group">
+          <label for="contact_info">
+            <span class="lbl-icon">◈</span> Contact Info
+          </label>
+          <input
+            type="text"
+            id="contact_info"
+            name="contact_info"
+            placeholder="e.g. 0300-1234567"
+          >
+        </div>
+
+        <!-- Address -->
+        <div class="form-group full-width">
+          <label for="address">
+            <span class="lbl-icon">◈</span> Address
+          </label>
+          <textarea
+            id="address"
+            name="address"
+            rows="3"
+            placeholder="Street, City, Country…"
+          ></textarea>
+        </div>
+
+        <!-- Divider -->
+        <div class="form-divider"></div>
+        <div class="section-label">Opening Balance</div>
+
+        <!-- Opening Balance + Balance Type inline -->
+        <div class="form-group full-width">
+          <label for="opening_balance">
+            <span class="lbl-icon">◈</span> Amount &amp; Type
+          </label>
+          <div class="balance-row">
+            <input
+              type="number"
+              id="opening_balance"
+              name="opening_balance"
+              value="0"
+              min="0"
+              placeholder="0"
+            >
+            <div class="select-wrapper">
+              <select id="balance_type" name="balance_type">
+                <option value="Debit">Debit</option>
+                <option value="Credit">Credit</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-submit">
+          <span class="btn-icon">✦</span>
+          <span class="btn-text">Save Party</span>
+        </button>
+
+      </div><!-- /.form-grid -->
+    </form>
+  </div><!-- /.party-card -->
+
+</div><!-- /.party-page-wrapper -->
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Unified JS -->
+<script src="{% static 'js/party_forms.js' %}"></script>
+
+{% endblock body %}

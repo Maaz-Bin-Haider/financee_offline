@@ -1,0 +1,346 @@
+/* ============================================================
+   LOGIN PAGE
+
+   This page does not extend base/base.html, so it never received
+   base_styling.css and had no theme at all — every colour below used to be
+   a hardcoded light-mode hex. Dark is now the application default, which
+   made this the one white page in a dark product.
+
+   Rather than pull in 704 lines of layout CSS this page has no use for, the
+   handful of tokens it needs are declared here with the same names and the
+   same values as base_styling.css, so the two stay legible side by side.
+   Keep them in step when the palette moves.
+
+   Layout was never the problem here: the card is fluid at 94vw and reads
+   correctly from 320px up. What is scoped below is theme and touch.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
+
+:root {
+  --bg-page:           #f0f4f8;
+  --bg-surface:        #ffffff;
+  --text-primary:      #1e293b;
+  --text-secondary:    #475569;
+  --text-tertiary:     #94a3b8;
+  --text-heading:      #0f172a;
+  --text-muted:        #64748b;
+
+  --border-color:      #e2e8f0;
+  --input-bg:          #f8fafc;
+  --input-bg-focus:    #ffffff;
+  --input-border:      #e2e8f0;
+  --input-text:        #1e293b;
+  --input-placeholder: #94a3b8;
+  --input-focus-ring:  rgba(37,99,235,0.14);
+
+  --brand-primary:       #2563eb;
+  --brand-primary-hover: #1d4ed8;
+  --brand-primary-deep:  #1e40af;
+  --brand-accent:        #0ea5e9;
+
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 8px 32px rgba(0,0,0,0.08);
+  --card-hairline: rgba(0,0,0,0.04);
+
+  /* The two soft washes behind the card. */
+  --glow-1: rgba(37,99,235,0.06);
+  --glow-2: rgba(14,165,233,0.05);
+  --glow-3: rgba(99,102,241,0.04);
+}
+
+:root.dark-mode {
+  --bg-page:           #0a0f1e;
+  --bg-surface:        #111827;
+  --text-primary:      #f1f5f9;
+  --text-secondary:    #cbd5e1;
+  --text-tertiary:     #8fa1b8;
+  --text-heading:      #f8fafc;
+  --text-muted:        #94a3b8;
+
+  --border-color:      rgba(255,255,255,0.10);
+  --input-bg:          #1a2234;
+  --input-bg-focus:    #1f2942;
+  --input-border:      rgba(255,255,255,0.10);
+  --input-text:        #e2e8f0;
+  /* base_styling.css uses #475569 for dark placeholders. On this page the
+     placeholder carries the only instruction in the field, at 1.5x the size
+     it has elsewhere, so it is lifted to stay readable on #1a2234. */
+  --input-placeholder: #7c8ba1;
+  --input-focus-ring:  rgba(96,165,250,0.22);
+
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.5), 0 8px 32px rgba(0,0,0,0.45);
+  --card-hairline: rgba(255,255,255,0.06);
+
+  /* The washes have to work harder against #0a0f1e than against #f0f4f8. */
+  --glow-1: rgba(37,99,235,0.14);
+  --glow-2: rgba(14,165,233,0.10);
+  --glow-3: rgba(99,102,241,0.09);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  /* dvh follows the mobile browser's collapsing chrome; vh does not. */
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Stops the card meeting the screen edge on a short landscape viewport. */
+  padding: 22px 16px;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  background: var(--bg-page);
+  /* Subtle geometric pattern */
+  background-image:
+    radial-gradient(circle at 20% 20%, var(--glow-1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, var(--glow-2) 0%, transparent 50%),
+    radial-gradient(circle at 60% 10%, var(--glow-3) 0%, transparent 40%);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== CARD ===== */
+.auth-card {
+  background: var(--bg-surface);
+  border-radius: 20px;
+  box-shadow: var(--card-shadow), 0 0 0 1px var(--card-hairline);
+  padding: 2.5rem 2.25rem;
+  width: 420px;
+  max-width: 94vw;
+  animation: cardIn 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-card { animation: none; }
+}
+
+/* ===== LOGO / BRAND ===== */
+.auth-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.auth-logo-icon {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: #ffffff;
+  margin-bottom: 0.85rem;
+  box-shadow: 0 4px 14px rgba(37,99,235,0.3);
+}
+
+.auth-brand h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin: 0 0 4px;
+  letter-spacing: -0.025em;
+}
+
+.auth-brand p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ===== FORM ===== */
+.auth-form-group {
+  margin-bottom: 1.1rem;
+}
+
+.auth-form-group label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  letter-spacing: 0.01em;
+}
+
+.auth-form-group .form-control,
+.auth-card .form-control {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  border: 1.5px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--input-text);
+  font-family: 'DM Sans', inherit;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  outline: none;
+}
+
+.auth-card .form-control:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+  background: var(--input-bg-focus);
+}
+
+.auth-card .form-control::placeholder {
+  color: var(--input-placeholder);
+}
+
+/* Password field wrapper */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper .form-control {
+  padding-right: 2.8rem;
+}
+
+.toggle-btn {
+  position: absolute;
+  right: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 0.25rem;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-btn:hover {
+  color: var(--text-secondary);
+}
+
+/* ===== SUBMIT BUTTON ===== */
+.auth-card .btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0.68rem 1rem;
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-hover));
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-family: 'DM Sans', inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 0.5rem;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.28);
+  letter-spacing: 0.01em;
+}
+
+.auth-card .btn-primary:hover {
+  background: linear-gradient(135deg, var(--brand-primary-hover), var(--brand-primary-deep));
+  box-shadow: 0 4px 16px rgba(37,99,235,0.38);
+  transform: translateY(-1px);
+}
+
+.auth-card .btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(37,99,235,0.2);
+}
+
+/* loading state */
+.auth-card .btn-primary.loading {
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+/* ===== FOOTER NOTE ===== */
+.auth-footer-note {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+
+/* ===== DIVIDER ===== */
+.auth-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 1.5rem 0 1.25rem;
+}
+
+/* ===== INPUT GROUP (Bootstrap override) ===== */
+.auth-card .input-group {
+  position: relative;
+  display: flex;
+}
+
+.auth-card .input-group .form-control {
+  border-radius: 10px !important;
+  padding-right: 3rem;
+}
+
+/* ===== SWEETALERT =====
+   The failed-login and welcome dialogs are the only other surface this page
+   shows. dark_mode.css carries rules for these but is never loaded here, so
+   without this a white modal opens over a dark card. */
+:root.dark-mode .swal2-popup {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+:root.dark-mode .swal2-title,
+:root.dark-mode .swal2-html-container {
+  color: var(--text-primary);
+}
+
+:root.dark-mode .swal2-timer-progress-bar {
+  background: var(--brand-primary);
+}
+
+/* ============================================================
+   TOUCH
+
+   Keyed on the pointing device rather than on viewport width, because that
+   is what the rule is actually about: an iPad at 768px driven by a finger
+   needs 44px targets, and a 768px desktop window driven by a mouse does
+   not. A width breakpoint would get both of those wrong.
+
+   The 1rem input size is not cosmetic — iOS Safari zooms the whole page
+   when a focused field is under 16px, which throws the card off screen
+   mid-sign-in.
+   ============================================================ */
+@media (pointer: coarse) {
+  .auth-form-group .form-control,
+  .auth-card .form-control {
+    font-size: 1rem;
+    min-height: 48px;
+  }
+
+  .password-wrapper .form-control {
+    padding-right: 3.25rem;
+  }
+
+  .toggle-btn {
+    right: 0.35rem;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+    font-size: 1.05rem;
+  }
+
+  .auth-card .btn-primary {
+    font-size: 1rem;
+    min-height: 48px;
+  }
+}

@@ -1,0 +1,833 @@
+/* ============================================================
+   REPORT EMAIL MODULE
+
+   Loaded after accounts_reports.css, which supplies .table-container and
+   #reportTable for the delivery log; everything else here is the module's
+   own. No hardcoded colours — every value is a token from
+   base_styling.css, so both themes follow from one set of declarations.
+
+   Every @media block is at the BOTTOM of this file, per the convention in
+   CONTEXT.md: a responsive override written above an equal-specificity
+   desktop rule loses silently.
+
+   Motion is decorative throughout and every animation is disabled under
+   prefers-reduced-motion at the end of the file.
+   ============================================================ */
+
+/* ═══════════ Page head ═══════════ */
+.re-page-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.1rem;
+  animation: re-rise 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.re-page-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--tint-cyan);
+  color: var(--ink-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.re-page-head h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.re-page-head p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+
+/* ═══════════ Status hero ═══════════
+   The one screen element that answers "is this actually going to happen
+   tonight?" without reading anything else. */
+.re-hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  padding: 1.15rem 1.35rem;
+  margin-bottom: 1.1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+  animation: re-rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+
+/* A slow drift behind the card. Sits under the content and cannot move it. */
+.re-hero-glow {
+  position: absolute;
+  inset: -60% -20%;
+  background:
+    radial-gradient(38% 55% at 18% 40%, var(--tint-cyan) 0%, transparent 70%),
+    radial-gradient(34% 50% at 78% 60%, var(--tint-blue) 0%, transparent 72%);
+  opacity: 0.85;
+  animation: re-drift 22s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.re-hero-main,
+.re-hero-next { position: relative; }
+
+.re-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.re-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--text-tertiary);
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* The halo is a pseudo-element so the dot itself never changes size and
+   cannot nudge the text beside it. */
+.re-dot::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  opacity: 0;
+}
+
+.re-hero.is-armed   .re-dot { background: var(--brand-success); color: var(--brand-success); }
+.re-hero.is-armed   .re-dot::after { animation: re-ping 2.4s ease-out infinite; }
+.re-hero.is-armed   .re-status-text { color: var(--ink-green); }
+/* Settled for the day, not idle. A steady dot rather than the armed ping:
+   nothing is pending, so nothing should look like it is counting down to a
+   send that is not coming. */
+.re-hero.is-delivered .re-dot { background: var(--brand-primary); color: var(--brand-primary); }
+.re-hero.is-delivered .re-status-text { color: var(--ink-blue); }
+.re-hero.is-paused  .re-dot { background: var(--brand-warning); color: var(--brand-warning); }
+.re-hero.is-paused  .re-status-text { color: var(--ink-amber); }
+.re-hero.is-blocked .re-dot { background: var(--brand-danger); color: var(--brand-danger); }
+.re-hero.is-blocked .re-status-text { color: var(--ink-red); }
+
+.re-hero-line {
+  margin: 0.5rem 0 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  max-width: 62ch;
+}
+
+.re-rearm { margin-top: 0.7rem; }
+
+.re-hero-next {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.re-hero-next-label,
+.re-hero-next-at {
+  font-size: 0.68rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+
+.re-countdown {
+  font-family: var(--font-mono);
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════ Tabs ═══════════ */
+.re-tabs {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  margin-bottom: 1rem;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+  scrollbar-width: none;
+  animation: re-rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.re-tabs::-webkit-scrollbar { display: none; }
+
+.re-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.55rem 0.95rem;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--transition), background var(--transition);
+}
+
+.re-tab i { font-size: 0.8rem; opacity: 0.8; }
+.re-tab:hover { background: var(--bg-surface-alt); color: var(--text-primary); }
+.re-tab.is-active { color: var(--brand-primary); }
+.re-tab:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
+
+.re-tab-count {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--tint-blue);
+  color: var(--ink-blue);
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+/* Slides between tabs rather than jumping, so the eye follows which panel
+   it is going to. Positioned from JS, which measures the active tab. */
+.re-tab-marker {
+  position: absolute;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--brand-primary);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              width 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, width;
+}
+
+.re-panel { display: none; }
+.re-panel.is-active {
+  display: block;
+  animation: re-fade 0.32s ease both;
+}
+
+/* ═══════════ Cards ═══════════ */
+.re-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 1.15rem 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.re-card-soft { background: var(--bg-surface-alt); }
+
+.re-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.re-card-head h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.re-card-head h3 i { color: var(--ink-cyan); font-size: 0.88rem; }
+
+.re-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.re-foot-note {
+  font-size: 0.76rem;
+  color: var(--text-tertiary);
+  min-width: 0;
+}
+
+.re-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+.re-hint {
+  margin: 0.85rem 0 0;
+  font-size: 0.76rem;
+  color: var(--text-tertiary);
+  line-height: 1.55;
+}
+
+/* ═══════════ Fields ═══════════ */
+.re-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(232px, 1fr));
+  gap: 0.9rem 1rem;
+}
+
+.re-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.re-field-wide { grid-column: 1 / -1; }
+
+.re-field > label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.re-optional {
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-tertiary);
+}
+
+.re-field input[type="text"],
+.re-field input[type="email"],
+.re-field input[type="password"],
+.re-field input[type="number"],
+.re-field input[type="date"],
+.re-field input[type="time"] {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-md);
+  background: var(--input-bg);
+  color: var(--input-text);
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.re-field input::placeholder { color: var(--input-placeholder); }
+
+.re-field input:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+}
+
+.re-field input.is-invalid {
+  border-color: var(--brand-danger);
+  animation: re-shake 0.35s ease;
+}
+
+.re-field small {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+.re-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  padding-top: 1.35rem;
+}
+
+.re-check input { width: 17px; height: 17px; accent-color: var(--brand-primary); cursor: pointer; }
+
+.re-password { position: relative; display: flex; }
+.re-password input { padding-right: 2.6rem; }
+
+.re-eye {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color var(--transition), background var(--transition);
+}
+
+.re-eye:hover { color: var(--ink-blue); background: var(--tint-blue); }
+
+/* The mail server is the one thing here that is right on the first day and
+   never touched again, so it folds away rather than competing with the
+   fields that do change. The summary keeps the current values in view, so
+   folding it does not hide what is configured. */
+.re-advanced {
+  margin-top: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-alt);
+}
+
+.re-advanced > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.65rem 0.85rem;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  list-style: none;
+  border-radius: var(--radius-md);
+}
+
+.re-advanced > summary::-webkit-details-marker { display: none; }
+.re-advanced > summary:hover { color: var(--text-primary); }
+.re-advanced > summary:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
+.re-advanced > summary i { font-size: 0.8rem; color: var(--ink-cyan); }
+
+.re-advanced > summary small {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.re-chevron {
+  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text-tertiary) !important;
+}
+
+.re-advanced[open] .re-chevron { transform: rotate(180deg); }
+
+.re-grid-advanced {
+  padding: 0 0.85rem 0.95rem;
+  animation: re-fade 0.28s ease both;
+}
+
+/* ═══════════ Switch ═══════════ */
+.re-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.re-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.re-switch-track {
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--border-strong);
+  position: relative;
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+
+.re-switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.re-switch input:checked + .re-switch-track { background: var(--brand-success); }
+.re-switch input:checked + .re-switch-track .re-switch-thumb { transform: translateX(20px); }
+.re-switch input:focus-visible + .re-switch-track {
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+}
+
+.re-switch-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ═══════════ Buttons ═══════════ */
+.re-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.58rem 1.05rem;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-family: var(--font-sans);
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.14s ease, box-shadow var(--transition),
+              background var(--transition), border-color var(--transition);
+}
+
+.re-btn:active { transform: translateY(1px); }
+.re-btn:focus-visible { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
+
+.re-btn-primary {
+  background: var(--brand-primary);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.re-btn-primary:hover { background: var(--brand-primary-hover); box-shadow: var(--shadow-md); }
+
+.re-btn-ghost {
+  background: transparent;
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+.re-btn-ghost:hover {
+  background: var(--bg-surface-alt);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.re-btn-sm { padding: 0.4rem 0.75rem; font-size: 0.78rem; }
+
+.re-btn-danger { background: transparent; border-color: transparent; color: var(--text-tertiary); }
+.re-btn-danger:hover { background: var(--tint-red); color: var(--ink-red); }
+
+.re-btn[disabled] { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* A button that is working says so in place, rather than leaving the person
+   wondering whether the click landed. */
+.re-btn.is-busy { pointer-events: none; }
+.re-btn.is-busy i { animation: re-spin 0.8s linear infinite; }
+.re-btn.is-busy i::before { content: "\f110"; }
+
+/* ═══════════ Recipients ═══════════ */
+.re-add-row {
+  display: grid;
+  grid-template-columns: 2fr 1.3fr auto;
+  gap: 0.75rem;
+  align-items: end;
+  padding-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.re-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+.re-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  animation: re-slide-in 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: border-color var(--transition), box-shadow var(--transition),
+              opacity 0.24s ease, transform 0.24s ease;
+}
+
+.re-item:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+.re-item.is-leaving { opacity: 0; transform: translateX(14px); }
+.re-item.is-inactive { opacity: 0.62; }
+
+.re-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--tint-purple);
+  color: var(--ink-purple);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.re-item-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+
+.re-item-email {
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.re-item-meta { font-size: 0.72rem; color: var(--text-tertiary); }
+
+.re-item-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+.re-empty {
+  text-align: center;
+  padding: 2.4rem 1rem;
+  color: var(--text-tertiary);
+  animation: re-fade 0.4s ease both;
+}
+
+.re-empty i { font-size: 1.9rem; opacity: 0.35; display: block; margin-bottom: 0.7rem; }
+.re-empty p { margin: 0; font-size: 0.86rem; }
+
+/* ═══════════ Delivery log ═══════════ */
+.re-log-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+.re-stat {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 0.8rem 0.95rem;
+  box-shadow: var(--shadow-sm);
+  animation: re-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.re-stat-label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.re-stat-value {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding-top: 3px;
+}
+
+.re-stat.is-sent   .re-stat-value { color: var(--ink-green); }
+.re-stat.is-failed .re-stat-value { color: var(--ink-red); }
+
+.re-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.re-pill-sent    { background: var(--tint-green); color: var(--ink-green); }
+.re-pill-failed  { background: var(--tint-red);   color: var(--ink-red); }
+.re-pill-skipped { background: var(--tint-amber); color: var(--ink-amber); }
+
+.re-trigger {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* The error belongs with the row that failed, not in a tooltip nobody opens. */
+.re-error {
+  display: block;
+  max-width: 46ch;
+  font-size: 0.74rem;
+  color: var(--ink-red);
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+/* ═══════════ Toasts ═══════════ */
+.re-toasts {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: min(360px, calc(100vw - 36px));
+}
+
+.re-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.83rem;
+  color: var(--text-primary);
+  animation: re-toast-in 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: opacity 0.24s ease, transform 0.24s ease;
+}
+
+.re-toast.is-leaving { opacity: 0; transform: translateX(16px); }
+.re-toast i { flex-shrink: 0; margin-top: 2px; }
+.re-toast-ok   { border-left: 3px solid var(--brand-success); }
+.re-toast-ok i { color: var(--ink-green); }
+.re-toast-bad  { border-left: 3px solid var(--brand-danger); }
+.re-toast-bad i { color: var(--ink-red); }
+.re-toast-info { border-left: 3px solid var(--brand-primary); }
+.re-toast-info i { color: var(--ink-blue); }
+
+/* ═══════════ Keyframes ═══════════ */
+@keyframes re-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes re-fade {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes re-slide-in {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes re-toast-in {
+  from { opacity: 0; transform: translateX(22px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes re-ping {
+  0%   { opacity: 0.7; transform: scale(0.7); }
+  70%  { opacity: 0;   transform: scale(1.5); }
+  100% { opacity: 0;   transform: scale(1.5); }
+}
+
+@keyframes re-drift {
+  from { transform: translate3d(-4%, -2%, 0) scale(1); }
+  to   { transform: translate3d(4%, 3%, 0) scale(1.08); }
+}
+
+@keyframes re-spin { to { transform: rotate(360deg); } }
+
+@keyframes re-shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-4px); }
+  75%      { transform: translateX(4px); }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE AND MOTION BLOCKS
+   Everything below is a @media block, and they are last in the file on
+   purpose. See the header comment.
+   ═══════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .re-hero { align-items: flex-start; }
+  .re-hero-next { text-align: left; }
+  .re-add-row { grid-template-columns: 1fr 1fr; }
+  .re-add-row .re-btn { grid-column: 1 / -1; justify-content: center; }
+}
+
+@media (max-width: 640px) {
+  .re-hero { padding: 1rem; gap: 0.9rem; }
+  .re-hero-line { font-size: 0.85rem; }
+  .re-countdown { font-size: 1.3rem; }
+  .re-grid { grid-template-columns: 1fr; }
+  .re-field-narrow { grid-column: auto; }
+  .re-check { padding-top: 0; }
+  .re-add-row { grid-template-columns: 1fr; }
+  .re-card { padding: 0.95rem 1rem; }
+  .re-card-foot { flex-direction: column; align-items: stretch; }
+  .re-actions { width: 100%; }
+  .re-actions .re-btn { flex: 1; }
+  .re-manual { flex-direction: column; align-items: stretch; }
+  .re-manual .re-btn { width: 100%; }
+  .re-item { flex-wrap: wrap; }
+  .re-item-actions { width: 100%; justify-content: flex-end; }
+  .re-toasts { left: 12px; right: 12px; bottom: 12px; max-width: none; }
+}
+
+/* Keyed on the pointing device rather than on width: an iPad at 768px driven
+   by a finger needs this and a 768px desktop window does not. base_styling.css
+   already floors inputs, selects and buttons at 44px; these are the module's
+   own controls, which take their height from their content. */
+@media (pointer: coarse) {
+  .re-tab { min-height: 44px; }
+  .re-eye { width: 44px; height: 44px; }
+  /* A checkbox is excluded from the base 44px floor, correctly -- but the
+     label around it is the tap target, and the phone block above zeroes the
+     padding that was giving it height. Measured at 18px before this. */
+  .re-check { min-height: 44px; align-items: center; }
+  .re-check input { width: 20px; height: 20px; }
+  .re-advanced > summary { min-height: 44px; }
+  .re-switch-track { width: 52px; height: 30px; }
+  .re-switch-thumb { width: 24px; height: 24px; }
+  .re-switch input:checked + .re-switch-track .re-switch-thumb { transform: translateX(22px); }
+  .re-switch { min-height: 44px; }
+}
+
+/* Every animation in this file is decoration. None of it carries meaning that
+   the text beside it does not, so all of it goes when the viewer has asked for
+   less motion — including the hero glow, which is the only thing here that
+   moves without being asked. */
+@media (prefers-reduced-motion: reduce) {
+  .re-page-head,
+  .re-hero,
+  .re-tabs,
+  .re-panel.is-active,
+  .re-grid-advanced,
+  .re-item,
+  .re-stat,
+  .re-toast,
+  .re-empty { animation: none; }
+  .re-hero-glow { animation: none; }
+  .re-hero.is-armed .re-dot::after { animation: none; opacity: 0; }
+  .re-tab-marker { transition: none; }
+  .re-chevron { transition: none; }
+  .re-btn.is-busy i { animation: none; }
+  .re-field input.is-invalid { animation: none; }
+}
+
+.re-panel[hidden], .re-rearm[hidden] { display:none !important; }
+.re-capture-note {padding:12px;border:1px solid var(--border-color);background:var(--card-bg);color:var(--text-primary);border-radius:8px;}
+.re-pill-unknown { color:var(--ink-amber);background:var(--tint-amber); }
+.re-pill-pending,.re-pill-sending { color:var(--ink-blue);background:var(--tint-blue); }

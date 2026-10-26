@@ -1,0 +1,375 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Theme: dark unless 'light' is explicitly stored (localStorage 'theme', per
+       browser). Runs before any stylesheet so a dark page never paints light
+       for a frame. Every place that decides the theme must agree: this
+       script, the one at the start of <body>, the login and suspended pages,
+       and static/js/dark_mode.js (PROJECT_CONTEXT.md, Dark Mode). -->
+  <script>
+    (function () {
+      var dark = true;
+      try { dark = localStorage.getItem('theme') !== 'light'; } catch (e) {}
+      if (dark) document.documentElement.classList.add('dark-mode');
+    })();
+  </script>
+  <title>{% block title %}{% endblock title %}</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+  <!-- Excel File Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+
+  <!-- Per-company feature flags (admin-controlled). JS-built toolbars read
+       window.FinanceeFeatures to hide disabled controls (e.g. CSV export). -->
+  {% comment %}
+    Must be the raw dict: json_script serializes it once. A pre-dumped
+    string would be double-encoded and the JS checks would fail open.
+  {% endcomment %}
+  {{ features|json_script:"financee-features" }}
+  <script>
+    window.FinanceeFeatures = JSON.parse(document.getElementById("financee-features").textContent);
+    // financeeFeatureEnabled("stock_reports")            -> group switch
+    // financeeFeatureEnabled("excel_export")             -> single feature
+    // financeeFeatureEnabled("sales_reports", "trend")   -> sub-report switch
+    // Fails open: unknown keys / missing map mean "enabled".
+    window.financeeFeatureEnabled = function (group, sub) {
+      const g = window.FinanceeFeatures && window.FinanceeFeatures[group];
+      if (!g) return true;
+      if (g.enabled === false) return false;
+      return !sub || !g.subs || g.subs[sub] !== false;
+    };
+  </script>
+
+  {% if activity_config %}
+  {{ activity_config|json_script:"activity-config" }}
+  <script src="{% static 'js/activity_ping.js' %}"></script>
+  {% endif %}
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Your global CSS -->
+  <link rel="stylesheet" href="{% static 'css/base_styling.css' %}">
+
+  <!-- Dark Mode Css -->
+  <link rel="stylesheet" href="{% static 'css/dark_mode.css' %}">
+
+  <!-- Unified alert layer (animations + theming for alerts.js) -->
+  <link rel="stylesheet" href="{% static 'css/alerts.css' %}">
+
+  <!-- Subscription renewal banner + suspended page -->
+  <link rel="stylesheet" href="{% static 'css/subscription.css' %}">
+
+  {% if spotlight_config %}<link rel="stylesheet" href="{% static 'css/spotlight.css' %}">{% endif %}
+  {% block SeperateCssFile %}{% endblock SeperateCssFile %}
+
+  <style>
+    
+    
+  </style>
+</head>
+<body>
+  <script>
+    /* dark_mode.css also keys rules off body.dark-mode, and the <head>
+       script cannot reach <body> before it exists. */
+    document.body.classList.toggle('dark-mode',
+      document.documentElement.classList.contains('dark-mode'));
+  </script>
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <!-- Fixed Header -->
+        <div class="sidebar-header">
+            <h2><i class="fa-solid fa-coins"></i> Financee</h2>
+            <div class="sidebar-search">
+            <input type="text" id="sidebarSearch" placeholder="Search..." onkeyup="filterNavLinks()" />
+            <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+        </div>
+
+        {% if spotlight_config %}
+        <button class="spotlight-open" type="button" data-open-spotlight aria-haspopup="dialog">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <span class="spotlight-open-label">Search everything</span><kbd class="spotlight-open-kbd">⌘ / Ctrl K</kbd>
+        </button>
+        {% endif %}
+        <!-- Scrollable Nav -->
+        <div class="sidebar-scroll">
+            <nav class="nav-links">
+            <a href="{% url 'home:home' %}" class="{% if request.resolver_match.url_name == 'home' or request.resolver_match.url_name == 'home_redirect' %}active{% endif %}">
+                <i class="fa-solid fa-house"></i> {% if features.dashboard.enabled %}Dashboard{% else %}Home{% endif %}
+            </a>
+            {% if features.sales.enabled %}
+            <a href="{% url 'sale:sales' %}" class="{% if request.resolver_match.url_name == 'sales' %}active{% endif %}">
+                <i class="fa-solid fa-cart-arrow-down"></i> Sales
+            </a>
+            {% endif %}
+            {% if draft_sales_enabled and features.draft_invoices.enabled %}
+            {% if perms.auth.view_draft_invoice and features.draft_invoices.subs.drafts %}
+            <a href="{% url 'draft:draft_page' %}" class="{% if request.resolver_match.namespace == 'draft' and request.resolver_match.url_name == 'draft_page' %}active{% endif %}">
+                <i class="fa-solid fa-file-pen"></i> Draft Invoices
+            </a>
+            {% endif %}
+            {% if perms.auth.confirm_draft_invoice and features.draft_invoices.subs.confirm %}
+            <a href="{% url 'draft:convert_page' %}" class="{% if request.resolver_match.namespace == 'draft' and request.resolver_match.url_name == 'convert_page' %}active{% endif %}">
+                <i class="fa-solid fa-file-circle-check"></i> Confirm Draft
+            </a>
+            {% endif %}
+            {% if perms.auth.view_draft_return and features.draft_invoices.subs.returns %}
+            <a href="{% url 'draft:draft_return_page' %}" class="{% if request.resolver_match.namespace == 'draft' and request.resolver_match.url_name == 'draft_return_page' %}active{% endif %}">
+                <i class="fa-solid fa-file-arrow-up"></i> Confirmed Draft Return
+            </a>
+            {% endif %}
+            {% if perms.auth.view_pending_drafts_report and features.draft_invoices.subs.pending_report %}
+            <a href="{% url 'draft:pending_report_page' %}" class="{% if request.resolver_match.namespace == 'draft' and request.resolver_match.url_name == 'pending_report_page' %}active{% endif %}">
+                <i class="fa-solid fa-hourglass-half"></i> Pending Drafts
+            </a>
+            {% endif %}
+            {% endif %}
+            {% if features.purchases.enabled %}
+            <a href="{% url 'purchase:purchasing' %}" class="{% if request.resolver_match.url_name == 'purchasing' %}active{% endif %}">
+                <i class="fa-solid fa-bag-shopping"></i> Purchases
+            </a>
+            {% endif %}
+            {% if features.payments.enabled %}
+            <a href="{% url 'payments:payment' %}" class="{% if request.resolver_match.url_name == 'payment' %}active{% endif %}">
+                <i class="fa-solid fa-credit-card"></i> Payments
+            </a>
+            {% endif %}
+            {% if features.receipts.enabled %}
+            <a href="{% url 'receipts:receipt' %}" class="{% if request.resolver_match.url_name == 'receipt' %}active{% endif %}">
+                <i class="fa-solid fa-receipt"></i> Receipts
+            </a>
+            {% endif %}
+            {% if perms.auth.view_contra_entry and features.contra.enabled %}
+            <a href="{% url 'contra:contra' %}" class="{% if request.resolver_match.url_name == 'contra' %}active{% endif %}">
+                <i class="fa-solid fa-right-left"></i> Contra Entry
+            </a>
+            {% endif %}
+            {% if features.sale_returns.enabled %}
+            <a href="{% url 'saleReturn:create_sale_return' %}" class="{% if request.resolver_match.url_name == 'create_sale_return' %}active{% endif %}">
+                <i class="fa-solid fa-rotate-left"></i> Sale Return
+            </a>
+            {% endif %}
+            {% if features.purchase_returns.enabled %}
+            <a href="{% url 'purchaseReturn:create_purchase_return' %}" class="{% if request.resolver_match.url_name == 'create_purchase_return' %}active{% endif %}">
+                <i class="fa-solid fa-rotate-right"></i> Purchase Return
+            </a>
+            {% endif %}
+            {% if features.items.enabled %}
+            <a href="{% url 'items:itemsDash' %}" class="{% if request.resolver_match.namespace == 'items' %}active{% endif %}">
+                <i class="fa-solid fa-box"></i> Items
+            </a>
+            {% endif %}
+            {% if features.parties.enabled %}
+            <a href="{% url 'parties:partiesDash' %}" class="{% if request.resolver_match.namespace == 'parties' %}active{% endif %}">
+                <i class="fa-solid fa-users"></i> Parties
+            </a>
+            {% endif %}
+            {% if features.accounts_reports.enabled %}
+            <a href="{{ features.accounts_reports.landing }}" class="{% if request.resolver_match.url_name == 'cash_ledger' %}active{% endif %}">
+                <i class="fa-solid fa-book-open"></i> Accounts Reports
+            </a>
+            {% endif %}
+            {% if features.stock_reports.enabled %}
+            <a href="{{ features.stock_reports.landing }}" class="{% if request.resolver_match.url_name == 'stock_summary' %}active{% endif %}">
+                <i class="fa-solid fa-warehouse"></i> Stock Reports
+            </a>
+            {% endif %}
+            {% if features.monthly_reports.enabled %}
+            <a href="{{ features.monthly_reports.landing }}" class="{% if request.resolver_match.url_name == 'monthly_position_report' or request.resolver_match.url_name == 'monthly_income_report' %}active{% endif %}">
+                <i class="fa-solid fa-chart-pie"></i> Monthly Reports
+            </a>
+            {% endif %}
+            {% if perms.auth.can_set_or_update_opening and features.opening_cash.enabled %}
+            <a href="{% url 'set_opening:set_opening' %}" class="{% if request.resolver_match.url_name == 'set_opening' %}active{% endif %}">
+                <i class="fa-solid fa-sliders"></i> Set Opening
+            </a>
+            {% endif %}
+            {% if perms.auth.can_manage_owner_equity and features.owner_equity.enabled %}
+            <a href="{% url 'owner_equity:owner_equity' %}" class="{% if request.resolver_match.url_name == 'owner_equity' %}active{% endif %}">
+                <i class="fa-solid fa-user-tie"></i> Owner Equity
+            </a>
+            {% endif %}
+            {% if perms.auth.can_close_period and features.month_close.enabled %}
+            <a href="{% url 'month_close:month_close' %}" class="{% if request.resolver_match.url_name == 'month_close' %}active{% endif %}">
+                <i class="fa-solid fa-calendar-check"></i> Month-End Close
+            </a>
+            {% endif %}
+            {% if features.sales_reports.enabled %}
+            {# Any one of SALES_REPORT_PERMS (financee/security.py) opens the page; keep this list in sync. #}
+            {% if perms.auth.can_view_sales_summary or perms.auth.can_view_product_profitability or perms.auth.can_view_customer_profitability or perms.auth.can_view_sales_by_product or perms.auth.can_view_sales_by_customer or perms.auth.can_view_sale_wise_profit or perms.auth.can_view_sales_trend or perms.auth.can_view_invoice_register %}
+            <a href="{% url 'sales_reports:sales_reports' %}" class="{% if request.resolver_match.url_name == 'sales_reports' %}active{% endif %}">
+                <i class="fa-solid fa-chart-line"></i> Sales Reports
+            </a>
+            {% endif %}
+            {% endif %}
+            {% if perms.auth.view_opening_stock and features.opening_stock.enabled %}
+            <a href="{% url 'opening_stock:opening_stock' %}" class="{% if request.resolver_match.url_name == 'opening_stock' %}active{% endif %}">
+                <i class="fa-solid fa-boxes-stacked"></i> Opening Stock
+            </a>
+            {% endif %}
+            {% if team_activity_available %}
+            <a href="{% url 'activity:page' %}" class="{% if request.resolver_match.app_name == 'activity' %}active{% endif %}"><i class="fa-solid fa-chart-simple"></i> Team Activity</a>
+            {% endif %}
+            {% if features.report_email.enabled and features.sales_reports.enabled and features.sales_reports.subs.sale_wise and perms.auth.send_reports and perms.auth.can_view_sale_wise_profit and report_email_enabled %}
+            <a href="{% url 'reportmailer:report_email' %}" class="{% if request.resolver_match.app_name == 'reportmailer' %}active{% endif %}"><i class="fa-solid fa-paper-plane"></i> Report Email</a>
+            {% endif %}
+            </nav>
+        </div>
+
+        <!-- Footer -->
+        <div class="sidebar-footer">
+            <div class="user_name"><i class="fa-solid fa-user"></i>  <span id="username">-</span></div>
+            {% if request.tenant_company %}
+            <div class="user_name company_name"><i class="fa-solid fa-building"></i>  <span id="companyname">{{ request.tenant_company.name }}</span></div>
+            {% endif %}
+            <hr>
+
+            <button type="button" class="theme-toggle" id="themeToggle" data-theme-toggle aria-pressed="false">
+                <i class="fa-solid fa-moon" id="themeIcon" aria-hidden="true"></i>
+                <span id="themeText">Dark Mode</span>
+            </button>
+            <a href="{% url 'authentication:logout' %}" class="logout-link">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <i class="fa-solid fa-bars menu-toggle" id="menuToggle"></i>
+
+      {% if subscription_notice %}
+      <div id="subscriptionBanner" class="subscription-banner {{ subscription_notice.state }}"
+           data-banner-key="subscription-banner-{{ subscription_notice.state }}-{{ subscription_notice.paid_until|date:'Y-m-d' }}"
+           hidden>
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>
+          {% if subscription_notice.state == 'grace' %}
+            Your subscription expired on {{ subscription_notice.paid_until|date:"d M Y" }}.
+            Access will be suspended on {{ subscription_notice.blocked_on|date:"d M Y" }} — please arrange the renewal payment.
+          {% else %}
+            Your subscription expires on {{ subscription_notice.paid_until|date:"d M Y" }}
+            ({{ subscription_notice.days_left }} day{{ subscription_notice.days_left|pluralize }} left).
+            Please arrange the renewal payment to avoid interruption.
+          {% endif %}
+        </span>
+        <button type="button" class="subscription-banner-close" aria-label="Dismiss">&times;</button>
+      </div>
+      <script>
+        (function () {
+          const banner = document.getElementById("subscriptionBanner");
+          if (!banner) return;
+          const key = banner.dataset.bannerKey;
+          if (!sessionStorage.getItem(key)) banner.hidden = false;
+          banner.querySelector(".subscription-banner-close").addEventListener("click", () => {
+            sessionStorage.setItem(key, "1");
+            banner.hidden = true;
+          });
+        })();
+      </script>
+      {% endif %}
+
+      {% block body %}
+      {% endblock body %}
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Unified alert layer: exposes the global `Alerts` helper. Must load
+       after SweetAlert2 and before any page script that raises alerts. -->
+  <script src="{% static 'js/alerts.js' %}"></script>
+  <script>
+    function filterNavLinks() {
+    const query = document.getElementById("sidebarSearch").value.toLowerCase();
+    document.querySelectorAll(".nav-links a").forEach(link => {
+        const text = link.textContent.toLowerCase();
+        link.classList.toggle("hidden-link", !text.includes(query));
+    });
+    }
+   </script>
+  <!-- JS for menu toggle -->
+  <script>
+    const toggle = document.getElementById("menuToggle");
+    const sidebar = document.querySelector(".sidebar");
+    toggle.addEventListener("click", () => {
+      sidebar.classList.toggle("open");
+    });
+  </script>
+  {% if messages %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            {% for message in messages %}
+                {% if 'error' in message.tags %}
+                // Swal.fire({
+                //     icon: "error",
+                //     title: "Access Denied",
+                //     text: "{{ message|escapejs }}",
+                // });
+                Alerts.error("{{ message|escapejs }}", { title: "Access Denied" });
+                {% endif %}
+            {% endfor %}
+        });
+    </script>
+  {% endif %} 
+    <script>
+        async function fetchCurrentUser() {
+            try {
+                const response = await fetch("/authentication/current/user/", {
+                    method: "GET",
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+
+                const data = await response.json();
+
+                // Update HTML dynamically
+                document.getElementById("username").textContent = data.username;
+            } catch (error) {
+                console.error("Fetch error:", error);
+            }
+        }
+
+        // Call once immediately
+        fetchCurrentUser();
+
+        // Call every 3 seconds (live update)
+        setInterval(fetchCurrentUser, 3000);
+    </script>
+    <script src="{% static 'js/dark_mode.js' %}"></script>
+    <script src="{% static 'js/record_link.js' %}"></script>
+    {% if spotlight_config %}
+    {{ spotlight_config|json_script:"spotlight-config" }}
+    <button class="spotlight-fab" type="button" data-open-spotlight aria-label="Search everything" aria-haspopup="dialog"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></button>
+    <div class="sp-layer" id="spotlight-layer" hidden>
+      <section class="sp-panel" role="dialog" aria-modal="true" aria-label="Search everything">
+        <div class="sp-head">
+          <i class="sp-glass fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input class="sp-input" id="spotlight-query" type="search" maxlength="150" placeholder="Search names, serials, documents, pages…" autocomplete="off" role="combobox" aria-label="Search everything" aria-autocomplete="list" aria-controls="spotlight-results" aria-expanded="false">
+          <button class="sp-close" id="spotlight-close" type="button" aria-label="Close search">Esc</button>
+        </div>
+        <div class="sp-list" id="spotlight-results" role="listbox" aria-label="Search results"></div>
+        <div class="sp-foot"><span class="sp-foot-hint">↑ ↓ Navigate · Enter Open · Esc Close</span><button id="spotlight-clear" class="sp-clear" type="button">Clear recent records</button></div>
+        <span id="spotlight-live" class="sp-live" role="status" aria-live="polite"></span>
+      </section>
+    </div>
+    <script src="{% static 'js/spotlight.js' %}"></script>
+    {% endif %}
+
+</body>
+</html>

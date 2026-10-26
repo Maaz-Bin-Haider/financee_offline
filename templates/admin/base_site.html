@@ -1,0 +1,46 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ financee_system_name|default:"Financee" }} Admin{% endblock %}
+
+{% comment %}
+The admin stays light: blanking this block drops Django's admin
+dark-theme CSS variables and theme.js, so the admin always renders the
+light Financee theme. The tenant pages' dark mode (PROJECT_CONTEXT.md,
+Dark Mode) does not reach the admin.
+{% endcomment %}
+{% block dark-mode-vars %}{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+{% endblock %}
+
+{% block responsive %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/financee_admin.css' %}">
+{% endblock %}
+
+{% block branding %}
+<div id="site-name" class="financee-brand">
+  <span class="brand-mark"><i class="fa-solid fa-chart-pie"></i></span>
+  <a href="{% url 'admin:index' %}">
+    <span class="brand-text">
+      <span class="brand-name">{{ financee_system_name|default:"Financee" }}</span>
+      <span class="brand-tag">{{ financee_tagline|default:"Accounting Plus Inventory Management System" }}</span>
+    </span>
+  </a>
+</div>
+{% comment %}
+The admin stays light: the anonymous-page toggle include is disabled
+(the shared color_theme_toggle.html override is blank anyway).
+{% endcomment %}
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block footer %}
+<div id="footer"></div>
+<div class="fin-admin-footer">
+  {{ financee_system_name|default:"Financee" }} — {{ financee_tagline|default:"Accounting Plus Inventory Management System" }}
+  &nbsp;·&nbsp; Developed by <strong>{{ financee_developer|default:"Maaz Rehan" }}</strong>
+</div>
+{% endblock %}

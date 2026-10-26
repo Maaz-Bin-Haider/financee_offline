@@ -1,0 +1,118 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Owner Equity{% endblock title %}
+
+{% block SeperateCssFile %}
+<link rel="stylesheet" href="{% static 'css/owner_equity.css' %}">
+{% endblock SeperateCssFile %}
+
+{% block body %}
+
+<!-- Page title bar -->
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:1.1rem;">
+  <div style="width:36px;height:36px;background:var(--brand-primary-light);border-radius:var(--radius-md);
+              display:flex;align-items:center;justify-content:center;color:var(--brand-primary);font-size:0.95rem;flex-shrink:0;">
+    <i class="fa-solid fa-user-tie"></i>
+  </div>
+  <div>
+    <h2 style="margin:0;font-size:1.2rem;font-weight:700;letter-spacing:-0.02em;">Owner Equity</h2>
+    <p style="margin:0;font-size:0.78rem;color:var(--text-tertiary);">Owner withdrawals &amp; capital injections</p>
+  </div>
+</div>
+
+<div class="reports-wrapper">
+
+  <!-- ====== CONTENT PANEL (full width) ====== -->
+  <section class="right-panel">
+
+    <!-- Summary stat cards -->
+    <div class="oe-stats">
+      <div class="oe-stat">
+        <span class="oe-stat-label">Capital Injected</span>
+        <span class="oe-stat-value oe-stat-in" id="oe-total-inj">—</span>
+      </div>
+      <div class="oe-stat">
+        <span class="oe-stat-label">Withdrawn</span>
+        <span class="oe-stat-value oe-stat-out" id="oe-total-wd">—</span>
+      </div>
+      <div class="oe-stat oe-stat-net">
+        <span class="oe-stat-label">Net Contributed</span>
+        <span class="oe-stat-value" id="oe-net">—</span>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="oe-form">
+        <div class="filter-field">
+          <label for="oe-direction">Type</label>
+          <select id="oe-direction">
+            <option value="withdrawal">Withdrawal (owner takes money out)</option>
+            <option value="injection">Capital injection (owner puts money in)</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label for="oe-account">Capital account</label>
+          <select id="oe-account"></select>
+        </div>
+        <div class="filter-field">
+          <label for="oe-amount">Amount</label>
+          <input type="number" id="oe-amount" step="0.01" min="0" placeholder="0.00">
+        </div>
+        <div class="filter-field">
+          <label for="oe-date">Date</label>
+          <input type="date" id="oe-date">
+        </div>
+        <div class="filter-field oe-grow">
+          <label for="oe-desc">Note (optional)</label>
+          <input type="text" id="oe-desc" placeholder="e.g. monthly drawing">
+        </div>
+        <button type="button" class="generate-btn" id="oe-save-btn">
+          <i class="fa-solid fa-floppy-disk"></i> Record
+        </button>
+      </div>
+
+      <p class="oe-hint">
+        A withdrawal posts <strong>Debit Owner's Capital / Credit Cash</strong>; a capital
+        injection posts <strong>Debit Cash / Credit Owner's Capital</strong>. No cash is
+        invented and no party is involved, so the Company Position's Net Position moves by
+        exactly this amount.
+      </p>
+
+      <div class="oe-list-header">
+        <h3 class="oe-list-title">Recent owner-equity entries</h3>
+        <div class="table-actions">
+          {% if features.pdf_export.subs.reports %}
+          <button type="button" id="oe-download-pdf" class="btn-download">
+            <i class="fa-solid fa-file-pdf"></i> PDF
+          </button>
+          {% endif %}
+          {% if features.excel_export.enabled %}
+          <button type="button" id="oe-download-csv" class="btn-download btn-csv">
+            <i class="fa-solid fa-file-csv"></i> CSV
+          </button>
+          {% endif %}
+        </div>
+      </div>
+      <div class="oe-table-wrap">
+        <table class="oe-table">
+          <thead>
+            <tr><th>Date</th><th>Type</th><th>Account</th><th>Amount</th><th>Note</th><th></th></tr>
+          </thead>
+          <tbody id="oe-tbody">
+            <tr><td colspan="6" class="oe-empty">No entries yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<!-- Dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="{% static 'js/owner_equity.js' %}"></script>
+
+{% endblock body %}

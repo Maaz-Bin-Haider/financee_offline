@@ -1,0 +1,47 @@
+<div class="attachment-widget" id="attachments_panel">
+  <div class="attachment-widget-header">
+    <div class="attachment-widget-title">
+      <span class="attachment-title-icon"><i class="fa-solid fa-paperclip"></i></span>
+      <span>Attachments</span>
+    </div>
+    <span class="attachment-widget-subtitle">Image and PDF</span>
+  </div>
+
+  <div class="attachment-card-grid">
+    <div class="attachment-card" data-attachment-kind="image">
+      <div class="attachment-card-head">
+        <span class="attachment-kind-icon attachment-kind-icon-image"><i class="fa-solid fa-image"></i></span>
+        <div>
+          <label for="attachment_image">Image</label>
+          <span id="attachment_image_selected">No new file selected</span>
+        </div>
+      </div>
+      <input class="attachment-file-input" type="file" id="attachment_image" name="attachment_image" accept="image/jpeg,image/png,image/webp,image/gif">
+      <label class="attachment-upload-btn" for="attachment_image">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <span>Choose</span>
+      </label>
+      <div class="attachment-status" id="attachment_image_status">
+        <span class="attachment-name">No image attached</span>
+      </div>
+    </div>
+
+    <div class="attachment-card" data-attachment-kind="pdf">
+      <div class="attachment-card-head">
+        <span class="attachment-kind-icon attachment-kind-icon-pdf"><i class="fa-solid fa-file-pdf"></i></span>
+        <div>
+          <label for="attachment_pdf">PDF</label>
+          <span id="attachment_pdf_selected">No new file selected</span>
+        </div>
+      </div>
+      <input class="attachment-file-input" type="file" id="attachment_pdf" name="attachment_pdf" accept="application/pdf">
+      <label class="attachment-upload-btn" for="attachment_pdf">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <span>Choose</span>
+      </label>
+      <div class="attachment-status" id="attachment_pdf_status">
+        <span class="attachment-name">No PDF attached</span>
+      </div>
+    </div>
+  </div>
+</div>

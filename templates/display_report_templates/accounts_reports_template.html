@@ -1,0 +1,126 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Accounts Reports{% endblock title %}
+
+{% block SeperateCssFile %}
+<link rel="stylesheet" href="{% static 'css/accounts_reports.css' %}">
+<link rel="stylesheet" href="{% static 'css/detailed_ledger2.css' %}">
+{% endblock SeperateCssFile %}
+
+{% block body %}
+
+<!-- Page title bar -->
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:1.1rem;">
+  <div style="width:36px;height:36px;background:var(--brand-primary-light);border-radius:var(--radius-md);
+              display:flex;align-items:center;justify-content:center;color:var(--brand-primary);font-size:0.95rem;flex-shrink:0;">
+    <i class="fa-solid fa-book-open"></i>
+  </div>
+  <div>
+    <h2 style="margin:0;font-size:1.2rem;font-weight:700;letter-spacing:-0.02em;">Accounts Reports</h2>
+    <p style="margin:0;font-size:0.78rem;color:var(--text-tertiary);">Ledgers, balances, receivables &amp; payables</p>
+  </div>
+</div>
+
+<div class="reports-wrapper">
+
+  <!-- ====== LEFT PANEL ====== -->
+  <aside class="left-panel">
+    <h3>Reports</h3>
+    <div class="report-buttons">
+      {# Each sub-report can be switched off per company from the admin. #}
+      {% if features.accounts_reports.subs.detailed_ledger2 %}
+      <button class="report-btn" id="btn-ledger2" data-report="ledger2"
+              onclick="selectReport('ledger2')">
+        <i class="fa-solid fa-list-ul" style="margin-right:7px;font-size:0.78rem;"></i>Detailed Ledger
+      </button>
+      {% endif %}
+      {% if features.accounts_reports.subs.detailed_ledger %}
+      <button class="report-btn active" id="btn-ledger" data-report="ledger"
+              onclick="selectReport('ledger')">
+        <i class="fa-solid fa-address-book" style="margin-right:7px;font-size:0.78rem;"></i>Party Ledger
+      </button>
+      {% endif %}
+      {% if features.accounts_reports.subs.cash_ledger %}
+      <button class="report-btn" id="btn-cash-ledger" data-report="cash-ledger"
+              onclick="selectReport('cash-ledger')">
+        <i class="fa-solid fa-money-bill-wave" style="margin-right:7px;font-size:0.78rem;"></i>Cash Ledger
+      </button>
+      {% endif %}
+      {% if features.accounts_reports.subs.trial_balance %}
+      <button class="report-btn" id="btn-trial" data-report="trial"
+              onclick="selectReport('trial')">
+        <i class="fa-solid fa-scale-balanced" style="margin-right:7px;font-size:0.78rem;"></i>Trial Balance
+      </button>
+      {% endif %}
+      {% if features.accounts_reports.subs.accounts_receivable %}
+      <button class="report-btn" id="btn-receivable" data-report="receivable"
+              onclick="selectReport('receivable')">
+        <i class="fa-solid fa-arrow-down-to-line" style="margin-right:7px;font-size:0.78rem;"></i>Receivable
+      </button>
+      {% endif %}
+      {% if features.accounts_reports.subs.accounts_payable %}
+      <button class="report-btn" id="btn-payable" data-report="payable"
+              onclick="selectReport('payable')">
+        <i class="fa-solid fa-arrow-up-from-line" style="margin-right:7px;font-size:0.78rem;"></i>Payable
+      </button>
+      {% endif %}
+    </div>
+  </aside>
+
+  <!-- ====== RIGHT PANEL ====== -->
+  <section class="right-panel">
+
+    <!-- ── Detailed Ledger (ledger2) ── -->
+    <div id="ledger2-section" style="display:block;">
+      <div id="ledger2-form-area"></div>
+      <div id="ledger2-container">
+        <div class="ledger2-empty">
+          <i class="fa-solid fa-magnifying-glass" style="font-size:1.8rem;margin-bottom:0.75rem;display:block;opacity:0.4;"></i>
+          Select a party and date range, then click <strong>Generate Ledger</strong>.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Classic reports ── -->
+    <div id="classic-section" style="display:none;">
+
+      <div id="report-form-container"></div>
+
+      <div class="table-actions">
+        {% if features.pdf_export.subs.reports %}
+        <button id="download_pdf" class="btn-download">
+          <i class="fa-solid fa-file-pdf"></i> PDF
+        </button>
+        {% endif %}
+        {% if features.excel_export.enabled %}
+        <button id="download_csv" class="btn-download btn-csv">
+          <i class="fa-solid fa-file-csv"></i> CSV
+        </button>
+        {% endif %}
+      </div>
+
+      <div class="table-container">
+        <table id="reportTable">
+          <thead id="reportHeader"></thead>
+          <tbody id="reportBody">
+            <tr><td class="no-data">Select a report to view results</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </section>
+</div>
+
+<!-- Dependencies -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+<script src="{% static 'js/accounts_reports.js' %}"></script>
+<script src="{% static 'js/detailed_ledger2.js' %}"></script>
+
+{% endblock body %}

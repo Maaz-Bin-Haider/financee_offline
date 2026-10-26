@@ -1,0 +1,13 @@
+const assert=require('assert');
+const A=require('../static/js/activity_ping.js');
+let sent=[];
+const fetch=(url,options)=>{sent.push([url,options]);return Promise.resolve({});};
+assert.strictEqual(A.exported('pdf','anything',{fetch}),false,'no receipt cannot create an event');
+assert.strictEqual(A.exported('exe','anything',{fetch,token:'signed'}),false);
+assert.strictEqual(A.exported('csv','ignored client caption',{fetch,token:'signed',document:{cookie:'other=1; csrftoken=csrf-token'}}),true);
+assert.deepStrictEqual(JSON.parse(sent[0][1].body),{format:'csv',token:'signed'});
+assert.strictEqual(sent[0][1].headers['X-CSRFToken'],'csrf-token');
+assert.strictEqual(sent[0][1].credentials,'same-origin');
+assert.strictEqual(A.exported('pdf','',{token:'signed',fetch:()=>{throw Error('offline');}}),false);
+assert.strictEqual(A.csrf({cookie:'notcsrftoken=x'}),'');
+console.log('8 activity export helper assertions passed');

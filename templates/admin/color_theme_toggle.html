@@ -1,0 +1,6 @@
+{% comment %}
+The admin stays light (the tenant pages have their own dark mode; see
+PROJECT_CONTEXT.md, Dark Mode). This override blanks Django's built-in
+admin theme toggle (included by admin/base.html), which would otherwise also
+write 'auto' into the localStorage 'theme' key the tenant pages read.
+{% endcomment %}

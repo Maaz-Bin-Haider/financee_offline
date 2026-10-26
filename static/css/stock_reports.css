@@ -1,0 +1,61 @@
+/* ============================================================
+   STOCK REPORTS — extends accounts_reports.css tokens
+   Just import accounts_reports.css first in the template,
+   then this file for any stock-specific overrides.
+   ============================================================ */
+
+/* Stock report table is more compact / dense */
+#reportTable {
+  font-size: 0.78rem;
+}
+
+#reportTable th,
+#reportTable td {
+  padding: 7px 10px;
+}
+
+/* Serial chips inside table cells */
+.serial-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--tint-blue);
+  border: 1px solid var(--brand-primary-border);
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ink-blue);
+  margin: 1px;
+  white-space: nowrap;
+}
+
+/* Stock worth / summary highlight cells */
+.cell-highlight {
+  font-weight: 700;
+  color: var(--ink-blue);
+  font-family: var(--font-mono);
+}
+
+.cell-positive {
+  color: var(--ink-green);
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+.cell-negative {
+  color: var(--ink-red);
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+
+/* Stock form section min-height so autocomplete doesn't shift layout */
+.form-section {
+  min-height: 100px;
+}
+
+/* Item autocomplete max width */
+.autocomplete-container {
+  max-width: 480px;
+}

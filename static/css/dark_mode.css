@@ -1,0 +1,324 @@
+/* ================================================
+   DARK MODE STYLES FOR PAGE-SPECIFIC ELEMENTS
+   ================================================ */
+
+   /* Prevent flash - apply dark background to html too */
+html.dark-mode {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+}
+
+html.dark-mode body {
+    background: linear-gradient(135deg, #0f172a, #1e293b) !important;
+}
+
+/* Home Page Dark Mode Styles */
+body.dark-mode .container header h1 {
+  color: var(--text-primary);
+}
+
+body.dark-mode .subtitle {
+  color: var(--text-tertiary);
+}
+
+body.dark-mode .debit-card {
+  background: linear-gradient(160deg, #0f172a, #020617);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+}
+
+body.dark-mode .data-btn {
+  background: linear-gradient(160deg, #1e293b, #0f172a);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .data-btn:hover {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+/* Table Styles for Dark Mode */
+body.dark-mode table {
+  color: var(--text-primary);
+}
+
+body.dark-mode th {
+  background: #1e293b;
+  color: #fff;
+}
+
+body.dark-mode td {
+  border-bottom: 1px solid #334155;
+}
+
+body.dark-mode tr:hover td {
+  background: #1e293b;
+}
+
+body.dark-mode .search-input {
+  background: var(--input-bg);
+  color: var(--input-text);
+  border: 2px solid #fbbf24;
+}
+
+body.dark-mode .search-input::placeholder {
+  color: var(--input-placeholder);
+}
+
+body.dark-mode .search-input:focus {
+  border-color: #64748b;
+  background: var(--input-bg);
+  box-shadow: 0 0 6px rgba(100, 116, 139, 0.5);
+}
+
+/* Alert/Message Styles for Dark Mode */
+body.dark-mode .alert {
+  background: #1e293b;
+  color: var(--text-primary);
+  border-color: #334155;
+}
+
+body.dark-mode .alert-container {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Card/Container Backgrounds */
+body.dark-mode .card,
+body.dark-mode .panel,
+body.dark-mode .box {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  box-shadow: var(--card-shadow);  /* --shadow-color no longer exists */
+}
+
+/* Button Variants for Dark Mode */
+body.dark-mode .btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+body.dark-mode .btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.4);
+}
+
+body.dark-mode .btn-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+body.dark-mode .btn-success:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
+}
+
+body.dark-mode .btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+body.dark-mode .btn-danger:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.4);
+}
+
+/* Select/Dropdown Dark Mode */
+body.dark-mode select {
+  background: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--input-border);
+}
+
+body.dark-mode select option {
+  background: var(--input-bg);
+  color: var(--input-text);
+}
+
+/* Modal/Dialog Dark Mode */
+body.dark-mode .modal-content,
+body.dark-mode .dialog {
+  background: var(--card-bg);
+  color: var(--text-primary);
+}
+
+body.dark-mode .modal-header {
+  border-bottom: 1px solid #334155;
+}
+
+body.dark-mode .modal-footer {
+  border-top: 1px solid #334155;
+}
+
+/* Badge/Tag Dark Mode */
+body.dark-mode .badge,
+body.dark-mode .tag {
+  background: #334155;
+  color: var(--text-primary);
+}
+
+/* Scrollbar Dark Mode */
+body.dark-mode ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+body.dark-mode ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  body.dark-mode .menu-toggle {
+    color: var(--text-primary);
+  }
+}
+
+/* SweetAlert2 Dark Mode Support */
+body.dark-mode .swal2-popup {
+  background: var(--card-bg);
+  color: var(--text-primary);
+}
+
+body.dark-mode .swal2-title {
+  color: var(--text-primary);
+}
+
+/* .swal2-content is SweetAlert2 v10's name; v11 (what base.html loads)
+   renders the body as .swal2-html-container. */
+body.dark-mode .swal2-content,
+body.dark-mode .swal2-html-container {
+  color: var(--text-secondary);
+}
+
+/* HR/Divider Dark Mode */
+body.dark-mode hr {
+  border-color: #334155;
+  opacity: 0.5;
+}
+
+/* Link Colors for Dark Mode */
+body.dark-mode a:not(.nav-links a):not(.logout-link):not(.btn) {
+  color: #60a5fa;
+}
+
+body.dark-mode a:not(.nav-links a):not(.logout-link):not(.btn):hover {
+  color: #93c5fd;
+}
+
+/* The theme cross-fade used to live here as
+
+     body.dark-mode * {
+       transition: background-color 0.3s ease, color 0.3s ease,
+                   border-color 0.3s ease;
+     }
+
+   which put three animated paint properties on every element of
+   every page, permanently, in what is now the default theme.
+   Hovering one row of the 1,700px Detailed Ledger transitioned
+   every cell in it; generating a report transitioned the whole
+   table; and every element added afterwards inherited a 300ms
+   background transition nobody asked for. It is also the reason
+   getComputedStyle reports every background as rgba(0,0,0,0) in
+   a hidden tab, recorded in CONTEXT.md as a measurement trap.
+
+   The cross-fade itself was worth keeping. It now runs as a
+   one-shot: dark_mode.js puts .theme-switching on <html> for the
+   length of the toggle and removes it again, and the rule below
+   scopes the transition to the surfaces that actually carry the
+   theme. Same effect when you press the button, nothing paid for
+   the rest of the session. (In the sibling project this rule lives in
+   motion.css; this project has no motion layer, so it lives here.
+   380ms must stay under dark_mode.js's SWITCH_MS of 420.) */
+html.theme-switching body,
+html.theme-switching .sidebar,
+html.theme-switching .main-content,
+html.theme-switching .dash-card,
+html.theme-switching .panel-card,
+html.theme-switching .card,
+html.theme-switching .table-container,
+html.theme-switching .modal-shell {
+  transition: background-color 380ms cubic-bezier(0.4, 0, 0.2, 1),
+              color 380ms cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 380ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-switching body,
+  html.theme-switching .sidebar,
+  html.theme-switching .main-content,
+  html.theme-switching .dash-card,
+  html.theme-switching .panel-card,
+  html.theme-switching .card,
+  html.theme-switching .table-container,
+  html.theme-switching .modal-shell {
+    transition: none;
+  }
+}
+
+/* Fix for text visibility in dark mode */
+body.dark-mode p,
+body.dark-mode span,
+body.dark-mode div {
+  color: var(--text-primary);
+}
+
+/* Specific heading colors */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+  color: var(--text-primary);
+}
+
+
+
+/* Apply to BOTH html and body dark mode */
+html.dark-mode .right-panel,
+body.dark-mode .right-panel {
+  background: linear-gradient(160deg, #1f2937, #111827) !important;
+}
+
+html.dark-mode .no-data,
+body.dark-mode .no-data {
+  border: none;
+}
+
+html.dark-mode .table-container,
+body.dark-mode .table-container {
+  background-color: transparent;
+}
+
+html.dark-mode #report-form-container,
+body.dark-mode #report-form-container {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+} 
+
+html.dark-mode #report-form-container .form-row input,
+body.dark-mode #report-form-container .form-row input {
+  background: transparent;
+  background-color: transparent;
+}
+
+html.dark-mode .valuation-section,
+html.dark-mode .valuation-table td,
+body.dark-mode .valuation-section,
+body.dark-mode .valuation-table td {
+  background: none;
+  color: white; 
+}
+
+/* The Company Valuation totals rows (profit_reports.js) keep the blue a
+   generic .highlight rule here gave them. That rule, the #search_name grey
+   and the .suggestion-item colours went with the search plan's Phase 11:
+   every search box now takes its page's own input style and lookup.css. */
+html.dark-mode .valuation-table tr.highlight,
+body.dark-mode .valuation-table tr.highlight {
+  background-color: #0e508d;
+}

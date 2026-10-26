@@ -1,0 +1,307 @@
+/* ============================================================
+   team_activity.css — the manager's Team Activity page
+   (team_activity.js; TEAM_ACTIVITY_PLAN.md, Phase 4)
+
+   The grid is GitHub's: one column a week, Monday at the top,
+   five shades of green on the same scale for every user. The
+   shades are GitHub's own, the dark ones for the dark theme.
+
+   Colour rules double their class, as lookup.css does:
+   dark_mode.css carries `body.dark-mode p, span, div { color }`
+   at (0,1,2), which a single class loses to.
+   ============================================================ */
+
+:root {
+  --ta-l0: #ebedf0;
+  --ta-l1: #9be9a8;
+  --ta-l2: #40c463;
+  --ta-l3: #30a14e;
+  --ta-l4: #216e39;
+  --ta-cell: 12px;
+  --ta-gap: 3px;
+}
+
+:root.dark-mode {
+  --ta-l0: #161b22;
+  --ta-l1: #0e4429;
+  --ta-l2: #006d32;
+  --ta-l3: #26a641;
+  --ta-l4: #39d353;
+}
+
+.ta-controls.ta-controls { align-items: flex-end; flex-wrap: wrap; }
+.ta-period.ta-period { margin: 0 0 6px; color: var(--text-secondary); font-size: 0.82rem; }
+
+/* ── Figures ──────────────────────────────────────────────── */
+.ta-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+.ta-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-surface);
+  min-width: 0;
+}
+.ta-figure-label.ta-figure-label { color: var(--text-secondary); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.ta-figure-value.ta-figure-value { color: var(--text-primary); font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ta-figure-value.ta-small { font-size: 0.95rem; }
+
+/* ── Cards ────────────────────────────────────────────────── */
+.ta-card {
+  margin: 0 0 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-surface);
+  min-width: 0;
+}
+.ta-card-title.ta-card-title { margin: 0 0 10px; font-size: 0.95rem; color: var(--text-primary); }
+
+/* ── The grid ─────────────────────────────────────────────── */
+.ta-grid-scroll { overflow-x: auto; padding-bottom: 4px; }
+.ta-grid-frame { width: max-content; }
+.ta-months-row { display: flex; }
+/* Covers the month names as they scroll under the weekday column. */
+.ta-corner {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  flex: none;
+  width: 34px;
+  background: var(--bg-surface);
+}
+.ta-months {
+  display: grid;
+  grid-template-columns: repeat(var(--ta-weeks, 53), var(--ta-cell));
+  column-gap: var(--ta-gap);
+  height: 16px;
+}
+.ta-month.ta-month { font-size: 0.7rem; line-height: 16px; color: var(--text-secondary); white-space: nowrap; }
+.ta-grid-body { display: flex; }
+/* The weekday names stay put while the weeks scroll under them. */
+.ta-weekdays {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: repeat(7, var(--ta-cell));
+  row-gap: var(--ta-gap);
+  box-sizing: border-box;
+  width: 34px;
+  padding-right: 6px;
+  background: var(--bg-surface);
+}
+.ta-weekdays span { font-size: 0.66rem; line-height: var(--ta-cell); color: var(--text-secondary); }
+.ta-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, var(--ta-cell));
+  grid-auto-columns: var(--ta-cell);
+  gap: var(--ta-gap);
+}
+.ta-cell {
+  display: inline-block;
+  width: var(--ta-cell);
+  height: var(--ta-cell);
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: var(--ta-l0);
+  outline: 1px solid rgba(27, 31, 35, 0.06);
+  outline-offset: -1px;
+  cursor: pointer;
+}
+/* The touch rule in base_styling.css gives every button in .main-content a
+   44px minimum height; a square stretched to that would break the grid, so
+   the grid opts out -- the squares are a map, as on GitHub, and the day's
+   list below them is what a finger works with. */
+.main-content .ta-grid .ta-cell,
+.main-content .ta-scale .ta-cell { min-height: 0; min-width: 0; }
+.ta-cell.ta-l1 { background: var(--ta-l1); }
+.ta-cell.ta-l2 { background: var(--ta-l2); }
+.ta-cell.ta-l3 { background: var(--ta-l3); }
+.ta-cell.ta-l4 { background: var(--ta-l4); }
+.ta-cell.is-out { visibility: hidden; cursor: default; }
+.ta-cell.is-selected { outline: 2px solid var(--text-primary); outline-offset: 0; }
+.ta-cell:focus-visible { outline: 2px solid var(--brand-primary, #2563eb); outline-offset: 1px; }
+
+.ta-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+.ta-scale { display: inline-flex; align-items: center; gap: 3px; }
+.ta-scale .ta-cell { cursor: default; }
+.ta-steps.ta-steps { margin-left: 6px; color: var(--text-secondary); }
+.ta-approx-note.ta-approx-note { color: var(--text-secondary); }
+
+/* ── A day ────────────────────────────────────────────────── */
+.ta-day-head.ta-day-head { margin: 0 0 8px; font-size: 0.95rem; color: var(--text-primary); }
+.ta-note.ta-note, .ta-empty.ta-empty { margin: 0 0 8px; color: var(--text-secondary); font-size: 0.82rem; }
+.ta-sub.ta-sub { margin: 12px 0 6px; font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+.ta-events { list-style: none; margin: 0; padding: 0; }
+.ta-event {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.86rem;
+  min-width: 0;
+}
+.ta-event:last-child { border-bottom: 0; }
+.ta-time.ta-time { flex: none; width: 3.2em; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.ta-what.ta-what { color: var(--text-primary); overflow-wrap: anywhere; min-width: 0; }
+a.ta-what.ta-what { color: var(--brand-primary, #2563eb); text-decoration: none; }
+a.ta-what.ta-what:hover { text-decoration: underline; }
+.ta-ip.ta-ip { margin-left: auto; color: var(--text-secondary); font-size: 0.78rem; font-variant-numeric: tabular-nums; }
+.ta-event.is-approx .ta-what { color: var(--text-secondary); }
+.ta-event.ta-delete .ta-what.ta-what,
+.ta-event.ta-sign_in_failed .ta-what.ta-what { color: var(--ink-red, #b91c1c); }
+
+/* ── Card heads, buttons, chips ───────────────────────────── */
+.ta-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.ta-card-head .ta-card-title { margin: 0; }
+.ta-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+/* A label and a select beside the buttons, not the form layout's stacked
+   full-width pair (base_styling.css's label and select rules). */
+.ta-actions .ta-inline.ta-inline { display: inline; margin: 0; font-size: 0.8rem; color: var(--text-secondary); }
+.ta-actions select.ta-select { width: auto; padding: 4px 8px; }
+.ta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-surface-alt);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.ta-btn:hover { border-color: var(--border-strong); }
+.ta-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.ta-chip {
+  padding: 4px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.ta-chip[aria-pressed="true"] { background: var(--tint-blue); border-color: var(--brand-primary, #2563eb); color: var(--text-primary); }
+.ta-chip-count.ta-chip-count { margin-left: 4px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* ── What and when ────────────────────────────────────────── */
+/* Side by side only when the hours map fits whole (24 squares: about
+   420px with the card's padding); below that the two stack. */
+.ta-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); gap: 14px; }
+.ta-pair .ta-card { margin-bottom: 14px; }
+.ta-mix-row {
+  display: grid;
+  grid-template-columns: minmax(0, 11em) minmax(0, 1fr) 3em;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 0.82rem;
+}
+.ta-mix-name.ta-mix-name { color: var(--text-primary); overflow-wrap: anywhere; }
+.ta-mix-bar { height: 8px; border-radius: 4px; background: var(--ta-l0); overflow: hidden; }
+.ta-mix-fill { display: block; height: 100%; background: var(--ta-l3); border-radius: 4px; }
+.ta-mix-share.ta-mix-share { color: var(--text-secondary); text-align: right; font-variant-numeric: tabular-nums; }
+.ta-hours {
+  display: grid;
+  grid-template-columns: 30px repeat(24, var(--ta-cell));
+  grid-auto-rows: var(--ta-cell);
+  gap: var(--ta-gap);
+  width: max-content;
+}
+.ta-hours-label.ta-hours-label { font-size: 0.64rem; line-height: var(--ta-cell); color: var(--text-secondary); white-space: nowrap; }
+.ta-hour { cursor: default; }
+
+/* ── The team and the watch list ──────────────────────────── */
+.ta-table-scroll { overflow-x: auto; }
+/* A floor under the width: on a phone the table scrolls inside its card
+   rather than squeezing its text a word to a line. */
+.ta-table { width: 100%; min-width: 36rem; border-collapse: collapse; font-size: 0.84rem; }
+.ta-table th {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  vertical-align: bottom;
+}
+/* Headers wrap and cells stay tight so the team fits a 1024px window
+   without scrolling sideways; narrower ones scroll inside the card. */
+.ta-table th.ta-num { min-width: 3.2em; }
+.ta-table td {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+.ta-table .ta-num { text-align: right; font-variant-numeric: tabular-nums; }
+.ta-table tr.is-inactive td { color: var(--text-secondary); }
+.ta-user-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand-primary, #2563eb);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ta-user-link:hover { text-decoration: underline; }
+.ta-tag.ta-tag {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--tint-amber, #fef3c7);
+  color: var(--ink-amber, #b45309);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+.ta-tag.ta-tag-muted { background: var(--bg-surface-alt); color: var(--text-secondary); }
+.ta-strip { display: inline-flex; gap: 2px; }
+.ta-strip .ta-cell.ta-cell { width: 10px; height: 10px; }
+.ta-table td a { color: var(--brand-primary, #2563eb); text-decoration: none; }
+.ta-table td a:hover { text-decoration: underline; }
+.ta-watch-delete td:nth-child(3),
+.ta-watch-failed_sign_in td:nth-child(3) { color: var(--ink-red, #b91c1c); }
+
+.main-content .ta-hours .ta-cell,
+.main-content .ta-strip .ta-cell { min-height: 0; min-width: 0; }
+
+@media (max-width: 640px) {
+  :root { --ta-cell: 11px; }
+  .ta-figures { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ta-mix-row { grid-template-columns: minmax(0, 9em) minmax(0, 1fr) 3em; }
+}
+
+/* A flex item's automatic minimum otherwise expands to the year grid's width. */
+.main-content:has(.ta-page) { min-width: 0; }
+.ta-controls .filter-field { min-width: 0; max-width: 100%; }
+.ta-controls select { max-width: 100%; }

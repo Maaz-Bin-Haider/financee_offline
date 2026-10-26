@@ -1,0 +1,159 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Confirm Draft{% endblock title %}
+
+{% block SeperateCssFile %}
+<link rel="stylesheet" href="{% static 'css/purchasing_styling.css' %}">
+<link rel="stylesheet" href="{% static 'css/draft_styling.css' %}">
+{% endblock SeperateCssFile %}
+
+{% block body %}
+<div class="sale-page-wrapper">
+
+  <div class="sale-topbar">
+    <div class="sale-topbar-left">
+      <button type="button" class="custom-btn btn-topbar" onclick="openDraftPicker()">
+        <i class="fa-solid fa-folder-open"></i> Choose a Draft
+      </button>
+    </div>
+    <div class="sale-topbar-right">
+      {% if features.draft_invoices.subs.drafts %}
+      <a class="custom-btn btn-topbar" href="{% url 'draft:draft_page' %}">
+        <i class="fa-solid fa-file-pen"></i> Draft Invoices
+      </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="sale-card">
+
+    <div class="sale-card-header">
+      <div class="sale-card-header-left">
+        <div class="sale-invoice-icon">✅</div>
+        <div>
+          <h2 class="sale-invoice-title">Confirm Draft</h2>
+          <span class="sale-invoice-id-badge" id="draftIdBadge">#—</span>
+          <span class="draft-status-badge" id="draftStatusBadge">—</span>
+          <span class="draft-entry-badge" title="Customer">
+            <i class="fa-solid fa-user"></i>
+            <span id="draftCustomer">—</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    {% comment %}
+    Said plainly, because this is the screen where a reservation turns into
+    money. Everything before it moved nothing.
+    {% endcomment %}
+    <p class="draft-explainer">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>Tick the serials you are invoicing <strong>now</strong> and set the agreed
+      rate. This raises a real sale invoice: stock goes out, the journal posts
+      and the customer's balance moves. Anything left unticked stays reserved
+      for the next tranche.</span>
+    </p>
+
+    <div class="sale-card-body">
+
+      <div class="sale-meta-grid draft-meta-grid">
+        <div class="sale-field-group">
+          <label class="sale-field-label" for="draft_picker">
+            <i class="fa-solid fa-file-pen"></i> Draft Invoice
+          </label>
+          {% comment %}
+          A search, not a bare number box. Nobody remembers draft numbers; they
+          remember who the goods are for. Typing either a number or part of a
+          customer name narrows the list of drafts that still have something
+          reserved, and a number typed whole puts that draft first.
+          {% endcomment %}
+          <div class="draft-search-wrap">
+            <input type="text" id="draft_picker" class="sale-input"
+                   autocomplete="off"
+                   placeholder="Search by draft number or customer…">
+            <div class="draft-suggestions" id="draftSuggestions"></div>
+          </div>
+        </div>
+        <div class="sale-field-group">
+          <label class="sale-field-label" for="invoice_date">
+            <i class="fa-solid fa-calendar"></i> Sale Date
+          </label>
+          {% comment %}
+          Defaults to today and is editable. It is the date the rate was agreed
+          and of the sale invoice being raised, not the date the goods were
+          reserved.
+          {% endcomment %}
+          <input type="date" id="invoice_date" class="sale-input">
+        </div>
+      </div>
+
+      <div class="sale-divider"></div>
+
+      <div class="items-section-header">
+        <div class="items-section-title">
+          <div class="title-icon">💰</div>
+          Price this tranche
+        </div>
+        <div class="items-action-bar">
+          <button type="button" class="custom-btn btn-topbar" onclick="selectAll(true)">
+            <i class="fa-solid fa-check-double"></i> Select All
+          </button>
+          <button type="button" class="custom-btn btn-topbar" onclick="selectAll(false)">
+            <i class="fa-solid fa-xmark"></i> Clear
+          </button>
+        </div>
+      </div>
+
+      <p class="draft-hint">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>One rate per item line, exactly as a sale invoice works. A rate is
+        <strong>required</strong> here — the draft's expected rate was only ever
+        an expectation.</span>
+      </p>
+
+      <div id="convertItems">
+        <p class="draft-hint" id="emptyState">
+          <i class="fa-solid fa-arrow-up"></i>
+          <span>Choose a draft to begin.</span>
+        </p>
+      </div>
+
+    </div><!-- /.sale-card-body -->
+
+    <div class="sale-card-footer">
+      <div class="sale-totals-group">
+        <div class="total-chip">
+          <span class="total-chip-label">Invoicing Now</span>
+          <span class="total-chip-value" id="selectedUnits">0</span>
+        </div>
+        <div class="total-chip">
+          <span class="total-chip-label">Staying Reserved</span>
+          <span class="total-chip-value" id="remainingUnits">0</span>
+        </div>
+        <div class="total-chip">
+          <span class="total-chip-label">Invoice Amount ({{ currency|default:"PKR" }})</span>
+          <span class="total-chip-value amount-value" id="trancheTotal">0.00</span>
+        </div>
+      </div>
+      <div class="sale-actions">
+        <button type="button" class="save-and-update-btn" id="convertBtn" onclick="convertTranche()" disabled>
+          <i class="fa-solid fa-file-invoice-dollar"></i> Raise Sale Invoice
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /.sale-card -->
+
+</div><!-- /.sale-page-wrapper -->
+
+{% comment %}
+The company's base currency (money labels) and DRAFT_AGE_WARNING_DAYS (the
+"old draft" highlight in the draft picker), read by draft_convert.js.
+{% endcomment %}
+<script>
+  window.FINANCEE_CURRENCY = "{{ currency|default:'PKR'|escapejs }}";
+  window.DRAFT_AGE_WARNING_DAYS = Number("{{ age_warning_days|default:30|escapejs }}") || 30;
+</script>
+<script src="{% static 'js/draft_convert.js' %}"></script>
+{% endblock body %}

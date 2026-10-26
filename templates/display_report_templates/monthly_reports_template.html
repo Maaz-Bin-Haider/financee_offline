@@ -1,0 +1,72 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Monthly Reports{% endblock title %}
+
+{% block SeperateCssFile %}
+<link rel="stylesheet" href="{% static 'css/accounts_reports.css' %}">
+<link rel="stylesheet" href="{% static 'css/profit_reports.css' %}">
+<link rel="stylesheet" href="{% static 'css/monthly_reports.css' %}">
+{% endblock SeperateCssFile %}
+
+{% block body %}
+
+<!-- Page title bar -->
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:1.1rem;">
+  <div style="width:36px;height:36px;background:#ecfdf5;border-radius:var(--radius-md);
+              display:flex;align-items:center;justify-content:center;color:#059669;font-size:0.95rem;flex-shrink:0;">
+    <i class="fa-solid fa-calendar-days"></i>
+  </div>
+  <div>
+    <h2 style="margin:0;font-size:1.2rem;font-weight:700;letter-spacing:-0.02em;">Monthly Reports</h2>
+    <p style="margin:0;font-size:0.78rem;color:var(--text-tertiary);">Company Position &amp; Income Statement</p>
+  </div>
+</div>
+
+<div class="reports-wrapper">
+
+  <!-- ====== LEFT PANEL ====== -->
+  <aside class="left-panel">
+    <h3>Reports</h3>
+    <div class="report-buttons">
+      {# Each sub-report can be switched off per company from the admin. #}
+      {% if features.monthly_reports.subs.monthly_position %}
+      <button class="report-btn active" id="mpr-btn-position" data-report="position"
+              onclick="mprSelectReport('position')">
+        <i class="fa-solid fa-scale-balanced"></i>Company Position
+      </button>
+      {% endif %}
+      {% if features.monthly_reports.subs.monthly_income %}
+      <button class="report-btn" id="mpr-btn-income" data-report="income"
+              onclick="mprSelectReport('income')">
+        <i class="fa-solid fa-chart-line"></i>Income Statement
+      </button>
+      {% endif %}
+    </div>
+  </aside>
+
+  <!-- ====== RIGHT PANEL ====== -->
+  <section class="right-panel" id="mpr-right-panel">
+
+    <!-- Dynamic filter form -->
+    <div id="mpr-form-container"></div>
+
+    <!-- Report output area -->
+    <div id="mpr-output">
+      <div class="mpr-placeholder">
+        <i class="fa-solid fa-calendar-days"></i>
+        <p>Select a report from the left panel</p>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<!-- Dependencies -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="{% static 'js/monthly_reports.js' %}"></script>
+
+{% endblock body %}

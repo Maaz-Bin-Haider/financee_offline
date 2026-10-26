@@ -1,0 +1,134 @@
+{
+  "backdated_fifo_replay_seconds": 2.6696,
+  "concurrency": {
+    "failures": 0,
+    "p50_seconds": 0.3643,
+    "p95_seconds": 0.5706,
+    "p99_seconds": 0.5789,
+    "sessions": 100,
+    "wall_seconds": 1.7686
+  },
+  "counts": {
+    "movements": 5000000,
+    "physical_units": "100000",
+    "skus": 100000
+  },
+  "daily_workload": {
+    "operations": 140,
+    "p95_seconds": 0.0129,
+    "seconds": 1.1841
+  },
+  "heavy_export": {
+    "bytes": 3477839,
+    "mode": "streamed_postgresql_csv",
+    "name": "100k_sku_csv_export",
+    "rows": 100000,
+    "seconds": 0.149
+  },
+  "invariants": {
+    "deadlocks_unchanged": true,
+    "movement_count_at_least_target": true,
+    "negative_stock_absent": true,
+    "physical_units_at_least_target": true,
+    "sku_count": true,
+    "trial_balance_exact": true,
+    "waiting_locks_absent": true
+  },
+  "normal_reports": [
+    {
+      "name": "trial_balance",
+      "result_bytes": 2734,
+      "seconds": 0.0159
+    },
+    {
+      "name": "stock_summary",
+      "result_bytes": 34680,
+      "seconds": 1.0453
+    },
+    {
+      "name": "stock_valuation",
+      "result_bytes": 34680,
+      "seconds": 0.6848
+    },
+    {
+      "name": "stock_movement",
+      "result_bytes": 33407,
+      "seconds": 2.6922
+    },
+    {
+      "name": "inventory_reconciliation",
+      "result_bytes": 14712,
+      "seconds": 0.4589
+    },
+    {
+      "name": "valuation_reconciliation",
+      "result_bytes": 14712,
+      "seconds": 0.4315
+    },
+    {
+      "name": "low_stock",
+      "result_bytes": 34828,
+      "seconds": 0.4947
+    }
+  ],
+  "passed": true,
+  "profile": "target",
+  "schema": "tenant_company_542",
+  "seed_seconds": 183.9026,
+  "targets": {
+    "movements": 5000000,
+    "sessions": 100,
+    "skus": 100000
+  },
+  "telemetry_after": {
+    "blocks_hit": 1052708262,
+    "blocks_read": 6302171,
+    "commits": 290661,
+    "connections": 5,
+    "database_bytes": 6412762135,
+    "deadlocks": 0,
+    "load_average": [
+      1.07958984375,
+      0.83837890625,
+      0.63623046875
+    ],
+    "locks_granted": 2,
+    "locks_waiting": 0,
+    "temp_bytes": 763923016,
+    "temp_files": 29
+  },
+  "telemetry_after_serial_work": {
+    "blocks_hit": 1052494088,
+    "blocks_read": 6302095,
+    "commits": 290304,
+    "connections": 5,
+    "database_bytes": 6412762135,
+    "deadlocks": 0,
+    "load_average": [
+      1.07958984375,
+      0.83837890625,
+      0.63623046875
+    ],
+    "locks_granted": 2,
+    "locks_waiting": 0,
+    "temp_bytes": 763923016,
+    "temp_files": 29
+  },
+  "telemetry_before": {
+    "blocks_hit": 858987503,
+    "blocks_read": 4448421,
+    "commits": 290088,
+    "connections": 4,
+    "database_bytes": 156081175,
+    "deadlocks": 0,
+    "load_average": [
+      0.54052734375,
+      0.47216796875,
+      0.48046875
+    ],
+    "locks_granted": 2,
+    "locks_waiting": 0,
+    "temp_bytes": 522710720,
+    "temp_files": 20
+  }
+}

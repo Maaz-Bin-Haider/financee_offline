@@ -1,0 +1,273 @@
+/* ============================================================
+   PROFIT REPORTS — extends accounts_reports.css shared tokens
+   ============================================================ */
+
+/* ===== COMPANY VALUATION CARDS ===== */
+.valuation-section {
+  margin: 1.1rem 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.valuation-section h3 {
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.015em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.valuation-section h3 i {
+  color: var(--ink-blue);
+  font-size: 0.9rem;
+}
+
+/* Valuation table */
+.valuation-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.valuation-table th {
+  text-align: left;
+  color: var(--text-secondary);
+  width: 60%;
+  padding: 9px 10px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.valuation-table td {
+  text-align: right;
+  padding: 9px 10px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.valuation-table tr:last-child th,
+.valuation-table tr:last-child td {
+  border-bottom: none;
+}
+
+.valuation-table .highlight th {
+  background: var(--bg-surface-alt);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.valuation-table .highlight td {
+  background: var(--bg-surface-alt);
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.valuation-table .profit-positive td {
+  color: var(--ink-green);
+}
+
+.valuation-table .profit-negative td {
+  color: var(--ink-red);
+}
+
+/* ===== KPI SUMMARY ROW ===== */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 1.1rem;
+}
+
+.kpi-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s;
+}
+
+.kpi-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.kpi-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-tertiary);
+}
+
+.kpi-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.kpi-card.kpi-profit .kpi-value { color: var(--ink-green); }
+.kpi-card.kpi-loss   .kpi-value { color: var(--ink-red); }
+.kpi-card.kpi-sales  .kpi-value { color: var(--ink-blue); }
+
+/* ===== SALE-WISE REPORT ROW HIGHLIGHT COLOURS ===== */
+/* Priority 1 – sale price ≤ 4  → light blue  */
+#reportTable tbody tr.row-low-sale {
+  background-color: var(--tint-blue) !important;  /* blue-100 */
+}
+#reportTable tbody tr.row-low-sale:hover {
+  background-color: #bfdbfe !important;  /* blue-200 */
+}
+
+/* Priority 2 – purchase price ≤ 4  → light yellow */
+#reportTable tbody tr.row-low-purchase {
+  background-color: var(--tint-amber) !important;  /* yellow-100 */
+}
+#reportTable tbody tr.row-low-purchase:hover {
+  background-color: var(--tint-amber) !important;  /* yellow-200 */
+}
+
+/* Priority 3 – profit/loss < 0  → light red */
+#reportTable tbody tr.row-loss {
+  background-color: var(--tint-red) !important;  /* red-100 */
+}
+#reportTable tbody tr.row-loss:hover {
+  background-color: #fecaca !important;  /* red-200 */
+}
+
+/* Totals row */
+#reportTable tbody tr.row-totals td {
+  font-weight: 700;
+  background-color: var(--tint-blue) !important;
+  border-top: 2px solid #cbd5e1;
+  color: var(--text-primary);
+}
+#reportTable tbody tr.row-totals td:first-child {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Legend bar */
+.row-colour-legend {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0.45rem 0.75rem;
+  margin-bottom: 0.6rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+.row-colour-legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.row-colour-legend .swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.swatch-blue   { background: var(--tint-blue); }
+.swatch-yellow { background: var(--tint-amber); }
+.swatch-red    { background: var(--tint-red); }
+
+/* ===== VENDOR FILTER BAR ===== */
+.vendor-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding: 0.55rem 0.85rem;
+  margin-bottom: 0.55rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.vendor-filter-icon {
+  color: var(--ink-blue);          /* blue-500 */
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.vendor-filter-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.vendor-filter-select {
+  flex: 1;
+  min-width: 180px;
+  max-width: 320px;
+  padding: 0.32rem 0.65rem;
+  font-size: 0.82rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-page, #f8fafc);
+  color: var(--text-primary);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.vendor-filter-select:focus {
+  border-color: var(--ink-blue);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.vendor-clear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-size: 0.78rem;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.vendor-clear-btn:hover {
+  background: var(--tint-red);
+  color: var(--ink-red);
+  border-color: #fca5a5;
+}
+
+.vendor-count-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ink-blue);
+  background: var(--tint-blue);
+  border: 1px solid #bfdbfe;
+  border-radius: 9999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}

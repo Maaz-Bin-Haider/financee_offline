@@ -1,0 +1,398 @@
+/* ============================================================
+   spotlight.css — the "Search everything" window (spotlight.js)
+   and the buttons that open it (base.html).
+   SPOTLIGHT_SEARCH_PLAN.md, Phase 2.
+
+   Colour comes from these tokens, derived from the theme's own,
+   so both themes follow from the one class the theme switch sets
+   on <html>, as lookup.css does.
+
+   Colour rules double their class on purpose, as in lookup.css:
+   dark_mode.css carries `body.dark-mode p, span, div { color }`
+   at (0,1,2), which a single class loses to.
+
+   One short fade on opening, none under reduced motion: the
+   window is opened many times a day, and must feel instant.
+   ============================================================ */
+
+:root {
+  --sp-bg:            var(--bg-surface, #ffffff);
+  --sp-border:        var(--border-strong, #cbd5e1);
+  --sp-rule:          var(--border-color, #e2e8f0);
+  --sp-text:          var(--text-primary, #1e293b);
+  --sp-muted:         var(--text-secondary, #475569);
+  /* Not the theme's tertiary grey (#94a3b8, 2.6:1 on white): the details,
+     group titles and foot are read, not decoration, so they keep 4.5:1 on
+     white and on the selected row's tint (Phase 6). */
+  --sp-faint:         #5f6f86;
+  --sp-selected:      var(--tint-blue, #eff6ff);
+  --sp-selected-edge: var(--brand-primary, #2563eb);
+  --sp-link:          var(--sp-selected-edge);
+  --sp-mark-bg:       #fde68a;
+  --sp-mark-text:     #1f2937;
+  --sp-scrim:         rgba(15, 23, 42, 0.42);
+  --sp-shadow:        0 24px 60px rgba(15, 23, 42, 0.28), 0 4px 12px rgba(15, 23, 42, 0.12);
+  /* The figures beside a party or an item, in the voucher chips' colours. */
+  --sp-receivable:    var(--ink-green, #047857);
+  --sp-payable:       var(--ink-red, #b91c1c);
+  --sp-settled:       var(--sp-faint);
+}
+
+:root.dark-mode {
+  --sp-faint:         var(--text-tertiary, #8fa1b8);
+  --sp-link:          #60a5fa;    /* the brand blue is 3.4:1 on the dark panel */
+  --sp-mark-bg:       rgba(250, 204, 21, 0.32);
+  --sp-mark-text:     #fef9c3;
+  --sp-scrim:         rgba(0, 0, 0, 0.6);
+  --sp-shadow:        0 24px 60px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+
+/* ── The window ────────────────────────────────────────────── */
+
+.sp-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 2200;              /* above the lookup list (2100) and the sidebar */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 12vh 16px 16px;
+  background: var(--sp-scrim);
+  animation: sp-fade 0.12s ease-out both;
+}
+
+.sp-layer[hidden] { display: none; }
+
+.sp-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 640px;
+  max-height: 72vh;
+  box-sizing: border-box;
+  border: 1px solid var(--sp-border);
+  border-radius: 14px;
+  background: var(--sp-bg);
+  box-shadow: var(--sp-shadow);
+  overflow: hidden;
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.sp-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--sp-rule);
+}
+
+.sp-glass.sp-glass { color: var(--sp-faint); font-size: 1rem; }
+
+.sp-input.sp-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--sp-text);
+  font-size: 1.05rem;
+  padding: 4px 0;
+  box-shadow: none;
+}
+
+.sp-input::placeholder { color: var(--sp-faint); }
+
+.sp-close.sp-close {
+  flex: none;
+  border: 1px solid var(--sp-rule);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--sp-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 7px;
+  cursor: pointer;
+}
+
+.sp-list {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px 0;
+}
+
+.sp-group + .sp-group { border-top: 1px solid var(--sp-rule); margin-top: 4px; padding-top: 4px; }
+
+.sp-group-title.sp-group-title {
+  padding: 6px 16px 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sp-faint);
+}
+
+.sp-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  padding: 6px 16px;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.sp-row[aria-selected="true"] {
+  background: var(--sp-selected);
+  border-left-color: var(--sp-selected-edge);
+}
+
+.sp-icon.sp-icon {
+  width: 18px;
+  text-align: center;
+  color: var(--sp-muted);
+  font-size: 0.95rem;
+}
+
+.sp-row[aria-selected="true"] .sp-icon.sp-icon { color: var(--sp-selected-edge); }
+
+.sp-text.sp-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sp-label.sp-label {
+  flex: 1;
+  min-width: 0;
+  color: var(--sp-text);
+  font-size: 0.93rem;
+  overflow-wrap: anywhere;
+}
+
+.sp-meta.sp-meta {
+  color: var(--sp-faint);
+  font-size: 0.76rem;
+  overflow-wrap: anywhere;
+}
+
+/* A party's balance or an item's stock, when this user may see it. */
+.sp-fact.sp-fact {
+  flex: none;
+  color: var(--sp-muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.sp-fact.sp-fact[data-tone="receivable"] { color: var(--sp-receivable); }
+.sp-fact.sp-fact[data-tone="payable"]    { color: var(--sp-payable); }
+.sp-fact.sp-fact[data-tone="settled"],
+.sp-fact.sp-fact[data-tone="out"]        { color: var(--sp-settled); }
+
+/* A serial's sentence: reserved for, sold to, bought from (Phase 4). */
+.sp-detail.sp-detail {
+  color: var(--sp-muted);
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+.sp-fact.sp-fact[data-tone="stock"]    { color: var(--sp-receivable); }
+.sp-fact.sp-fact[data-tone="reserved"] { color: var(--ink-amber, #b45309); }
+.sp-fact.sp-fact[data-tone="sold"],
+.sp-fact.sp-fact[data-tone="spent"]    { color: var(--sp-muted); }
+
+/* While the server is being asked: says so, takes no keys, moves nothing. */
+.sp-pending.sp-pending {
+  padding: 10px 16px;
+  color: var(--sp-faint);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+/* The empty box's way in (Phase 5). */
+.sp-hint.sp-hint {
+  padding: 8px 16px 4px;
+  color: var(--sp-faint);
+  font-size: 0.78rem;
+}
+
+/* A row this user may see but has nowhere to open. */
+.sp-row.sp-inert { cursor: default; }
+
+/* "Show all N parties": opens the hub's list with the words in its filter. */
+.sp-more .sp-label.sp-label { color: var(--sp-link); font-size: 0.86rem; }
+
+.sp-section.sp-section {
+  flex: none;
+  color: var(--sp-faint);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.sp-mark.sp-mark {
+  background: var(--sp-mark-bg);
+  color: var(--sp-mark-text);
+  border-radius: 3px;
+  padding: 0 1px;
+}
+
+.sp-empty.sp-empty {
+  padding: 18px 16px;
+  color: var(--sp-muted);
+  font-size: 0.9rem;
+}
+
+.sp-foot.sp-foot {
+  padding: 8px 14px;
+  border-top: 1px solid var(--sp-rule);
+  color: var(--sp-faint);
+  font-size: 0.74rem;
+}
+
+.sp-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@keyframes sp-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── The buttons that open it ─────────────────────────────── */
+
+/* In the sidebar, under the menu's own search. */
+.spotlight-open {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 0.55rem;
+  padding: 0.42rem 0.6rem 0.42rem 0.75rem;
+  border: 1px solid var(--sidebar-border, rgba(255,255,255,0.1));
+  border-radius: var(--radius-md, 8px);
+  background: rgba(96, 165, 250, 0.1);
+  color: var(--sidebar-link, #cbd5e1);
+  font-size: 0.82rem;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.spotlight-open:hover,
+.spotlight-open:focus-visible {
+  background: rgba(96, 165, 250, 0.18);
+  border-color: rgba(96, 165, 250, 0.4);
+  outline: none;
+}
+
+.spotlight-open i { color: #60a5fa; font-size: 0.8rem; }
+.spotlight-open-label { flex: 1; }
+.spotlight-open-kbd {
+  font-family: inherit;
+  font-size: 0.68rem;
+  padding: 1px 5px;
+  border: 1px solid rgba(203, 213, 225, 0.25);
+  border-radius: 4px;
+  color: rgba(203, 213, 225, 0.7);
+}
+
+/* On a phone, beside the menu button. */
+.spotlight-fab { display: none; }
+
+/* ── Tablet, upright: the icon rail (base_styling.css) ────── */
+@media (min-width: 641px) and (max-width: 900px) and (min-height: 700px) {
+  /* An icon with a short caption under it, as every rail item has: an iPad
+     has no hover to show a tooltip. */
+  .sidebar:not(.open) .spotlight-open {
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    padding: 0.35rem 0.15rem;
+    margin-top: 0.4rem;
+    min-height: 44px;
+    text-align: center;
+  }
+  .sidebar:not(.open) .spotlight-open-label,
+  .sidebar:not(.open) .spotlight-open-kbd { display: none; }
+  .sidebar:not(.open) .spotlight-open i { font-size: 1.05rem; }
+  .sidebar:not(.open) .spotlight-open::after {
+    content: "Search";
+    font-size: 0.56rem;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: 0.01em;
+  }
+}
+
+/* ── Phone, and short viewports: the off-canvas drawer ────── */
+@media (max-width: 640px),
+       (max-width: 900px) and (max-height: 699px) {
+  .spotlight-open { min-height: 44px; }
+  .spotlight-open-kbd { display: none; }   /* no keyboard shortcut there */
+
+  .spotlight-fab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 1rem;
+    left: calc(1rem + 52px);
+    width: 44px;
+    height: 44px;
+    z-index: 1100;
+    border: none;
+    border-radius: var(--radius-md, 8px);
+    background: var(--bg-surface, #ffffff);
+    color: var(--text-secondary, #475569);
+    box-shadow: var(--shadow-md, 0 2px 8px rgba(0,0,0,0.12));
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+
+  /* Behind a full-screen window the page must not scroll. */
+  html.sp-open, html.sp-open body { overflow: hidden; }
+
+  /* The window fills the screen, its box on top, above the keyboard. */
+  .sp-layer { padding: 0; align-items: stretch; }
+  .sp-panel {
+    max-width: none;
+    max-height: none;
+    height: 100%;
+    border: none;
+    border-radius: 0;
+  }
+  .sp-head { padding: 10px 12px; }
+  .sp-input.sp-input { font-size: 1rem; min-height: 44px; }
+  .sp-close.sp-close { min-height: 36px; min-width: 44px; font-size: 0.8rem; }
+  .sp-row { min-height: 48px; }
+  .sp-list { flex: 1; }
+  .sp-foot { display: none; }             /* keys a phone does not have */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-layer { animation: none; }
+}
+
+/* Local palette controls and long amounts on narrow screens. */
+html.sp-open, html.sp-open body { overflow: hidden; }
+.sp-more-button, .sp-clear {
+  border: 0; background: transparent; color: var(--sp-link);
+  font: inherit; font-size: .8rem; padding: 8px 16px; cursor: pointer;
+}
+.sp-more-button:focus-visible, .sp-clear:focus-visible, .sp-close:focus-visible {
+  outline: 2px solid var(--sp-selected-edge); outline-offset: -2px;
+}
+.sp-foot { display: flex; justify-content: space-between; align-items: center; }
+.sp-clear { padding: 2px 0; }
+@media (max-width: 640px) {
+  .sp-row { flex-wrap: wrap; }
+  .sp-fact.sp-fact { margin-left: 30px; white-space: normal; }
+  .sp-foot.sp-foot { display: flex; }
+  .sp-foot-hint { display: none; }
+  .sp-clear { min-height: 36px; }
+}

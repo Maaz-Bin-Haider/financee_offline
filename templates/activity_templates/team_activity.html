@@ -1,0 +1,154 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Team Activity{% endblock title %}
+
+{% block SeperateCssFile %}
+{% comment %}
+The report shell (accounts_reports.css: the page title, the filter row) plus
+what is new here: the grid of days and the day's list (team_activity.css).
+TEAM_ACTIVITY_PLAN.md, Phase 4.
+{% endcomment %}
+<link rel="stylesheet" href="{% static 'css/accounts_reports.css' %}">
+<link rel="stylesheet" href="{% static 'css/team_activity.css' %}">
+
+{% endblock SeperateCssFile %}
+
+{% block body %}
+<div class="reports-wrapper">
+  <div class="right-panel ta-page">
+
+    <h2 class="page-title">
+      <i class="fa-solid fa-chart-simple"></i> Team Activity
+    </h2>
+
+    <p class="ta-note">{{ request.tenant_company.name }} · {{ activity_page.timezone }} · Work actions and sessions are shown separately.</p>
+    <div class="filter-form ta-controls">
+      <div class="filter-field">
+        <label for="taUser">User</label>
+        <select id="taUser"></select>
+      </div>
+      <div class="filter-field">
+        <label for="taYear">Period</label>
+        <select id="taYear"></select>
+      </div>
+      <p class="ta-period" id="taPeriod" aria-live="polite"></p>
+    </div>
+
+    <div class="ta-figures">
+      <div class="ta-figure"><span class="ta-figure-label">Actions</span><span class="ta-figure-value" id="taActions">-</span></div>
+      <div class="ta-figure"><span class="ta-figure-label">Active days</span><span class="ta-figure-value" id="taActiveDays">-</span></div>
+      <div class="ta-figure"><span class="ta-figure-label">Current streak</span><span class="ta-figure-value" id="taStreak">-</span></div>
+      <div class="ta-figure"><span class="ta-figure-label">Longest streak</span><span class="ta-figure-value" id="taLongest">-</span></div>
+      <div class="ta-figure"><span class="ta-figure-label">Per active day</span><span class="ta-figure-value" id="taPerDay">-</span></div>
+      <div class="ta-figure"><span class="ta-figure-label">Last activity</span><span class="ta-figure-value ta-small" id="taLastWork">-</span></div>
+      <div class="ta-figure"><span class="ta-figure-label">Last sign-in</span><span class="ta-figure-value ta-small" id="taLastSignIn">-</span></div>
+    </div>
+
+    <section class="ta-card" aria-labelledby="taGridTitle">
+      <h3 class="ta-card-title" id="taGridTitle">Activity by day</h3>
+      <div class="ta-grid-scroll">
+        <div class="ta-grid-frame">
+          <div class="ta-months-row" aria-hidden="true"><span class="ta-corner"></span><div class="ta-months" id="taMonths"></div></div>
+          <div class="ta-grid-body">
+            <div class="ta-weekdays" aria-hidden="true"><span>Mon</span><span></span><span>Wed</span><span></span><span>Fri</span><span></span><span>Sun</span></div>
+            <div class="ta-grid" id="taGrid" role="group" aria-label="One square a day; the arrow keys move from day to day, Home and End go to the first and last"></div>
+          </div>
+        </div>
+      </div>
+      <div class="ta-legend">
+        <span class="ta-approx-note" id="taApprox" hidden>Days before this log began come from the old Entry By data and are approximate.</span>
+        <span class="ta-scale">Less
+          <i class="ta-cell ta-l0"></i><i class="ta-cell ta-l1"></i><i class="ta-cell ta-l2"></i><i class="ta-cell ta-l3"></i><i class="ta-cell ta-l4"></i>
+          More <span class="ta-steps">1&ndash;4 · 5&ndash;10 · 11&ndash;25 · 26+ actions</span></span>
+      </div>
+    </section>
+
+    <section class="ta-card">
+      <div class="ta-card-head">
+        <h3 class="ta-card-title">The day</h3>
+        <div class="ta-actions">
+{% if features.pdf_export.enabled and features.pdf_export.subs.reports %}          <button type="button" class="ta-btn" id="taDayPdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>{% endif %}
+{% if features.excel_export.enabled %}          <button type="button" class="ta-btn" id="taDayCsv"><i class="fa-solid fa-file-csv"></i> CSV</button>{% endif %}
+        </div>
+      </div>
+      <div id="taDay" aria-live="polite">
+        <p class="ta-empty">Pick a square to see that day.</p>
+      </div>
+    </section>
+
+    <div class="ta-pair">
+      <section class="ta-card" aria-labelledby="taMixTitle">
+        <h3 class="ta-card-title" id="taMixTitle">What the work was</h3>
+        <div id="taMix"></div>
+      </section>
+      <section class="ta-card" aria-labelledby="taHoursTitle">
+        <h3 class="ta-card-title" id="taHoursTitle">When it was done</h3>
+        <div class="ta-grid-scroll"><div class="ta-hours" id="taHours" aria-label="Actions by weekday and hour, {{ activity_page.timezone }}"></div></div>
+      </section>
+    </div>
+
+    <section class="ta-card" aria-labelledby="taTeamTitle">
+      <div class="ta-card-head">
+        <h3 class="ta-card-title" id="taTeamTitle">The team</h3>
+        <div class="ta-actions">
+{% if features.pdf_export.enabled and features.pdf_export.subs.reports %}          <button type="button" class="ta-btn" id="taTeamPdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>{% endif %}
+{% if features.excel_export.enabled %}          <button type="button" class="ta-btn" id="taTeamCsv"><i class="fa-solid fa-file-csv"></i> CSV</button>{% endif %}
+        </div>
+      </div>
+      <div class="ta-table-scroll">
+        <table class="ta-table">
+          <thead><tr>
+            <th scope="col">User</th><th scope="col" class="ta-num">7 days</th><th scope="col" class="ta-num">30 days</th>
+            <th scope="col" class="ta-num">Days worked (30)</th><th scope="col">Last activity</th><th scope="col">Last sign-in</th>
+            <th scope="col">Last 12 weeks</th>
+          </tr></thead>
+          <tbody id="taTeam"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="ta-card" aria-labelledby="taWatchTitle">
+      <div class="ta-card-head">
+        <h3 class="ta-card-title" id="taWatchTitle">Watch list</h3>
+        <div class="ta-actions">
+          <label class="ta-inline" for="taWatchDays">Last</label>
+          <select id="taWatchDays" class="ta-select">
+            <option value="7">7 days</option>
+            <option value="30" selected>30 days</option>
+            <option value="90">90 days</option>
+          </select>
+{% if features.pdf_export.enabled and features.pdf_export.subs.reports %}          <button type="button" class="ta-btn" id="taWatchPdf"><i class="fa-solid fa-file-pdf"></i> PDF</button>{% endif %}
+{% if features.excel_export.enabled %}          <button type="button" class="ta-btn" id="taWatchCsv"><i class="fa-solid fa-file-csv"></i> CSV</button>{% endif %}
+        </div>
+      </div>
+      <p class="ta-note">Every deletion; edits to documents dated more than 30 days before; work before 09:00; three or more failed sign-ins within ten minutes. From live history only.</p>
+      <div class="ta-chips" id="taWatchTypes" role="group" aria-label="Show">
+        <button type="button" class="ta-chip" data-type="" aria-pressed="true">All <span class="ta-chip-count">0</span></button>
+        <button type="button" class="ta-chip" data-type="delete" aria-pressed="false">Deletions <span class="ta-chip-count">0</span></button>
+        <button type="button" class="ta-chip" data-type="old_edit" aria-pressed="false">Old documents edited <span class="ta-chip-count">0</span></button>
+        <button type="button" class="ta-chip" data-type="late" aria-pressed="false">Before opening time <span class="ta-chip-count">0</span></button>
+        <button type="button" class="ta-chip" data-type="failed_sign_in" aria-pressed="false">Failed sign-ins <span class="ta-chip-count">0</span></button>
+      </div>
+      <div class="ta-table-scroll">
+        <table class="ta-table">
+          <thead><tr><th scope="col">When</th><th scope="col">Who</th><th scope="col">What happened</th><th scope="col">Detail</th></tr></thead>
+          <tbody id="taWatch"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+{{ activity_page|json_script:"activity-page" }}
+{% comment %}
+The PDFs: jspdf, then autotable after it and in the body, as every report
+screen that exports loads them (see pending_report_template.html).
+report_pdf.js comes from base.html.
+{% endcomment %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js" integrity="sha384-vxxMdt1K6XlME6zkLsgFrrHIeC7XIdAo1GW/uhhObjJXnymxiIi/eoMXsKJA13ZJ" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{% static 'js/report_pdf.js' %}"></script>
+<script src="{% static 'js/team_activity.js' %}"></script>
+{% endblock body %}

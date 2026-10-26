@@ -1,0 +1,124 @@
+/* update_items.css */
+
+/* --- Body Styling --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background-color: var(--bg-surface-alt);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;  /* stack children vertically */
+    align-items: center;     /* center horizontally */
+    min-height: 100vh;
+    padding-top: 40px;       /* space from top */
+}
+
+/* --- Form Container --- */
+form {
+    /* Was `background: none` with a drop shadow, so the shadow hung around
+       transparent content and the card read as a rectangle of blur rather
+       than a surface. It is a card now, on the themed surface token, which
+       also gives the shadow something to sit under in dark mode. */
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 25px 30px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    width: 40vw; /* standard width */
+    max-width: 90%; /* responsive on small screens */
+    margin: auto;
+}
+button{
+      background: var(--brand-success);
+      color: #fff;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 12px;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      align-self: center;
+      gap: 8px;
+      border: none;
+    }
+button:hover{
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+/* --- Headings --- */
+h2 {
+    margin-bottom: 20px;
+    color: var(--ink-blue);
+    text-align: center;
+}
+
+/* --- Label & Input Styling --- */
+form label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
+form input[type="text"],
+form input[type="number"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--input-border);
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+form input[type="text"]:focus,
+form input[type="number"]:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px var(--input-focus-ring);
+    outline: none;
+}
+
+
+
+/* --- Suggestions Dropdown --- */
+.autocomplete-container {
+    position: relative;
+    width: 100%;
+}
+
+#suggestions {
+    border: 1px solid var(--border-color);
+    display: none;
+    position: absolute;
+    background: var(--card-bg);
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    z-index: 1000;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#suggestions div {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.2s;
+}
+
+#suggestions div:hover {
+    background-color: var(--brand-primary);
+    color: var(--text-inverse);
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 480px) {
+    form {
+        width: 90%;
+        padding: 20px;
+    }
+
+    button {
+        padding: 14px;
+    }
+}

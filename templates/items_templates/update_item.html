@@ -1,0 +1,78 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+
+
+{% block title %}Add / Edit Item{% endblock title %}
+
+{% block SeperateCssFile %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/update_items.css' %}">
+{% endblock SeperateCssFile %}
+
+{% block body %}
+<h2>Search Item</h2>
+<form method="get">
+    {% csrf_token %}
+    
+    <div class="autocomplete-container">
+        <label for="search_name">Item Name:</label>
+        <input type="text" id="search_name" name="search_name" placeholder="Enter item name" autocomplete="off" data-autocomplete-url="{% url 'items:autocomplete_item' %}">
+        <div id="suggestions" ></div>
+    </div>
+    <button type="submit">Search</button>
+</form>
+
+{% if not_found %}
+    <p style="color: var(--ink-red);">Item not found in database.</p>
+{% endif %}
+
+<h2>{% if item %}Edit Item{% else %}Select Item First{% endif %}</h2>
+
+{% if item and item.created_by_username %}
+<p style="font-size:0.82rem;color:var(--text-tertiary);margin:0 0 14px;display:flex;align-items:center;gap:6px;">
+  <i class="fa-solid fa-user-pen" style="color:var(--text-tertiary);"></i>
+  Added by: <strong>{{ item.created_by_username }}</strong>
+</p>
+{% endif %}
+<form method="post">
+    {% csrf_token %}
+    
+    
+    {% if item %}
+        <input type="hidden" name="item_id" value="{{ item.item_id }}">
+    {% endif %}
+    
+    <!-- Item Name -->
+    <label for="item_name">Item Name:</label>
+    <input type="text" id="item_name" name="item_name" value="{{ item.item_name|default:'' }}" required>
+
+    <!-- Sale Price -->
+    <label for="sale_price">Sale Price:</label>
+    <input type="number" step="0.01" id="sale_price" name="sale_price" value="{{ item.sale_price|default:'' }}">
+
+    <!-- Storage -->
+    <label for="storage">Storage: <small>(optional)</small></label>
+    <input type="text" id="storage" name="storage" value="{{ item.storage|default:'' }}">
+    <!-- Item Code -->
+    <label for="item_code">Item Code: <small>(optional)</small></label>
+    <input type="text" id="item_code" name="item_code" value="{{ item.item_code|default:'' }}">
+
+    <!-- Category -->
+    <label for="category">Category: <small>(optional)</small></label>
+    <input type="text" id="category" name="category" value="{{ item.category|default:'' }}">
+
+    <!-- Brand -->
+    <label for="brand">Brand: <small>(optional)</small></label>
+    <input type="text" id="brand" name="brand" value="{{ item.brand|default:'' }}">
+
+    <!-- Submit -->
+    <button type="submit">Submit</button>
+</form>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'js/autocomplete_item_names.js' %}"></script>
+
+
+{% endblock body %}

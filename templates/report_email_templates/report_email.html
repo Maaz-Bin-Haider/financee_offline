@@ -1,0 +1,237 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Report Email{% endblock title %}
+
+{% block SeperateCssFile %}
+<link rel="stylesheet" href="{% static 'css/accounts_reports.css' %}">
+<link rel="stylesheet" href="{% static 'css/report_email.css' %}">
+
+
+
+{% endblock SeperateCssFile %}
+
+{% block body %}
+
+{% if capture_only %}<p class="re-capture-note">Local review: all report mail is captured in the local inbox. No external SMTP delivery.</p>{% endif %}
+{% csrf_token %}
+<!-- Page title bar -->
+<div class="re-page-head">
+  <div class="re-page-icon"><i class="fa-solid fa-paper-plane"></i></div>
+  <div>
+    <h2>Report Email</h2>
+    <p>{{ request.tenant_company.name }} · Sale-wise Profit in {{ request.tenant_company.base_currency_id }}</p>
+  </div>
+</div>
+
+<!-- ══ Status hero ══════════════════════════════════════════════════════ -->
+<section class="re-hero" id="reHero" aria-live="polite">
+  <div class="re-hero-glow" aria-hidden="true"></div>
+  <div class="re-hero-main">
+    <span class="re-status" id="reStatus">
+      <span class="re-dot" aria-hidden="true"></span>
+      <span class="re-status-text" id="reStatusText">Loading…</span>
+    </span>
+    <p class="re-hero-line" id="reHeroLine">Checking the delivery schedule…</p>
+    <button type="button" class="re-btn re-btn-ghost re-btn-sm re-rearm" id="reRearm" hidden>
+      <i class="fa-solid fa-rotate-left"></i><span>Let the schedule send it again</span>
+    </button>
+  </div>
+  <div class="re-hero-next" id="reNextWrap" hidden>
+    <span class="re-hero-next-label">Next delivery in</span>
+    <span class="re-countdown" id="reCountdown">—</span>
+    <span class="re-hero-next-at" id="reNextAt"></span>
+  </div>
+</section>
+
+<!-- ══ Tabs ═════════════════════════════════════════════════════════════ -->
+<div class="re-tabs" role="tablist" aria-label="Report Email sections">
+  <button type="button" class="re-tab is-active" role="tab" id="tab-mailbox"
+          aria-selected="true" aria-controls="panel-mailbox" data-panel="mailbox">
+    <i class="fa-solid fa-inbox"></i><span>Sending mailbox</span>
+  </button>
+  <button type="button" class="re-tab" role="tab" id="tab-recipients"
+          aria-selected="false" aria-controls="panel-recipients" data-panel="recipients">
+    <i class="fa-solid fa-users"></i><span>Recipients</span>
+    <span class="re-tab-count" id="reRecipientCount" hidden>0</span>
+  </button>
+  <button type="button" class="re-tab" role="tab" id="tab-log"
+          aria-selected="false" aria-controls="panel-log" data-panel="log">
+    <i class="fa-solid fa-clock-rotate-left"></i><span>Delivery log</span>
+  </button>
+  <span class="re-tab-marker" id="reTabMarker" aria-hidden="true"></span>
+</div>
+
+<!-- ══ Mailbox ══════════════════════════════════════════════════════════ -->
+<section class="re-panel is-active" id="panel-mailbox" role="tabpanel" aria-labelledby="tab-mailbox">
+  <form class="re-card" id="reMailboxForm" autocomplete="off" novalidate>
+    <header class="re-card-head">
+      <h3><i class="fa-solid fa-inbox"></i> The mailbox reports are sent from</h3>
+      <label class="re-switch" for="reEnabled">
+        <input type="checkbox" id="reEnabled" checked>
+        <span class="re-switch-track" aria-hidden="true"><span class="re-switch-thumb"></span></span>
+        <span class="re-switch-label">Daily delivery on</span>
+      </label>
+    </header>
+
+    <div class="re-grid">
+      <div class="re-field">
+        <label for="reSenderEmail">Sending address</label>
+        <input type="email" id="reSenderEmail" placeholder="reports@yourcompany.com" required>
+        <small>The company mailbox the report is sent <em>from</em>. One only.</small>
+      </div>
+
+      <div class="re-field">
+        <label for="reSenderName">Display name</label>
+        <input type="text" id="reSenderName" placeholder="Financee Reports">
+        <small>What recipients see in the From line.</small>
+      </div>
+
+      <div class="re-field re-field-wide">
+        <label for="reAppPassword">App password</label>
+        <div class="re-password">
+          <input type="password" id="reAppPassword" placeholder="Enter the 16-character app password"
+                 autocomplete="new-password">
+          <button type="button" class="re-eye" id="reReveal" aria-label="Show the app password"
+                  aria-pressed="false"><i class="fa-solid fa-eye"></i></button>
+        </div>
+        <small id="rePasswordHint">
+          For Gmail this is an <strong>app password</strong>, not the account password.
+        </small>
+      </div>
+
+      <div class="re-field re-field-narrow">
+        <label for="reSendTime">Send at</label>
+        <input type="time" id="reSendTime" value="00:00" step="60">
+        <small>Every day, in the time zone beside it.</small>
+      </div>
+
+      <div class="re-field">
+        <label for="reTimezone">Business time zone</label>
+        <input type="text" id="reTimezone" list="reZoneList" placeholder="Asia/Karachi">
+        <datalist id="reZoneList"></datalist>
+        <small>Decides which day counts as “yesterday”.</small>
+      </div>
+      <label class="re-check"><input type="checkbox" id="reClearPassword"> Clear stored app password when saving</label>
+    </div>
+
+    <!-- Transport last: the fields nobody touches after the first day. -->
+    <details class="re-advanced" id="reAdvanced">
+      <summary>
+        <i class="fa-solid fa-sliders"></i>
+        <span>Mail server</span>
+        <small id="reAdvancedSummary">smtp.gmail.com : 587 · TLS</small>
+        <i class="fa-solid fa-chevron-down re-chevron" aria-hidden="true"></i>
+      </summary>
+      <div class="re-grid re-grid-advanced">
+        <div class="re-field">
+          <label for="reSmtpHost">SMTP server</label>
+          <input type="text" id="reSmtpHost" placeholder="smtp.gmail.com">
+        </div>
+
+        <div class="re-field re-field-narrow">
+          <label for="reSmtpPort">Port</label>
+          <input type="number" id="reSmtpPort" min="1" max="65535" placeholder="587">
+        </div>
+
+        <div class="re-field re-field-narrow">
+          <label class="re-check" for="reUseTls">
+            <input type="checkbox" id="reUseTls" checked>
+            <span>Use TLS</span>
+          </label>
+          <small>TLS on port 587; uncheck only for implicit TLS on port 465.</small>
+        </div>
+      </div>
+    </details>
+
+    <footer class="re-card-foot">
+      <div class="re-foot-note" id="reMailboxNote"></div>
+      <div class="re-actions">
+        <button type="button" class="re-btn re-btn-ghost" id="reSendTest">
+          <i class="fa-solid fa-vial"></i><span>Send test email</span>
+        </button>
+        <button type="submit" class="re-btn re-btn-primary" id="reSaveMailbox">
+          <i class="fa-solid fa-floppy-disk"></i><span>Save mailbox</span>
+        </button>
+      </div>
+    </footer>
+  </form>
+
+  <div class="re-card re-card-soft">
+    <header class="re-card-head">
+      <h3><i class="fa-solid fa-rocket"></i> Send a report by hand</h3>
+    </header>
+    <div class="re-manual">
+      <div class="re-field">
+        <label for="reManualDate">Business day</label>
+        <input type="date" id="reManualDate">
+        <small>Leave empty for yesterday.</small>
+      </div>
+      <button type="button" class="re-btn re-btn-primary" id="reSendNow">
+        <i class="fa-solid fa-paper-plane"></i><span>Send now</span>
+      </button>
+    </div>
+    <p class="re-hint">
+      A manual send is logged separately, so re-sending a day by hand never stops
+      that day's scheduled delivery from going out.
+    </p>
+  </div>
+</section>
+
+<!-- ══ Recipients ═══════════════════════════════════════════════════════ -->
+<section class="re-panel" id="panel-recipients" role="tabpanel" aria-labelledby="tab-recipients" hidden>
+  <div class="re-card">
+    <header class="re-card-head">
+      <h3><i class="fa-solid fa-users"></i> Who receives the report</h3>
+    </header>
+
+    <form class="re-add-row" id="reAddForm" autocomplete="off">
+      <div class="re-field">
+        <label for="reNewEmail">Email address</label>
+        <input type="email" id="reNewEmail" placeholder="owner@yourcompany.com" required>
+      </div>
+      <div class="re-field">
+        <label for="reNewLabel">Label <span class="re-optional">optional</span></label>
+        <input type="text" id="reNewLabel" placeholder="Owner">
+      </div>
+      <button type="submit" class="re-btn re-btn-primary" id="reAddRecipient">
+        <i class="fa-solid fa-plus"></i><span>Add recipient</span>
+      </button>
+    </form>
+
+    <ul class="re-list" id="reRecipientList"></ul>
+    <div class="re-empty" id="reRecipientEmpty" hidden>
+      <i class="fa-solid fa-user-plus"></i>
+      <p>No recipients yet. Add at least one and the daily report has somewhere to go.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ Delivery log ═════════════════════════════════════════════════════ -->
+<section class="re-panel" id="panel-log" role="tabpanel" aria-labelledby="tab-log" hidden>
+  <div class="re-log-stats" id="reLogStats"></div>
+  <div class="re-card">
+    <header class="re-card-head">
+      <h3><i class="fa-solid fa-clock-rotate-left"></i> Every delivery attempt</h3>
+      <button type="button" class="re-btn re-btn-ghost re-btn-sm" id="reRefreshLog">
+        <i class="fa-solid fa-rotate"></i><span>Refresh</span>
+      </button>
+    </header>
+    <p class="re-hint">Unknown means SMTP may have accepted the message. Check the inbox before re-arming. Superseded rows remain as history.</p>
+    <div class="table-container">
+      <table id="reportTable">
+        <thead id="reLogHead"></thead>
+        <tbody id="reLogBody">
+          <tr><td class="no-data">Loading the delivery log…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="re-actions"><button type="button" class="re-btn re-btn-ghost" id="reLogPrev">Newer</button><span id="reLogPage"></span><button type="button" class="re-btn re-btn-ghost" id="reLogNext">Older</button></div>
+  </div>
+</section>
+
+<div class="re-toasts" id="reToasts" aria-live="polite" aria-atomic="false"></div>
+
+<script src="{% static 'js/report_email.js' %}"></script>
+
+{% endblock body %}

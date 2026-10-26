@@ -1,0 +1,95 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Add New Item{% endblock title %}
+
+{% block SeperateCssFile %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/update_items.css' %}">
+{% endblock SeperateCssFile %}
+
+{% block body %}
+<!-- ------------------------------Item Form----------------------------------------------------- -->
+<h2>Add Item </h2>
+<form method="post" id="create_item_form">
+    {% csrf_token %}
+
+    
+
+    <!-- Item Name -->
+    <label for="item_name">Item Name:</label>
+    <input type="text" id="item_name" name="item_name" placeholder="Enter item name" required>
+
+
+    <!-- Sale Price -->
+    <label for="sale_price">Sale Price:</label>
+    <input type="number" step="0.01" id="sale_price" name="sale_price" placeholder="Enter price">
+
+    <!-- Storage -->
+    <label for="storage">Storage: <small>(optional)</small></label>
+    <input type="text" id="storage" name="storage" placeholder="e.g. Warehouse A">
+
+    <!-- Item Code -->
+    <label for="item_code">Item Code: <small>(optional)</small></label>
+    <input type="text" id="item_code" name="item_code" placeholder="Enter unique item code">
+
+    <!-- Category -->
+    <label for="category">Category: <small>(optional)</small></label>
+    <input type="text" id="category" name="category" placeholder="e.g. Electronics">
+
+    <!-- Brand -->
+    <label for="brand">Brand: <small>(optional)</small></label>
+    <input type="text" id="brand" name="brand" placeholder="e.g. Samsung">
+
+
+    <!-- Submit -->
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+    document.getElementById("create_item_form").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const formData = new FormData(form);
+
+        fetch("", {
+            method: "POST",
+            body: formData,
+            headers: { "X-CSRFToken": form.querySelector('[name=csrfmiddlewaretoken]').value }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                // Swal.fire({
+                //     icon: "success",
+                //     title: "Success",
+                //     text: data.message,
+                //     showConfirmButton: false,   // 🔹 No confirm button
+                //     timer: 2500,                // 🔹 Auto close after 1.5s
+                //     timerProgressBar: true
+                // }).then(() => {
+                Alerts.success(data.message).then(() => {
+                    location.reload();          // 🔹 Reload page
+                });
+            } else {
+                // Swal.fire({
+                //     icon: "error",
+                //     title: "Error",
+                //     text: data.message,
+                //     confirmButtonColor: '#3085d6'  // 🔹 Has confirm button
+                // });
+                Alerts.error(data.message);
+            }
+        })
+        .catch(() => {
+            // Swal.fire({
+            //     icon: "error",
+            //     title: "Error",
+            //     text: "Something went wrong while submitting the form.",
+            //     confirmButtonColor: '#d33'
+            // });
+            Alerts.error("Something went wrong while submitting the form.");
+        });
+    });
+</script>
+{% endblock body %}

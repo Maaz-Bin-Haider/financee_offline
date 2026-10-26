@@ -1,0 +1,196 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Confirmed Draft Return{% endblock title %}
+
+{% block SeperateCssFile %}
+<link rel="stylesheet" href="{% static 'css/purchasing_styling.css' %}">
+<link rel="stylesheet" href="{% static 'css/smart_description.css' %}">
+{% comment %}
+The return-row rules live in draft_styling.css rather than an inline style
+block, where the Sale Return screen keeps its equivalent: a stylesheet is
+cacheable and reviewable, and the rows use the shared tokens throughout.
+{% endcomment %}
+<link rel="stylesheet" href="{% static 'css/draft_styling.css' %}">
+{% endblock SeperateCssFile %}
+
+{% block body %}
+<div class="sale-page-wrapper">
+
+  <div class="sale-topbar">
+    <div class="sale-topbar-left">
+      <button type="button" class="custom-btn btn-topbar" onclick="returnHistory()">
+        <i class="fa-solid fa-clock-rotate-left"></i> Return History
+      </button>
+      <button type="button" class="custom-btn btn-topbar" onclick="returnDateWise()">
+        <i class="fa-solid fa-calendar-days"></i> By Date Range
+      </button>
+    </div>
+    <div class="sale-topbar-right">
+      <button type="button" class="custom-btn btn-topbar" onclick="newReturn()">
+        <i class="fa-solid fa-file-circle-plus"></i> New Return
+      </button>
+    </div>
+  </div>
+
+  <div class="sale-card">
+
+    <div class="sale-card-header">
+      <div class="sale-card-header-left">
+        <div class="sale-invoice-icon">↩️</div>
+        <div>
+          <h2 class="sale-invoice-title">Confirmed Draft Return</h2>
+          <span class="sale-invoice-id-badge" id="returnIdBadge">#NEW</span>
+          <span class="draft-entry-badge" title="Entry By">
+            <i class="fa-solid fa-user-pen"></i>
+            <span id="entryByName">—</span>
+          </span>
+        </div>
+      </div>
+      <div class="sale-nav-pills">
+        <button type="button" class="nav-pill-btn" onclick="navigateReturn('previous')">
+          <i class="fa-solid fa-arrow-left"></i> Previous
+        </button>
+        <button type="button" class="nav-pill-btn" onclick="navigateReturn('next')">
+          Next <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    {% comment %}
+    Says which document this is and which it is not. A serial sold on an
+    ordinary invoice is refused here and sent to the Sale Return screen, and
+    the mirror holds there -- enforced in the database, not by this sentence.
+    {% endcomment %}
+    <p class="draft-explainer">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>This returns goods that were <strong>confirmed out of a draft</strong>
+      &mdash; priced, invoiced and delivered &mdash; and are now coming back.
+      Serials sold on an ordinary sale belong on the Sale Return screen. Returned
+      units go back to <strong>free stock</strong>, not back to their
+      reservation.</span>
+    </p>
+
+    {% comment %}
+    What this screen is NOT for. A reservation is not a sale -- no invoice, no
+    balance, nothing ever left stock -- so there is no return to make, and the
+    action that frees the unit lives on the draft itself. The database refuses
+    it either way; this is so nobody has to learn that by being told no.
+    {% endcomment %}
+    <p class="draft-explainer draft-explainer-note">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span>Still <strong>reserved</strong> and not yet confirmed? There is nothing
+      to return &mdash; a draft raises no invoice and moves no stock. Open the draft
+      on {% if features.draft_invoices.subs.drafts %}<a href="{% url 'draft:draft_page' %}">Draft Invoices</a>{% else %}Draft Invoices{% endif %} and use
+      <strong>Release Serials</strong> to put the unit back into free stock.</span>
+    </p>
+
+    <form onsubmit="submitReturn(event)" id="draftReturnForm">
+      <div class="sale-card-body">
+
+        <div class="sale-meta-grid draft-meta-grid">
+          <div class="sale-field-group">
+            <label class="sale-field-label" for="party_name"><i class="fa-solid fa-user"></i> Customer</label>
+            {% comment %}
+            Read-only and filled from the first serial. The serial's sale decides
+            the only party that may return it, so asking the operator to type it
+            as well would only be a chance to get it wrong.
+            {% endcomment %}
+            <input type="text" id="party_name" class="sale-input" readonly
+                   placeholder="Fills from the first serial…">
+          </div>
+          <div class="sale-field-group">
+            <label class="sale-field-label" for="return_date"><i class="fa-solid fa-calendar"></i> Return Date</label>
+            {% comment %}
+            A real date, sent to the database and booked on that date -- unlike
+            the older return screens, which stamp today's date whatever is
+            picked.
+            {% endcomment %}
+            <input type="date" id="return_date" class="sale-input" required>
+          </div>
+        </div>
+
+        <div class="sale-field-group draft-description-group">
+          <label class="sale-field-label" for="return_description">
+            <i class="fa-solid fa-note-sticky"></i> Description <span class="sale-field-optional">(optional)</span>
+          </label>
+          <textarea id="return_description" name="description" class="sale-input" data-smart-description
+                    rows="2" maxlength="1000" placeholder="Add a note for this return…"></textarea>
+        </div>
+
+        <div class="sale-divider"></div>
+
+        <div class="items-section-header">
+          <div class="items-section-title">
+            <div class="title-icon">🔢</div>
+            Serial Numbers to Return
+          </div>
+          <div class="items-action-bar">
+            <button type="button" class="custom-btn btn-add-item" onclick="addSerialRow()">
+              <i class="fa-solid fa-plus"></i> Add Serial
+            </button>
+          </div>
+        </div>
+
+        <div class="dr-col-headers">
+          <span class="dr-col-label">Serial Number</span>
+          <span class="dr-col-label">Item Name</span>
+          <span class="dr-col-label">Sold Price</span>
+          <span class="dr-col-label">From Draft</span>
+          <span class="dr-col-label"></span>
+        </div>
+
+        <p class="draft-hint">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>Enter a serial — the item, its sold price and the draft it came from
+          fill automatically from the original sale.</span>
+        </p>
+
+        <div id="serials"></div>
+
+      </div><!-- /.sale-card-body -->
+
+      <input type="hidden" id="current_return_id" value="">
+
+      <div class="sale-card-footer">
+        <div class="sale-totals-group">
+          <div class="total-chip">
+            <span class="total-chip-label">Serials</span>
+            <span class="total-chip-value" id="totalSerials">0</span>
+          </div>
+          <div class="total-chip">
+            <span class="total-chip-label">Return Amount ({{ currency|default:"PKR" }})</span>
+            <span class="total-chip-value amount-value" id="totalReturnAmount">0.00</span>
+          </div>
+        </div>
+        <div class="sale-actions">
+          <button type="submit" class="save-and-update-btn" id="saveBtn">
+            <i class="fa-solid fa-floppy-disk"></i> Save Return
+          </button>
+          <button type="button" class="delete-btn" id="deleteBtn" onclick="deleteReturn()">
+            <i class="fa-solid fa-trash"></i> Delete
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div><!-- /.sale-card -->
+
+</div><!-- /.sale-page-wrapper -->
+
+{% comment %}
+The company's base currency for the money labels the scripts build.
+jsPDF, then autotable, then the theme and the shared draft report helpers, in
+that order and in the body: the autotable copy in base.html's head runs before
+window.jspdf exists and attaches to nothing.
+{% endcomment %}
+<script>
+  window.FINANCEE_CURRENCY = "{{ currency|default:'PKR'|escapejs }}";
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="{% static 'js/smart_description.js' %}"></script>
+<script src="{% static 'js/report_pdf.js' %}"></script>
+<script src="{% static 'js/draft_reports.js' %}"></script>
+<script src="{% static 'js/draft_return_script.js' %}"></script>
+{% endblock body %}

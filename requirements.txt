@@ -1,0 +1,6 @@
+Django==6.0.6
+django-environ==0.14.0
+gunicorn==26.0.0
+psycopg2-binary==2.9.12
+redis==8.0.1
+reportlab==5.0.0

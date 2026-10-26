@@ -1,0 +1,149 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a> &rsaquo;
+  <a href="{% url 'admin:user_activity' %}">User Activity</a> &rsaquo;
+  {{ u.username }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main" class="fin-scope">
+
+  <!-- KPIs -->
+  <div class="fin-kpi-grid">
+    <div class="fin-kpi">
+      <div class="kpi-icon"><i class="fa-solid fa-bolt"></i></div>
+      <div><div class="kpi-val">{{ totals.count }}</div><div class="kpi-label">Actions in Range</div></div>
+    </div>
+    <div class="fin-kpi green">
+      <div class="kpi-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+      <div><div class="kpi-val kpi-val-money">{{ totals.amount|floatformat:2 }}</div><div class="kpi-label">Monetary Value</div></div>
+    </div>
+    <div class="fin-kpi violet">
+      <div class="kpi-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+      <div><div class="kpi-val">{% if row %}{{ row.admin_actions }}{% else %}0{% endif %}</div><div class="kpi-label">Admin Actions</div></div>
+    </div>
+    <div class="fin-kpi slate">
+      <div class="kpi-icon"><i class="fa-solid fa-database"></i></div>
+      <div><div class="kpi-val kpi-val-text">{{ schema }}</div><div class="kpi-label">Schema</div></div>
+    </div>
+  </div>
+
+  <!-- Profile + filter toolbar -->
+  <div class="fin-card fin-profile-card">
+    <div class="fin-card-head"><i class="fa-solid fa-id-badge"></i> {{ u.username }}
+      <span class="fin-head-spacer"></span>
+      {% if u.is_superuser %}<span class="fin-pill fin-pill-super">Superuser</span>
+      {% elif u.is_staff %}<span class="fin-pill fin-pill-staff">Staff</span>
+      {% else %}<span class="fin-pill fin-pill-user">User</span>{% endif %}
+      {% if u.is_active %}<span class="fin-pill fin-pill-active">Active</span>{% else %}<span class="fin-pill fin-pill-inactive">Inactive</span>{% endif %}
+    </div>
+    <div class="fin-card-body">
+      <div class="fin-meta fin-meta-spaced">
+        <span class="k">Full name</span><span class="v">{{ u.get_full_name|default:"—" }}</span>
+        <span class="k">Email</span><span class="v">{{ u.email|default:"—" }}</span>
+        <span class="k">Groups</span><span class="v">{{ groups }}</span>
+        <span class="k">Last login</span><span class="v">{% if u.last_login %}{{ u.last_login|date:"d M Y, H:i" }}{% else %}Never{% endif %}</span>
+      </div>
+
+      <form method="get" class="fin-filter-bar">
+        <div class="fin-field">
+          <label for="from">From</label>
+          <input type="date" id="from" name="from" value="{{ date_from }}">
+        </div>
+        <div class="fin-field">
+          <label for="to">To</label>
+          <input type="date" id="to" name="to" value="{{ date_to }}">
+        </div>
+        <button type="submit" class="fin-btn fin-btn-primary"><i class="fa-solid fa-filter"></i> Apply</button>
+        <a class="fin-btn fin-btn-ghost" href="{% url 'admin:user_activity_detail' u.id %}"><i class="fa-solid fa-xmark"></i> Clear</a>
+        <span class="fin-filter-spacer"></span>
+        <a class="fin-btn fin-btn-pdf" href="{% url 'admin:user_activity_pdf' u.id %}{% if date_from or date_to %}?from={{ date_from }}&to={{ date_to }}{% endif %}">
+          <i class="fa-solid fa-file-pdf"></i> Download PDF
+        </a>
+        <a class="fin-btn fin-btn-ghost" href="{% url 'admin:auth_user_change' u.id %}"><i class="fa-solid fa-pen"></i> Edit user</a>
+      </form>
+    </div>
+  </div>
+
+  <!-- Summary chips -->
+  <h2 class="fin-section-title">Summary</h2>
+  <div class="fin-summary-grid">
+    {% for s in summary %}
+      {% if s.count %}
+      <div class="fin-summary-chip">
+        <span class="chip-icon"><i class="fa-solid {{ s.icon }}"></i></span>
+        <div class="chip-body">
+          <div class="chip-top"><span class="chip-type">{{ s.type }}</span><span class="chip-count">{{ s.count }}</span></div>
+          {% if s.monetary %}<div class="chip-total">{{ s.total|floatformat:2 }}</div>{% else %}<div class="chip-total muted">—</div>{% endif %}
+        </div>
+      </div>
+      {% endif %}
+    {% empty %}{% endfor %}
+  </div>
+
+  <!-- Detailed activity -->
+  <h2 class="fin-section-title fin-title-tight">Detailed Activity
+    <span class="fin-count-badge">{{ entries|length }}</span>
+  </h2>
+
+  <div class="fin-table-wrap">
+    <table class="fin-table fin-activity-table">
+      <thead>
+        <tr>
+          <th class="col-num">#</th>
+          <th class="col-date">Date</th>
+          <th class="col-type">Type</th>
+          <th>Details</th>
+          <th class="col-money">Amount</th>
+          <th class="col-recorded">Recorded</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in entries %}
+        <tr>
+          <td class="fin-muted">{{ forloop.counter }}</td>
+          <td>{% if e.date %}{{ e.date|date:"d M Y" }}{% else %}—{% endif %}</td>
+          <td><span class="fin-type-badge type-{{ e.type|slugify }}"><i class="fa-solid {{ e.icon }}"></i> {{ e.type }}</span></td>
+          <td class="fin-desc">{{ e.description }}</td>
+          <td class="fin-money-cell">{% if e.amount != None %}<strong>{{ e.amount|floatformat:2 }}</strong>{% else %}<span class="fin-muted">—</span>{% endif %}</td>
+          <td class="fin-muted">{% if e.recorded_at %}{{ e.recorded_at|date:"d M Y, H:i" }}{% else %}—{% endif %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="fin-empty">No activity found for the selected period.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Recent admin actions -->
+  <h2 class="fin-section-title fin-title-spaced">Recent Admin Actions</h2>
+  <div class="fin-card">
+    <div class="fin-card-body">
+      {% if recent_actions %}
+      <ul class="fin-actions-list">
+        {% for a in recent_actions %}
+        <li>
+          <span>
+            <span class="fin-act-flag {{ a.action }}">{{ a.action }}</span>
+            {{ a.object }}
+            {% if a.model %}<span class="fin-muted fin-small">({{ a.model }})</span>{% endif %}
+          </span>
+          <span class="act-time">{{ a.time|date:"d M Y, H:i" }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <div class="fin-empty">No admin-panel actions recorded for this user.</div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

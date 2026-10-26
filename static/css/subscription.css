@@ -1,0 +1,211 @@
+/* ============================================================================
+   Subscription control — tenant-facing styles.
+   1) The full-page "Account Suspended" pay-wall
+      (templates/tenancy_templates/subscription_suspended.html).
+   2) The renewal warning banner injected by base.html when a company is in
+      the "expiring" or "grace" subscription state.
+   ========================================================================== */
+
+/* ── 1. Suspended page ──────────────────────────────────────────────────── */
+
+.suspended-body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f6f9;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  color: #1f2937;
+  padding: 20px;
+}
+
+.suspended-card {
+  max-width: 480px;
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e9f2;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  padding: 38px 34px 30px;
+  text-align: center;
+}
+
+.suspended-brand {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #2563eb;
+  margin-bottom: 22px;
+}
+
+.suspended-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background: #fff4f3;
+  border: 1px solid #f0beb9;
+  color: #b3453c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.suspended-card h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.suspended-company {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #51657b;
+  margin: 0 0 16px;
+}
+
+.suspended-message {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: #374151;
+  margin: 0 0 14px;
+}
+
+.suspended-hint {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #94a3b8;
+  margin: 0 0 24px;
+}
+
+.suspended-actions {
+  border-top: 1px solid #eef1f6;
+  padding-top: 18px;
+}
+
+.suspended-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  background: #334155;
+  color: #f8fafc;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.suspended-logout:hover {
+  background: #1e293b;
+  color: #ffffff;
+}
+
+/* Suspended page, dark theme. This page loads no base_styling.css, so it
+   has no tokens; the values are base_styling.css's dark tokens, copied. */
+html.dark-mode .suspended-body {
+  background: #0a0f1e;
+  color: #f1f5f9;
+}
+
+html.dark-mode .suspended-card {
+  background: #111827;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+html.dark-mode .suspended-brand {
+  color: #93c5fd;
+}
+
+html.dark-mode .suspended-icon {
+  background: rgba(239, 68, 68, 0.16);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+
+html.dark-mode .suspended-company,
+html.dark-mode .suspended-message {
+  color: #cbd5e1;
+}
+
+html.dark-mode .suspended-hint {
+  color: #8fa1b8;
+}
+
+html.dark-mode .suspended-actions {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+html.dark-mode .suspended-logout {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+html.dark-mode .suspended-logout:hover {
+  background: #334155;
+}
+
+/* ── 2. Renewal warning banner (base.html) ──────────────────────────────── */
+
+.subscription-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 14px 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.subscription-banner i {
+  flex-shrink: 0;
+}
+
+.subscription-banner span {
+  flex: 1;
+}
+
+.subscription-banner.expiring {
+  background: #fdf6e3;
+  border: 1px solid #f0e0b0;
+  color: #8a6d1a;
+}
+
+.subscription-banner.grace {
+  background: #fff4f3;
+  border: 1px solid #f0beb9;
+  color: #b3453c;
+}
+
+.subscription-banner-close {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.subscription-banner-close:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* Dark mode (base.html toggles .dark-mode on <html>/<body>) */
+.dark-mode .subscription-banner.expiring {
+  background: rgba(240, 224, 176, 0.12);
+  border-color: rgba(240, 224, 176, 0.35);
+  color: #e4cf8d;
+}
+
+.dark-mode .subscription-banner.grace {
+  background: rgba(240, 190, 185, 0.12);
+  border-color: rgba(240, 190, 185, 0.35);
+  color: #eba39c;
+}

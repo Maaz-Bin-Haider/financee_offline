@@ -1,0 +1,33 @@
+{% comment %}
+Quick actions, shared by the dashboard and the plain home page shown when the
+dashboard is switched off. Each link follows its module's switch
+(tenancy/features.py). The View Items / View Parties popups belong to the
+dashboard's "Party & item lists" widget, so they come only with show_lists.
+{% endcomment %}
+{% if features.sales.enabled or features.purchases.enabled or features.parties.enabled or features.payments.enabled or features.receipts.enabled or features.items.enabled or show_lists %}
+<p class="dash-section-label"><i class="fa-solid fa-bolt"></i> Quick Actions</p>
+<div class="quick-actions-bar" style="margin-bottom:24px;">
+  {% if features.sales.enabled %}
+  <a href="{% url 'sale:sales' %}" class="qa-btn"><i class="fa-solid fa-cart-arrow-down"></i><span>New Sale</span></a>
+  {% endif %}
+  {% if features.purchases.enabled %}
+  <a href="{% url 'purchase:purchasing' %}" class="qa-btn"><i class="fa-solid fa-bag-shopping"></i><span>New Purchase</span></a>
+  {% endif %}
+  {% if features.parties.enabled %}
+  <a href="{% url 'parties:partiesDash' %}" class="qa-btn"><i class="fa-solid fa-user-plus"></i><span>Add Party</span></a>
+  {% endif %}
+  {% if features.payments.enabled %}
+  <a href="{% url 'payments:payment' %}" class="qa-btn"><i class="fa-solid fa-credit-card"></i><span>New Payment</span></a>
+  {% endif %}
+  {% if features.receipts.enabled %}
+  <a href="{% url 'receipts:receipt' %}" class="qa-btn"><i class="fa-solid fa-receipt"></i><span>New Receipt</span></a>
+  {% endif %}
+  {% if features.items.enabled %}
+  <a href="{% url 'items:itemsDash' %}" class="qa-btn"><i class="fa-solid fa-box-open"></i><span>Add Item</span></a>
+  {% endif %}
+  {% if show_lists %}
+  <button class="qa-btn" id="open-items-btn"><i class="fa-solid fa-boxes-stacked"></i><span>View Items</span></button>
+  <button class="qa-btn" id="open-parties-qa"><i class="fa-solid fa-users"></i><span>View Parties</span></button>
+  {% endif %}
+</div>
+{% endif %}

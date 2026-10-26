@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account Suspended — Financee</title>
+
+  <!-- Same theme contract as base/base.html: dark unless 'light' is explicitly stored.
+       This page does not extend that template, so it carries its own copy
+       (PROJECT_CONTEXT.md, Dark Mode). Above the stylesheet on purpose. -->
+  <script>
+    (function () {
+      var dark = true;
+      try { dark = localStorage.getItem('theme') !== 'light'; } catch (e) {}
+      if (dark) document.documentElement.classList.add('dark-mode');
+    })();
+  </script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link rel="stylesheet" href="{% static 'css/subscription.css' %}">
+</head>
+<body class="suspended-body">
+  <div class="suspended-card">
+    <div class="suspended-brand">
+      <i class="fa-solid fa-coins"></i> Financee
+    </div>
+    <div class="suspended-icon">
+      <i class="fa-solid fa-lock"></i>
+    </div>
+    <h1>Account Suspended</h1>
+    {% if company %}
+    <p class="suspended-company">{{ company.name }}</p>
+    {% endif %}
+    <p class="suspended-message">{{ message }}</p>
+    <p class="suspended-hint">
+      If the payment has already been made, please allow a short time for it to
+      be confirmed, or contact your service provider directly.
+    </p>
+    <div class="suspended-actions">
+      <a href="{% url 'authentication:logout' %}" class="suspended-logout">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </a>
+    </div>
+  </div>
+</body>
+</html>

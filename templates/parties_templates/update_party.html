@@ -1,0 +1,207 @@
+{% extends "base/base.html" %}
+
+
+
+
+{% load static %}
+
+{% block title %}Update / Add Party{% endblock title %}
+
+{% block SeperateCssFile %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/party_forms.css' %}">
+{% endblock SeperateCssFile %}
+
+{% block body %}
+
+<div class="party-page-wrapper">
+
+  <!-- ── Page Header ── -->
+  <div class="party-page-header">
+    <div class="page-eyebrow">
+      <span class="dot"></span>
+      Party Management
+    </div>
+    <h1>{% if party %}Edit <span>Party</span>{% else %}Update <span>Party</span>{% endif %}</h1>
+    <p>Search for an existing party or add a new one below</p>
+  </div>
+
+  <!-- ── Not Found Banner ── -->
+  {% if not_found %}
+  <div class="not-found-banner" style="max-width:680px;margin:0 auto 20px;">
+    No party found matching your search. Try a different name.
+  </div>
+  {% endif %}
+
+  <!-- ── Search Section ── -->
+  <div class="search-section">
+    <h2>Search Party</h2>
+    <form method="get" autocomplete="off">
+      {% csrf_token %}
+      <div class="search-row">
+        <div class="form-group autocomplete-container" style="position:relative;">
+          <label for="search_name">
+            <span class="lbl-icon">◈</span> Party Name
+          </label>
+          <input
+            type="text"
+            id="search_name"
+            name="search_name"
+            placeholder="Start typing a party name…"
+            autocomplete="off"
+            data-autocomplete-url="{% url 'parties:autocomplete_party' %}"
+          >
+          <div id="suggestions"></div>
+        </div>
+        <button type="submit" class="btn-search">
+          <span>⌕</span> Search
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ── Edit / Add Card ── -->
+  <div class="party-card">
+
+    {% if party %}
+    <div class="edit-mode-badge">
+      <span class="dot-green"></span>
+      Editing: {{ party.party_name }}
+    </div>
+    {% if party.created_by_username %}
+    <p style="font-size:0.82rem;color:var(--text-tertiary);margin:0 0 12px;display:flex;align-items:center;gap:6px;">
+      <i class="fa-solid fa-user-pen" style="color:var(--text-tertiary);"></i>
+      Added by: <strong>{{ party.created_by_username }}</strong>
+    </p>
+    {% endif %}
+    {% endif %}
+
+    <form method="post" autocomplete="off">
+      {% csrf_token %}
+
+      {% if party %}
+        <input type="hidden" name="party_id" value="{{ party.party_id }}">
+      {% endif %}
+
+      <div class="form-grid">
+
+        <!-- Section -->
+        <div class="section-label">Party Identity</div>
+
+        <!-- Party Name -->
+        <div class="form-group full-width">
+          <label for="party_name">
+            <span class="lbl-icon">◈</span> Party Name
+          </label>
+          <input
+            type="text"
+            id="party_name"
+            name="party_name"
+            value="{{ party.party_name|default:'' }}"
+            placeholder="e.g. AHMED TRADERS"
+            required
+          >
+        </div>
+
+        <!-- Party Type -->
+        <div class="form-group">
+          <label for="party_type">
+            <span class="lbl-icon">◈</span> Party Type
+          </label>
+          <div class="select-wrapper">
+            <select id="party_type" name="party_type">
+              <option value="Both" {% if party.party_type == "Both" %}selected{% endif %}>Both</option>
+              <option value="Expense" {% if party.party_type == "Expense" %}selected{% endif %}>Expense</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="form-group">
+          <label for="contact_info">
+            <span class="lbl-icon">◈</span> Contact Info
+          </label>
+          <input
+            type="text"
+            id="contact_info"
+            name="contact_info"
+            value="{{ party.contact_info|default:'' }}"
+            placeholder="e.g. 0300-1234567"
+          >
+        </div>
+
+        <!-- Address -->
+        <div class="form-group full-width">
+          <label for="address">
+            <span class="lbl-icon">◈</span> Address
+          </label>
+          <textarea
+            id="address"
+            name="address"
+            rows="3"
+            placeholder="Street, City, Country…"
+          >{{ party.address|default:'' }}</textarea>
+        </div>
+
+        <!-- Divider -->
+        <div class="form-divider"></div>
+        <div class="section-label">Opening Balance</div>
+
+        <!-- Opening Balance + Balance Type inline -->
+        <div class="form-group full-width">
+          <label for="opening_balance">
+            <span class="lbl-icon">◈</span> Amount &amp; Type
+          </label>
+          <div class="balance-row">
+            <input
+              type="number"
+              id="opening_balance"
+              name="opening_balance"
+              value="{{ party.opening_balance|default:0 }}"
+              min="0"
+              placeholder="0"
+            >
+            <div class="select-wrapper">
+              <select id="balance_type" name="balance_type">
+                <option value="Debit"  {% if party.balance_type == "Debit"  %}selected{% endif %}>Debit</option>
+                <option value="Credit" {% if party.balance_type == "Credit" %}selected{% endif %}>Credit</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-submit">
+          <span class="btn-icon">{% if party %}✎{% else %}✦{% endif %}</span>
+          <span class="btn-text">{% if party %}Update Party{% else %}Save Party{% endif %}</span>
+        </button>
+
+      </div><!-- /.form-grid -->
+    </form>
+  </div><!-- /.party-card -->
+
+</div><!-- /.party-page-wrapper -->
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Unified JS -->
+<script src="{% static 'js/party_forms.js' %}"></script>
+
+<!-- Django messages → SweetAlert -->
+{% if messages %}
+<script>
+  $(function () {
+    {% for message in messages %}
+      window.showDjangoMessage(
+        "{{ message.tags }}",
+        {{ message.message|escapejs|json_script:"" }}
+      );
+    {% endfor %}
+  });
+</script>
+{% endif %}
+
+{% endblock body %}

@@ -1,0 +1,894 @@
+/* ============================================================
+   SALE PAGE — PROFESSIONAL LIGHT THEME
+   Clean, refined, enterprise-grade UI
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+/* Remove number arrows */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+/* ── Root overrides for this page ── */
+.main-content { font-family: 'DM Sans', sans-serif; min-width: 0; }
+
+/* ── Page wrapper ── */
+.sale-page-wrapper {
+  max-width: 1060px;
+  margin: 0 auto;
+}
+
+/* ── Top action bar ── */
+.sale-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.sale-topbar-left { display: flex; gap: 10px; flex-wrap: wrap; }
+.sale-topbar-right { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ── Invoice card ── */
+.sale-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(15, 30, 60, 0.08), 0 0 0 1px rgba(15,30,60,0.04);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+/* ── Invoice header band ── */
+.sale-card-header {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+  padding: 22px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.sale-card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sale-invoice-icon {
+  width: 46px; height: 46px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.sale-invoice-title {
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  margin: 0;
+}
+
+.sale-invoice-id-badge {
+  background: rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.85);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.25);
+  margin-top: 4px;
+  display: inline-block;
+}
+
+.sale-nav-pills {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-pill-btn {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.nav-pill-btn:hover {
+  background: rgba(255,255,255,0.25);
+  transform: translateY(-1px);
+}
+
+/* ── Form fields section ── */
+.sale-card-body {
+  padding: 24px 28px;
+}
+
+/* ── Field grid: Party + Date ── */
+.sale-meta-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.sale-field-group { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+
+.sale-field-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-primary);
+}
+
+.sale-input {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  background: var(--bg-surface-alt);
+  transition: all 0.18s ease;
+  width: 100%;
+}
+
+.sale-input:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  background: var(--card-bg);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+
+/* ── Divider ── */
+.sale-divider {
+  height: 1px;
+  background: linear-gradient(90deg, var(--border-strong) 0%, var(--border-color) 60%, transparent 100%);
+  margin: 0 0 22px;
+}
+
+/* ── Items section ── */
+.items-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.items-section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex; align-items: center; gap: 8px;
+}
+
+.items-section-title .title-icon {
+  width: 28px; height: 28px;
+  background: var(--tint-blue);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+
+.items-action-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── Column headers for item rows ── */
+.items-col-headers {
+  display: grid;
+  grid-template-columns: 280px 1fr 100px 70px 1fr auto;
+  gap: 8px;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+}
+
+.col-header {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+}
+
+/* ── Item rows ── */
+#items { display: flex; flex-direction: column; gap: 10px; }
+
+.item-row {
+  display: grid;
+  grid-template-columns: 280px 1fr 100px 70px 1fr auto;
+  gap: 8px;
+  align-items: start;
+  background: var(--bg-surface-alt);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px 14px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  animation: rowSlideIn 0.22s ease;
+}
+
+@keyframes rowSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.item-row:focus-within {
+  border-color: var(--brand-primary-border);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.06);
+  background: var(--card-bg);
+}
+
+/* Item name — display only (readonly) */
+.item-row .item_name_field {
+  position: relative;
+}
+
+.item-name-display {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 9px 12px;
+  background: var(--tint-blue);
+  border: 1.5px solid var(--brand-primary-border);
+  border-radius: 9px;
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--ink-blue);
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  gap: 6px;
+}
+
+.item-name-display.empty {
+  color: var(--text-tertiary);
+  font-weight: 400;
+  background: var(--bg-surface-alt);
+  border-color: var(--border-color);
+  font-style: italic;
+}
+
+.item-name-display .item-badge {
+  flex-shrink: 0;
+  font-size: 11px;
+}
+
+/* ── item_name visibility rules ──
+   Sale page:     hidden input + visible .item-name-display div
+                  → mark with class .sale-item-name-hidden to hide
+   Purchase page: visible autocomplete input — must NOT be hidden
+   The rule below is scoped to sale page only via the extra class. */
+input.item_name.sale-item-name-hidden {
+  display: none !important;
+}
+
+/* Purchase page: item_name stays visible and editable */
+/* .item-row.purchase-row .item_name_field input.item_name {
+  display: block !important;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 9px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.87rem;
+  color: var(--text-primary);
+  background: var(--card-bg);
+  transition: all 0.18s;
+}
+.item-row.purchase-row .item_name_field input.item_name:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  background: var(--tint-blue);
+} */
+
+.item-row.purchase-row .item_name_field input.item_name {
+  display: block !important;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid var(--brand-primary-border);
+  border-radius: 9px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--ink-blue);
+  background: var(--tint-blue);
+  transition: all 0.18s;
+}
+.item-row.purchase-row .item_name_field input.item_name:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  background: var(--tint-blue);
+}
+
+/* Unit price */
+.item-row input.unit_price {
+  padding: 9px 12px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 9px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.87rem;
+  color: var(--text-primary);
+  background: var(--card-bg);
+  width: 100%;
+  transition: all 0.18s;
+}
+
+.item-row input.unit_price:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+
+/* Qty box */
+.item-row .qty-box {
+  padding: 9px 6px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 9px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.87rem;
+  text-align: center;
+  color: var(--ink-blue);
+  background: var(--bg-surface-alt);
+  width: 100%;
+}
+
+/* ── Serials column ── */
+.serials {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 180px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 2px;
+  width: 100%;
+}
+
+.serials::-webkit-scrollbar { width: 4px; }
+.serials::-webkit-scrollbar-track { background: transparent; }
+.serials::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+.serials input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  background: var(--card-bg);
+  transition: all 0.18s;
+}
+
+.serials input:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+  background: var(--tint-blue);
+}
+
+.serials input.serial-valid {
+  border-color: var(--brand-success);
+  background: var(--tint-green);
+}
+
+/* Row action buttons column */
+.row-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* ── Button system ── */
+.custom-btn {
+  cursor: pointer;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.custom-btn:hover { transform: translateY(-1px); }
+.custom-btn:active { transform: translateY(0); }
+
+/* Topbar buttons */
+.btn-topbar {
+  background: var(--card-bg);
+  border: 1.5px solid var(--border-color);
+  color: var(--ink-blue);
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.btn-topbar:hover { border-color: var(--brand-primary); color: var(--ink-blue); background: var(--tint-blue); }
+
+/* Add item */
+.btn-add-item {
+  background: #2563eb;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(37,99,235,0.3);
+}
+.btn-add-item:hover { background: #1d4ed8; box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+
+/* Bulk paste */
+.btn-bulk {
+  background: var(--tint-purple);
+  color: var(--ink-purple);
+  border: 1.5px solid #ddd6fe;
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+.btn-bulk:hover { background: var(--tint-blue); border-color: #8b5cf6; }
+
+/* Add serial */
+.custom-btn.add-serial {
+  background: var(--tint-blue);
+  color: var(--ink-blue);
+  border: 1.5px solid #bae6fd;
+  font-size: 0.75rem;
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+.custom-btn.add-serial:hover { background: #bae6fd; }
+
+/* Remove serial */
+.custom-btn.remove-serial {
+  background: var(--tint-red);
+  color: var(--ink-red);
+  border: 1.5px solid #fecaca;
+  font-size: 0.75rem;
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+.custom-btn.remove-serial:hover { background: #fecaca; }
+
+/* Remove item */
+.custom-btn.remove-item {
+  background: var(--tint-amber);
+  color: var(--ink-amber);
+  border: 1.5px solid #fed7aa;
+  font-size: 0.75rem;
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+.custom-btn.remove-item:hover { background: #fed7aa; }
+
+/* ── Dark mode for the pastel action buttons ──
+   Everything above sets its *fill* from a --tint-* token, which is
+   translucent in dark mode and therefore correct. Its borders and its
+   hover fills are hardcoded light pastels, which are not: on a #111827
+   card, hovering "Add serial" painted a solid #bae6fd block, and the
+   same for Remove serial (#fecaca), Remove item (#fed7aa) and Bulk
+   paste (#ddd6fe).
+
+   This sheet had no dark half at all, on the four screens the business
+   spends its day in. The values below follow the translucent --tint-*
+   convention so they sit on whatever surface is behind them. */
+:root.dark-mode .custom-btn.add-serial    { border-color: rgba(59, 130, 246, 0.32); }
+:root.dark-mode .custom-btn.add-serial:hover    { background: rgba(59, 130, 246, 0.26); }
+:root.dark-mode .custom-btn.remove-serial { border-color: rgba(239, 68, 68, 0.32); }
+:root.dark-mode .custom-btn.remove-serial:hover { background: rgba(239, 68, 68, 0.26); }
+:root.dark-mode .custom-btn.remove-item   { border-color: rgba(245, 158, 11, 0.32); }
+:root.dark-mode .custom-btn.remove-item:hover   { background: rgba(245, 158, 11, 0.26); }
+:root.dark-mode .btn-bulk                 { border-color: rgba(139, 92, 246, 0.32); }
+:root.dark-mode .btn-bulk:hover           { border-color: rgba(139, 92, 246, 0.55); }
+:root.dark-mode .delete-btn,
+:root.dark-mode .btn-pdf                  { border-color: rgba(239, 68, 68, 0.32); }
+
+/* ── Footer: totals + action buttons ── */
+.sale-card-footer {
+  padding: 18px 28px 24px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.sale-totals-group { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
+
+.total-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.total-chip-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+}
+
+.total-chip-value {
+  font-family: 'DM Mono', monospace;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.total-chip-value.amount-value {
+  color: var(--ink-blue);
+  font-size: 1.35rem;
+}
+
+/* ── Action buttons (save / delete) ── */
+.sale-actions { display: flex; gap: 10px; align-items: center; }
+
+.save-and-update-btn {
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 11px 22px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(22,163,74,0.3);
+}
+.save-and-update-btn:hover {
+  background: linear-gradient(135deg, #15803d, #16a34a);
+  box-shadow: 0 4px 14px rgba(22,163,74,0.4);
+  transform: translateY(-1px);
+}
+
+.delete-btn {
+  background: var(--card-bg);
+  color: var(--ink-red);
+  border: 1.5px solid #fecaca;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 11px 22px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.delete-btn:hover {
+  background: var(--tint-red);
+  border-color: #dc2626;
+  transform: translateY(-1px);
+}
+
+/* PDF download button */
+.btn-pdf {
+  background: var(--card-bg);
+  color: var(--ink-red);
+  border: 1.5px solid #fecaca;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 9px 16px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-pdf:hover { background: var(--tint-red); border-color: #dc2626; transform: translateY(-1px); }
+
+/* ── Navigation strip ── */
+.sale-nav-strip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.sale-nav-btn {
+  background: var(--card-bg);
+  border: 1.5px solid var(--border-color);
+  color: var(--ink-blue);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 9px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.sale-nav-btn:hover {
+  border-color: var(--brand-primary);
+  color: var(--ink-blue);
+  background: var(--tint-blue);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(37,99,235,0.15);
+}
+
+.nav-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border-color);
+}
+
+/* ── Autocomplete dropdowns ── */
+.autocomplete-container { position: relative; }
+
+.items_suggestions, #suggestions {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 1000;
+  animation: dropFade 0.14s ease;
+}
+
+@keyframes dropFade {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.items_suggestions div, #suggestions div, .suggestion-item {
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  color: var(--ink-blue);
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.14s;
+}
+.items_suggestions div:last-child, #suggestions div:last-child { border-bottom: none; }
+.items_suggestions div:hover, #suggestions div:hover,
+.suggestion-item:hover, .suggestion-item.highlight {
+  background: var(--tint-blue);
+  color: var(--ink-blue);
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .sale-meta-grid { grid-template-columns: 1fr; }
+  .items-col-headers { display: none; }
+  .item-row {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+  }
+  .item-row .item_name_field { grid-column: 1 / -1; }
+  .item-row .serials { grid-column: 1 / -1; }
+  .row-actions { flex-direction: row; grid-column: 1 / -1; }
+}
+
+@media (max-width: 600px) {
+  .sale-card-header { flex-direction: column; align-items: flex-start; }
+  .sale-card-body { padding: 16px; }
+  .sale-card-footer { flex-direction: column; align-items: stretch; }
+  .sale-actions { flex-direction: column; }
+  .save-and-update-btn, .delete-btn { width: 100%; justify-content: center; }
+  .item-row { grid-template-columns: 1fr; }
+}
+
+
+/* Purchase rows match Accounting's two-tier layout: item/price/quantity
+   above a full-width serial list. Keep these after the generic row rules. */
+.item-row.purchase-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+  gap: 0;
+}
+
+.item-row.purchase-row .row-fields,
+.items-col-headers.purchase-col-headers {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px 70px;
+  gap: 10px;
+  align-items: center;
+}
+
+.items-col-headers.purchase-col-headers { padding: 6px 14px; }
+.item-row.purchase-row .row-fields > * { min-width: 0; }
+.item-row.purchase-row .item_name_field { grid-column: 1; }
+.item-row.purchase-row input.unit_price { grid-column: 2; width: 100%; }
+.item-row.purchase-row .qty-box { grid-column: 3; width: 100%; }
+
+.item-row.purchase-row .row-serials-block {
+  margin-top: 11px;
+  padding-top: 9px;
+  border-top: 1px solid var(--border-color);
+  min-width: 0;
+}
+
+.item-row.purchase-row .serials-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 7px;
+}
+
+.item-row.purchase-row .serials-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+}
+
+.item-row.purchase-row .serial-count {
+  display: inline-block;
+  min-width: 18px;
+  margin-left: 4px;
+  padding: 1px 6px;
+  border-radius: 20px;
+  background: var(--tint-neutral);
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  text-align: center;
+}
+
+.item-row.purchase-row .row-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.item-row.purchase-row .serials {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+  gap: 6px;
+  width: 100%;
+  max-height: 260px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ── Serial pair: SN + comment side by side ── */
+.serials .serial-pair {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Serial number input — use the space left beside its readable comment. */
+.serials .serial-pair input.sn {
+  flex: 1 1 0;
+  width: auto !important;        /* share the available pair width */
+  min-width: 0;
+  padding: 6px 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82rem;
+  border: 1.5px solid var(--input-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--input-text);
+  transition: all 0.18s;
+}
+
+/* Purchase serial inputs — match sale page serial-valid styling by default */
+.item-row.purchase-row .serials .serial-pair input.sn {
+  background: var(--tint-green);
+  border-color: var(--brand-success);
+  color: var(--text-primary);
+}
+
+.item-row.purchase-row .serials .serial-pair input.sn:focus {
+  outline: none;
+  border-color: #059669;
+  box-shadow: 0 0 0 2px rgba(16,185,129,0.15);
+  background: var(--tint-green);
+}
+
+/* Empty serial inputs stay white until filled */
+.item-row.purchase-row .serials .serial-pair input.sn:placeholder-shown {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+/* Keep comments readable instead of squeezing them into the old column. */
+.serials .serial-pair input.cmt {
+  flex: 0 0 100px;
+  min-width: 0;
+  width: auto !important;        /* override .serials input { width:100% } */
+  padding: 6px 10px;
+  font-size: 0.79rem;
+  font-style: italic;
+  border: 1.5px solid var(--input-border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  background: var(--input-bg);
+  transition: border-color 0.18s;
+}
+
+.serials .serial-pair input.sn:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.08);
+  background: var(--tint-blue);
+}
+.serials .serial-pair input.cmt:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+  background: var(--card-bg);
+}
+
+/* Status tag after comment */
+.serials .serial-pair .serial-status-tag {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+
+.items-action-bar-bottom { margin-top: 12px; }
+
+@media (max-width: 900px) {
+  .items-col-headers.purchase-col-headers { display: none; }
+  .item-row.purchase-row .row-fields { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .item-row.purchase-row .item_name_field { grid-column: 1 / -1; }
+  .item-row.purchase-row input.unit_price,
+  .item-row.purchase-row .qty-box { grid-column: auto; }
+  .item-row.purchase-row .serials { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (pointer: coarse) {
+  .purchase-page .sale-input,
+  .item-row.purchase-row input,
+  .item-row.purchase-row .item_name_field input.item_name,
+  .item-row.purchase-row .serials .serial-pair input {
+    min-height: 44px;
+    font-size: 1rem;
+  }
+  .purchase-page .custom-btn,
+  .purchase-page .nav-pill-btn,
+  .purchase-page .btn-pdf,
+  .purchase-page .save-and-update-btn,
+  .purchase-page .delete-btn { min-height: 44px; }
+}

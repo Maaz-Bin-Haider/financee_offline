@@ -1,0 +1,353 @@
+/* ============================================================
+   MONTHLY REPORTS — monthly_reports.css
+   Extends accounts_reports.css + profit_reports.css tokens.
+   Unique class prefix: mpr-
+   ============================================================ */
+
+/* ── Placeholder ── */
+.mpr-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  color: var(--text-tertiary);
+  gap: 12px;
+}
+.mpr-placeholder i { font-size: 2.2rem; opacity: 0.25; }
+.mpr-placeholder p  { font-size: 0.85rem; margin: 0; }
+
+/* ── Filter card ── */
+.mpr-filter-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 0.85rem 1rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.mpr-filter-card .filter-field label {
+  font-size: 0.69rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.mpr-filter-card input[type="date"] {
+  width: 148px;
+  padding: 0.45rem 0.65rem;
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--radius-md);
+  background: var(--input-bg);
+  color: var(--input-text);
+  font-size: 0.86rem;
+  font-family: var(--font-sans);
+}
+
+.mpr-generate-btn {
+  padding: 0.46rem 1.1rem;
+  background: var(--brand-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 0.84rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.mpr-generate-btn:hover { background: var(--brand-primary-dark, #1d4ed8); }
+
+/* ── GST entry area ── */
+.mpr-gst-section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 0.85rem 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.mpr-gst-section h4 {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  margin: 0 0 0.6rem 0;
+}
+
+.mpr-gst-rows { display: flex; flex-direction: column; gap: 6px; }
+
+.mpr-gst-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mpr-gst-row input[type="text"],
+.mpr-gst-row input[type="number"] {
+  padding: 0.38rem 0.6rem;
+  border: 1.5px solid var(--input-border);
+  border-radius: var(--radius-md);
+  background: var(--input-bg);
+  color: var(--input-text);
+  font-size: 0.84rem;
+  font-family: var(--font-sans);
+}
+.mpr-gst-row input[type="text"]   { flex: 1; min-width: 140px; }
+.mpr-gst-row input[type="number"] { width: 130px; }
+
+.mpr-gst-row .mpr-gst-remove {
+  background: none;
+  border: none;
+  color: var(--ink-red);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+.mpr-gst-row .mpr-gst-remove:hover { background: var(--tint-red); }
+
+.mpr-gst-add-btn {
+  margin-top: 6px;
+  background: none;
+  border: 1.5px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-size: 0.79rem;
+  padding: 0.3rem 0.7rem;
+  font-family: var(--font-sans);
+  transition: border-color 0.15s, color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.mpr-gst-add-btn:hover { border-color: var(--brand-primary); color: var(--ink-blue); }
+
+/* ── Report output card ── */
+.mpr-report-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.mpr-report-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.2rem 0;
+  letter-spacing: -0.015em;
+}
+.mpr-report-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin: 0 0 1rem 0;
+}
+
+/* ── Position report two-column layout ── */
+.mpr-position-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+
+@media (max-width: 860px) {
+  .mpr-position-grid { grid-template-columns: 1fr; }
+}
+
+.mpr-col-header {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-tertiary);
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--border-color);
+  margin-bottom: 6px;
+}
+.mpr-col-header.mpr-assets  { border-color: #059669; color: var(--ink-cyan); }
+.mpr-col-header.mpr-liab    { border-color: #dc2626; color: var(--ink-red); }
+
+/* ── Breakdown table ── */
+.mpr-breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.mpr-breakdown-table td {
+  padding: 5px 4px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+.mpr-breakdown-table td:last-child {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.mpr-breakdown-table tr.mpr-section-header td {
+  font-size: 0.69rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-tertiary);
+  background: var(--bg-surface-alt);
+  border-bottom: none;
+  padding-top: 10px;
+}
+.mpr-breakdown-table tr.mpr-subtotal td {
+  font-weight: 700;
+  border-top: 2px solid var(--border-color);
+  border-bottom: none;
+}
+.mpr-breakdown-table tr.mpr-subtotal td:last-child { color: var(--ink-cyan); }
+
+/* ── Net position summary bar ── */
+.mpr-net-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, var(--tint-green) 0%, var(--tint-green) 100%);
+  border: 2px solid #6ee7b7;
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.4rem;
+  margin-top: 0.5rem;
+}
+.mpr-net-bar.mpr-negative {
+  background: linear-gradient(135deg, var(--tint-red) 0%, var(--tint-red) 100%);
+  border-color: #fca5a5;
+}
+.mpr-net-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.mpr-net-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--ink-cyan);
+  letter-spacing: -0.02em;
+}
+.mpr-net-bar.mpr-negative .mpr-net-value { color: var(--ink-red); }
+
+/* ── Income Statement layout ── */
+.mpr-income-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.mpr-income-section {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+.mpr-income-section-title {
+  font-size: 0.69rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  padding: 7px 12px;
+  background: var(--bg-surface-alt);
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border-color);
+}
+.mpr-income-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+.mpr-income-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+.mpr-income-table td:last-child {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.mpr-income-table tr:last-child td { border-bottom: none; }
+.mpr-income-table tr.mpr-total-row td {
+  font-weight: 700;
+  background: var(--bg-surface-alt);
+}
+.mpr-income-table tr.mpr-total-row td:first-child { color: var(--text-primary); }
+
+/* ── Net income banner ── */
+.mpr-income-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.4rem;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--tint-green), var(--tint-green));
+  border: 2px solid #6ee7b7;
+}
+.mpr-income-banner.mpr-loss {
+  background: linear-gradient(135deg, var(--tint-red), var(--tint-red));
+  border-color: #fca5a5;
+}
+.mpr-income-banner-label { font-size: 0.9rem; font-weight: 600; color: var(--text-secondary); }
+.mpr-income-banner-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--ink-cyan);
+  letter-spacing: -0.02em;
+}
+.mpr-income-banner.mpr-loss .mpr-income-banner-value { color: var(--ink-red); }
+
+/* ── Toolbar: PDF / Print ── */
+.mpr-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.mpr-toolbar-btn {
+  padding: 0.38rem 0.85rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 0.79rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s;
+}
+.mpr-toolbar-btn:hover {
+  background: var(--bg-surface-alt);
+  color: var(--text-primary);
+}
+.mpr-toolbar-btn.mpr-btn-pdf  { border-color: #ef4444; color: var(--ink-red); }
+.mpr-toolbar-btn.mpr-btn-pdf:hover  { background: var(--tint-red); }
+.mpr-toolbar-btn.mpr-btn-print { border-color: var(--brand-primary); color: var(--ink-blue); }
+.mpr-toolbar-btn.mpr-btn-print:hover { background: var(--brand-primary-light); }
+
+/* ── Color helpers ── */
+.mpr-green { color: var(--ink-cyan) !important; }
+.mpr-red   { color: var(--ink-red) !important; }

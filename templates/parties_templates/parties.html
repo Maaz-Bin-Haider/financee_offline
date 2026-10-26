@@ -1,0 +1,227 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Parties{% endblock title %}
+
+{% block SeperateCssFile %}
+<link rel="stylesheet" href="{% static 'css/accounts_reports.css' %}">
+<link rel="stylesheet" href="{% static 'css/parties_dash_styling_light.css' %}">
+{% endblock SeperateCssFile %}
+
+{% block body %}
+
+<!-- URL config for the external JS -->
+<div id="partiesConfig"
+     data-autocomplete-url="{% url 'parties:autocomplete_party' %}"
+     data-add-url="{% url 'parties:add_new_party' %}"
+     data-update-url="{% url 'parties:update_party' %}"
+     data-list-url="{% url 'parties:parties_list' %}"
+     style="display:none;"></div>
+
+<!-- Page title bar (matches Accounts Reports) -->
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:1.1rem;">
+  <div style="width:36px;height:36px;background:var(--brand-primary-light);border-radius:var(--radius-md);
+              display:flex;align-items:center;justify-content:center;color:var(--brand-primary);font-size:0.95rem;flex-shrink:0;">
+    <i class="fa-solid fa-users"></i>
+  </div>
+  <div>
+    <h2 style="margin:0;font-size:1.2rem;font-weight:700;letter-spacing:-0.02em;">Parties</h2>
+    <p style="margin:0;font-size:0.78rem;color:var(--text-tertiary);">Add, update &amp; browse customers, suppliers &amp; expense accounts</p>
+  </div>
+</div>
+
+<div class="reports-wrapper">
+
+  <!-- ====== LEFT PANEL ====== -->
+  <aside class="left-panel">
+    <h3>Manage</h3>
+    <div class="report-buttons">
+      <button class="report-btn active" id="pbtn-add" type="button" onclick="selectPartyTab('add')">
+        <i class="fa-solid fa-user-plus" style="margin-right:7px;font-size:0.78rem;"></i>Add Party
+      </button>
+      <button class="report-btn" id="pbtn-update" type="button" onclick="selectPartyTab('update')">
+        <i class="fa-solid fa-user-pen" style="margin-right:7px;font-size:0.78rem;"></i>Update Party
+      </button>
+      <button class="report-btn" id="pbtn-list" type="button" onclick="selectPartyTab('list')">
+        <i class="fa-solid fa-table-list" style="margin-right:7px;font-size:0.78rem;"></i>All Parties
+      </button>
+    </div>
+  </aside>
+
+  <!-- ====== RIGHT PANEL ====== -->
+  <section class="right-panel">
+
+    <!-- ───── ADD PARTY ───── -->
+    <div id="padd-section" style="display:block;">
+      <div class="form-section">
+        <div class="section-head"><h3>Add Party</h3></div>
+        <p class="section-head sub" style="margin:0 0 14px;">Register a new customer, supplier, or expense account.</p>
+
+        <form id="add_party_form" autocomplete="off">
+          {% csrf_token %}
+          <div class="party-form-grid">
+            <div class="filter-field full">
+              <label for="add_party_name">Party Name</label>
+              <input type="text" id="add_party_name" name="party_name" placeholder="e.g. AHMED TRADERS" required>
+            </div>
+            <div class="filter-field">
+              <label for="add_party_type">Party Type</label>
+              <select id="add_party_type" name="party_type">
+                <option value="Both">Both</option>
+                <option value="Expense">Expense</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label for="add_contact_info">Contact Info <small>(optional)</small></label>
+              <input type="text" id="add_contact_info" name="contact_info" placeholder="e.g. 0300-1234567">
+            </div>
+            <div class="filter-field full">
+              <label for="add_address">Address <small>(optional)</small></label>
+              <textarea id="add_address" name="address" rows="2" placeholder="Street, City, Country…"></textarea>
+            </div>
+            <div class="filter-field">
+              <label for="add_opening_balance">Opening Balance</label>
+              <input type="number" id="add_opening_balance" name="opening_balance" value="0" min="0" placeholder="0">
+            </div>
+            <div class="filter-field">
+              <label for="add_balance_type">Balance Type</label>
+              <select id="add_balance_type" name="balance_type">
+                <option value="Debit">Debit</option>
+                <option value="Credit">Credit</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="generate-btn"><i class="fa-solid fa-user-plus"></i> Save Party</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ───── UPDATE PARTY ───── -->
+    <div id="pupdate-section" style="display:none;">
+
+      <div class="form-section">
+        <div class="section-head"><h3>Update Party</h3></div>
+        <p class="section-head sub" style="margin:0 0 14px;">Search an existing party, then edit its details.</p>
+
+        <div class="party-form-grid">
+          <div class="filter-field full autocomplete-container">
+            <label for="search_name">Search Party</label>
+            <input type="text" id="search_name" name="search_name" placeholder="Type party name…" autocomplete="off">
+            <div id="suggestions"></div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="search_party_btn" class="generate-btn"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+        </div>
+      </div>
+
+      <div class="form-section" id="pedit_card" style="display:none;">
+        <div class="section-head"><h3>Edit Party</h3></div>
+        <p class="added-by-note" id="padded_by_note" style="display:none;">
+          <i class="fa-solid fa-user-pen" style="color:#9ca3af;"></i>
+          Added by: <strong id="padded_by_name"></strong>
+        </p>
+
+        <form id="update_party_form" autocomplete="off">
+          {% csrf_token %}
+          <input type="hidden" id="upd_party_id" name="party_id" value="">
+          <div class="party-form-grid">
+            <div class="filter-field full">
+              <label for="upd_party_name">Party Name</label>
+              <input type="text" id="upd_party_name" name="party_name" required>
+            </div>
+            <div class="filter-field">
+              <label for="upd_party_type">Party Type</label>
+              <select id="upd_party_type" name="party_type">
+                <option value="Both">Both</option>
+                <option value="Expense">Expense</option>
+              </select>
+            </div>
+            <div class="filter-field">
+              <label for="upd_contact_info">Contact Info <small>(optional)</small></label>
+              <input type="text" id="upd_contact_info" name="contact_info">
+            </div>
+            <div class="filter-field full">
+              <label for="upd_address">Address <small>(optional)</small></label>
+              <textarea id="upd_address" name="address" rows="2"></textarea>
+            </div>
+            <div class="filter-field">
+              <label for="upd_opening_balance">Opening Balance</label>
+              <input type="number" id="upd_opening_balance" name="opening_balance" min="0">
+            </div>
+            <div class="filter-field">
+              <label for="upd_balance_type">Balance Type</label>
+              <select id="upd_balance_type" name="balance_type">
+                <option value="Debit">Debit</option>
+                <option value="Credit">Credit</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="generate-btn"><i class="fa-solid fa-floppy-disk"></i> Update Party</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="form-section" id="pupdate_placeholder">
+        <div class="update-empty">
+          <i class="fa-solid fa-magnifying-glass" style="font-size:1.6rem;margin-bottom:0.6rem;display:block;opacity:0.4;"></i>
+          Search for a party above to edit its details.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ───── ALL PARTIES ───── -->
+    <div id="plist-section" style="display:none;">
+      <div class="form-section">
+        <div class="section-head"><h3>All Parties</h3></div>
+        <p class="section-head sub" style="margin:0 0 14px;">Full directory — who added each party and when.</p>
+
+        <div class="parties-table-toolbar">
+          <div class="parties-search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="partiesListSearch" placeholder="Filter table…" autocomplete="off">
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="count-pill" id="partiesCount">—</span>
+            <button type="button" id="refreshPartiesBtn" class="btn-download"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+          </div>
+        </div>
+
+        <div class="parties-table-container">
+          <table id="partiesTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Party</th>
+                <th>Type</th>
+                <th>Contact</th>
+                <th>Address</th>
+                <th>Opening Balance</th>
+                <th>Bal. Type</th>
+                <th>Added / Updated By</th>
+                <th>Created On</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="partiesTableBody">
+              <tr><td class="no-data" colspan="10">Loading parties…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<!-- jQuery + SweetAlert (SweetAlert also loaded by base, kept here for safety) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Parties hub JS -->
+<script src="{% static 'js/parties_dash.js' %}"></script>
+
+{% endblock body %}

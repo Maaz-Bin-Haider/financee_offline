@@ -1,0 +1,748 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{% if features.dashboard.enabled %}Dashboard{% else %}Home{% endif %}{% endblock title %}
+
+{% block SeperateCssFile %}
+<link rel="stylesheet" href="{% static 'css/home_styling.css' %}">
+{% if draft_sales_enabled and features.draft_invoices.subs.dashboard_card and perms.auth.view_dash_draft_reservations %}
+{# The Stock Reserved on Drafts card's chips are styled in draft_styling.css. #}
+<link rel="stylesheet" href="{% static 'css/draft_styling.css' %}">
+{% endif %}
+{% endblock SeperateCssFile %}
+
+{% block body %}
+{% if features.dashboard.enabled %}
+{% comment %}
+Every widget below sits behind its own dashboard switch (tenancy/features.py,
+admin → company → Features). home_script.js skips loading a switched-off
+widget, and its data endpoint refuses anyway. With the whole dashboard off the
+page is a plain welcome page (the else branch at the bottom): /home/ itself is
+never blocked, because every denial redirects here.
+{% endcomment %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+{% if features.dashboard.subs.smart_alerts %}
+<!-- ══════════════════════════════════════════════ SMART ALERTS POPUP -->
+<div id="alerts-modal-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal-shell" style="max-width:520px;">
+    <div class="modal-head modal-head-alerts">
+      <div class="modal-head-title">
+        <div class="modal-head-icon"><i class="fa-solid fa-bell"></i></div>
+        <span>Smart Alerts</span>
+        <span class="alerts-pulse"></span>
+      </div>
+      <button id="alerts-modal-close" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div id="alerts-modal-body" class="modal-body" style="display:flex;flex-direction:column;gap:10px;max-height:360px;"></div>
+    <div class="modal-foot">
+      <label class="alerts-dismiss-label">
+        <input type="checkbox" id="alerts-dismiss-today"> Don't show again today
+      </label>
+      <button id="alerts-modal-ok" class="btn-primary-sm"><i class="fa-solid fa-check"></i> Got it</button>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if features.dashboard.subs.cash_balance and features.accounts_reports.subs.cash_ledger %}
+<!-- ══════════════════════════════════════════════ CASH LEDGER POPUP -->
+<div id="cash-modal-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal-shell" style="max-width:960px;">
+    <div class="modal-head modal-head-cash">
+      <div class="modal-head-title">
+        <div class="modal-head-icon"><i class="fa-solid fa-coins"></i></div>
+        <span>Cash Ledger</span>
+      </div>
+      <div class="modal-head-controls">
+        <input type="date" id="cash-from" class="filter-date-input">
+        <span style="color:rgba(255,255,255,.7);font-size:.8rem;">to</span>
+        <input type="date" id="cash-to" class="filter-date-input">
+        <button id="cash-load-btn" class="btn-primary-sm"><i class="fa-solid fa-rotate"></i> Load</button>
+        {% if features.pdf_export.subs.reports %}
+        <button id="cash-pdf-btn" class="btn-icon" data-tooltip="Download PDF"><i class="fa-solid fa-file-pdf"></i></button>
+        {% endif %}
+        <button id="cash-modal-close" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+    <div class="modal-kpi-strip cols-3" id="cash-kpi-row"></div>
+    <div class="modal-body">
+      <div class="dash-table-scroll" style="max-height:400px;">
+        <table class="dash-table" id="cash-ledger-table">
+          <thead>
+            <tr><th>Date</th><th>Journal #</th><th>Party</th><th>Description</th><th>Debit</th><th>Credit</th><th>Balance</th></tr>
+          </thead>
+          <tbody id="cash-ledger-body">
+            <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-tertiary);">Select a date range and click Load</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+
+
+{% if features.dashboard.subs.balances %}
+<!-- ══════════════════════════════════════════════ PARTY BALANCES POPUP -->
+<div id="party-balance-modal-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal-shell" style="max-width:720px;">
+    <div class="modal-head modal-head-party-bal">
+      <div class="modal-head-title">
+        <div class="modal-head-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+        <span>Party Balances</span>
+      </div>
+      <div class="modal-head-controls">
+        <input class="filter-search" id="pb-search" placeholder="Search party…" style="width:160px;">
+        <select class="filter-select" id="pb-type-filter">
+          <option value="">All Types</option>
+          <option value="customer">Customer</option>
+          <option value="vendor">Vendor</option>
+          <option value="both">Both</option>
+        </select>
+        <select class="filter-select" id="pb-balance-filter">
+          <option value="">All</option>
+          <option value="debit">Debit (Dr)</option>
+          <option value="credit">Credit (Cr)</option>
+        </select>
+        {% if features.pdf_export.subs.reports %}
+        <button class="btn-icon" id="pb-pdf-btn" data-tooltip="Download PDF"><i class="fa-solid fa-file-pdf"></i></button>
+        {% endif %}
+        <button class="modal-close-btn" id="party-balance-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="dash-table-scroll" style="max-height:460px;">
+        <table class="dash-table" id="party-balance-table">
+          <thead><tr><th>Party</th><th>Type</th><th>Debit</th><th>Credit</th><th>Net Balance</th></tr></thead>
+          <tbody id="party-balance-body"><tr><td colspan="5"><div class="skeleton"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ RECEIVABLE POPUP -->
+<div id="receivable-modal-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal-shell" style="max-width:620px;">
+    <div class="modal-head modal-head-receivable">
+      <div class="modal-head-title">
+        <div class="modal-head-icon"><i class="fa-solid fa-arrow-down-to-bracket"></i></div>
+        <span>Accounts Receivable</span>
+      </div>
+      <div class="modal-head-controls">
+        <input class="filter-search" id="rec-search" placeholder="Search party…" style="width:160px;">
+        {% if features.pdf_export.subs.reports %}
+        <button class="btn-icon" id="rec-pdf-btn" data-tooltip="Download PDF"><i class="fa-solid fa-file-pdf"></i></button>
+        {% endif %}
+        <button class="modal-close-btn" id="receivable-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="dash-table-scroll" style="max-height:460px;">
+        <table class="dash-table" id="receivable-table">
+          <thead><tr><th>Party</th><th>Balance</th></tr></thead>
+          <tbody id="receivable-body"><tr><td colspan="2"><div class="skeleton"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ PAYABLE POPUP -->
+<div id="payable-modal-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal-shell" style="max-width:620px;">
+    <div class="modal-head modal-head-payable">
+      <div class="modal-head-title">
+        <div class="modal-head-icon"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+        <span>Accounts Payable</span>
+      </div>
+      <div class="modal-head-controls">
+        <input class="filter-search" id="pay-search" placeholder="Search party…" style="width:160px;">
+        {% if features.pdf_export.subs.reports %}
+        <button class="btn-icon" id="pay-pdf-btn" data-tooltip="Download PDF"><i class="fa-solid fa-file-pdf"></i></button>
+        {% endif %}
+        <button class="modal-close-btn" id="payable-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="dash-table-scroll" style="max-height:460px;">
+        <table class="dash-table" id="payable-table">
+          <thead><tr><th>Party</th><th>Balance</th></tr></thead>
+          <tbody id="payable-body"><tr><td colspan="2"><div class="skeleton"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ ITEMS POPUP -->
+<div id="items-modal-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal-shell" style="max-width:860px;">
+    <div class="modal-head modal-head-items">
+      <div class="modal-head-title">
+        <div class="modal-head-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <span>All Items</span>
+      </div>
+      <div class="modal-head-controls">
+        <input class="filter-search" id="items-search" placeholder="Search item or category…" style="width:190px;">
+        <select class="filter-select" id="items-cat-filter"><option value="">All Categories</option></select>
+        {% if features.pdf_export.subs.reports %}
+        <button class="btn-icon" id="items-pdf-btn" data-tooltip="Download PDF"><i class="fa-solid fa-file-pdf"></i></button>
+        {% endif %}
+        <button class="modal-close-btn" id="items-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="dash-table-scroll" style="max-height:460px;">
+        <table class="dash-table" id="items-table">
+          <thead><tr><th>Item</th><th>Category</th><th>Brand</th><th>Sale Price</th><th>Units</th></tr></thead>
+          <tbody id="items-body"><tr><td colspan="5"><div class="skeleton"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ PARTIES POPUP -->
+<div id="parties-modal-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal-shell" style="max-width:760px;">
+    <div class="modal-head modal-head-parties">
+      <div class="modal-head-title">
+        <div class="modal-head-icon"><i class="fa-solid fa-users"></i></div>
+        <span>All Parties</span>
+      </div>
+      <div class="modal-head-controls">
+        <input class="filter-search" id="parties-search" placeholder="Search name or contact…" style="width:190px;">
+        <select class="filter-select" id="parties-type-filter">
+          <option value="">All Types</option>
+          <option value="customer">Customer</option>
+          <option value="vendor">Vendor</option>
+          <option value="both">Both</option>
+        </select>
+        {% if features.pdf_export.subs.reports %}
+        <button class="btn-icon" id="parties-pdf-btn" data-tooltip="Download PDF"><i class="fa-solid fa-file-pdf"></i></button>
+        {% endif %}
+        <button class="modal-close-btn" id="parties-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="dash-table-scroll" style="max-height:460px;">
+        <table class="dash-table" id="parties-table">
+          <thead><tr><th>Name</th><th>Type</th><th>Contact</th></tr></thead>
+          <tbody id="parties-body"><tr><td colspan="3"><div class="skeleton"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ EXPENSE PARTIES POPUP -->
+<div id="exp-party-modal-overlay" class="modal-overlay" style="display:none;">
+  <div class="modal-shell" style="max-width:620px;">
+    <div class="modal-head modal-head-exp-party">
+      <div class="modal-head-title">
+        <div class="modal-head-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <span>Expense Party Balances</span>
+      </div>
+      <div class="modal-head-controls">
+        <input class="filter-search" id="ep-search" placeholder="Search party…" style="width:160px;">
+        {% if features.pdf_export.subs.reports %}
+        <button class="btn-icon" id="ep-pdf-btn" data-tooltip="Download PDF"><i class="fa-solid fa-file-pdf"></i></button>
+        {% endif %}
+        <button class="modal-close-btn" id="exp-party-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="dash-table-scroll" style="max-height:460px;">
+        <table class="dash-table" id="exp-party-table">
+          <thead><tr><th>Party</th><th>Balance</th></tr></thead>
+          <tbody id="exp-party-body"><tr><td colspan="2"><div class="skeleton"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ════════════════════════════════════════════════════════ DASHBOARD ROOT -->
+<div class="dash-root">
+
+  <!-- Animated Header -->
+  <div class="dash-header">
+    <div class="dash-header-title">
+      <div class="dash-title-anim">
+        <div class="dash-title-icon"><i class="fa-solid fa-chart-pie dash-icon-spin"></i></div>
+        <div>
+          <h1 class="dash-title-text">Dashboard</h1>
+          <p id="dash-date" class="dash-subtitle"></p>
+        </div>
+      </div>
+    </div>
+    <div class="dash-header-right">
+      {% if features.dashboard.subs.smart_alerts %}
+      <button class="dash-alerts-bell" id="dash-alerts-bell" data-tooltip="View Alerts">
+        <i class="fa-solid fa-bell"></i>
+        <span class="bell-badge" id="bell-badge" style="display:none;">0</span>
+      </button>
+      {% endif %}
+      <span class="dash-date-badge"><i class="fa-solid fa-building-columns"></i> Finance & Inventory</span>
+      <button class="dash-refresh-all" id="dash-refresh-all"><i class="fa-solid fa-rotate"></i> Refresh All</button>
+    </div>
+  </div>
+
+  <!-- SECTION 1: Sales KPIs -->
+  {% if features.dashboard.subs.sales_overview or features.dashboard.subs.stock_overview or features.dashboard.subs.cash_balance %}
+  <p class="dash-section-label"><i class="fa-solid fa-chart-line"></i> Sales & Profit</p>
+  <div class="dash-grid-4" style="margin-bottom:18px;">
+    {% if features.dashboard.subs.sales_overview %}
+    <div class="dash-card kpi-animated">
+      <div class="kpi-accent accent-blue"></div>
+      <div class="kpi-bg-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
+      <div class="dash-card-header"><h3>Sales Today</h3><div class="dash-card-icon icon-blue"><i class="fa-solid fa-arrow-trend-up"></i></div></div>
+      <div class="kpi-value" id="kpi-sales-today"><div class="skeleton" style="height:30px;width:70%"></div></div>
+      <div class="kpi-sub" id="kpi-invoice-count">—</div>
+    </div>
+    <div class="dash-card kpi-animated">
+      <div class="kpi-accent accent-green"></div>
+      <div class="kpi-bg-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+      <div class="dash-card-header"><h3>Profit Today</h3><div class="dash-card-icon icon-green"><i class="fa-solid fa-sack-dollar"></i></div></div>
+      <div class="kpi-value" id="kpi-profit-today"><div class="skeleton" style="height:30px;width:70%"></div></div>
+      <div class="kpi-sub">Gross margin (sold − cost)</div>
+    </div>
+    {% endif %}
+    {% if features.dashboard.subs.stock_overview %}
+    <div class="dash-card kpi-animated">
+      <div class="kpi-accent accent-purple"></div>
+      <div class="kpi-bg-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+      <div class="dash-card-header"><h3>Stock Units</h3><div class="dash-card-icon icon-purple"><i class="fa-solid fa-boxes-stacked"></i></div></div>
+      <div class="kpi-value" id="kpi-total-units"><div class="skeleton" style="height:30px;width:50%"></div></div>
+      <div class="kpi-sub" id="kpi-total-items">—</div>
+    </div>
+    {% endif %}
+    {% if features.dashboard.subs.cash_balance %}
+    {# The card opens the cash ledger only while the Cash Ledger report is on. #}
+    {% if features.accounts_reports.subs.cash_ledger %}
+    <div class="dash-card kpi-animated kpi-clickable" id="cash-kpi-card" data-ledger="1" title="Click to view cash ledger">
+    {% else %}
+    <div class="dash-card kpi-animated" id="cash-kpi-card">
+    {% endif %}
+      <div class="kpi-accent accent-cyan"></div>
+      <div class="kpi-bg-icon"><i class="fa-solid fa-coins"></i></div>
+      <div class="dash-card-header"><h3>Cash Balance</h3><div class="dash-card-icon icon-cyan"><i class="fa-solid fa-coins"></i></div></div>
+      <div class="kpi-value" id="kpi-cash-balance"><div class="skeleton" style="height:30px;width:60%"></div></div>
+      {% if features.accounts_reports.subs.cash_ledger %}
+      <div class="kpi-sub">Click to view ledger <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:.65rem;"></i></div>
+      {% else %}
+      <div class="kpi-sub">Cash in hand</div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+  <!-- SECTION 6: Quick Actions -->
+  {% include "home_templtes/quick_actions.html" with show_lists=features.dashboard.subs.balances %}
+
+  {% if features.dashboard.subs.balances %}
+  <!-- SECTION 2: Parties & Balances -->
+  <p class="dash-section-label"><i class="fa-solid fa-users"></i> Parties & Balances</p>
+  <div class="dash-grid-2" style="margin-bottom:18px;">
+    <div class="summary-click-card" id="open-party-balance">
+      <div class="scc-icon icon-blue"><i class="fa-solid fa-scale-balanced"></i></div>
+      <div class="scc-body">
+        <div class="scc-label">Party Balances</div>
+        <div class="scc-value" id="pb-total-count"><div class="skeleton" style="height:22px;width:50px;"></div></div>
+        <div class="scc-meta" id="pb-total-meta">Total parties with balance</div>
+      </div>
+      <div class="scc-action"><i class="fa-solid fa-chevron-right"></i></div>
+    </div>
+    <div class="summary-click-card" id="open-parties">
+      <div class="scc-icon icon-purple"><i class="fa-solid fa-address-book"></i></div>
+      <div class="scc-body">
+        <div class="scc-label">All Parties</div>
+        <div class="scc-value" id="parties-total-count"><div class="skeleton" style="height:22px;width:50px;"></div></div>
+        <div class="scc-meta">Customers, vendors & both</div>
+      </div>
+      <div class="scc-action"><i class="fa-solid fa-chevron-right"></i></div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: Receivable + Payable -->
+  <p class="dash-section-label"><i class="fa-solid fa-arrows-left-right-to-line"></i> Receivable & Payable</p>
+  <div class="dash-grid-2" style="margin-bottom:18px;">
+    <div class="summary-click-card accent-left-green" id="open-receivable">
+      <div class="scc-icon icon-green"><i class="fa-solid fa-arrow-down-to-bracket"></i></div>
+      <div class="scc-body">
+        <div class="scc-label">Accounts Receivable</div>
+        <div class="scc-value" id="rec-total"><div class="skeleton" style="height:22px;width:80px;"></div></div>
+        <div class="scc-meta" id="rec-count">Click to view detail</div>
+      </div>
+      <div class="scc-action"><i class="fa-solid fa-chevron-right"></i></div>
+    </div>
+    <div class="summary-click-card accent-left-red" id="open-payable">
+      <div class="scc-icon icon-red"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+      <div class="scc-body">
+        <div class="scc-label">Accounts Payable</div>
+        <div class="scc-value" id="pay-total"><div class="skeleton" style="height:22px;width:80px;"></div></div>
+        <div class="scc-meta" id="pay-count">Click to view detail</div>
+      </div>
+      <div class="scc-action"><i class="fa-solid fa-chevron-right"></i></div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- SECTION 4: Expenses -->
+  {% if features.dashboard.subs.balances or features.dashboard.subs.expenses %}
+  <p class="dash-section-label"><i class="fa-solid fa-money-bill-wave"></i> Expenses</p>
+  <div class="dash-grid-2" style="margin-bottom:18px;">
+    {% if features.dashboard.subs.balances %}
+    <div class="summary-click-card accent-left-orange" id="open-exp-party">
+      <div class="scc-icon icon-orange"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+      <div class="scc-body">
+        <div class="scc-label">Expense Parties</div>
+        <div class="scc-value" id="ep-total"><div class="skeleton" style="height:22px;width:80px;"></div></div>
+        <div class="scc-meta">Click to view balances</div>
+      </div>
+      <div class="scc-action"><i class="fa-solid fa-chevron-right"></i></div>
+    </div>
+    {% endif %}
+    {% if features.dashboard.subs.expenses %}
+    <div class="panel-card">
+      <div class="panel-card-head">
+        <h3><i class="fa-solid fa-chart-pie"></i> Expense Tracking</h3>
+        <div class="panel-card-head-controls">
+          <div class="filter-btn-group">
+            <button class="filter-btn active" data-expense-range="mtd">MTD</button>
+            <button class="filter-btn" data-expense-range="ytd">YTD</button>
+            <button class="filter-btn" data-expense-range="30d">30D</button>
+          </div>
+          {% if features.pdf_export.subs.reports %}
+          <button class="btn-icon" data-pdf="expenses" data-tooltip="Download PDF"><i class="fa-solid fa-file-pdf"></i></button>
+          {% endif %}
+        </div>
+      </div>
+      <div class="panel-card-body">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;">
+          <div class="mini-kpi-card accent-red"><div class="mini-kpi-label">Today</div><div class="mini-kpi-val" id="kpi-expense-today"><div class="skeleton" style="height:16px"></div></div></div>
+          <div class="mini-kpi-card accent-orange"><div class="mini-kpi-label">This Month</div><div class="mini-kpi-val" id="kpi-expense-month"><div class="skeleton" style="height:16px"></div></div></div>
+          <div class="mini-kpi-card accent-cyan"><div class="mini-kpi-label">This Year</div><div class="mini-kpi-val" id="kpi-expense-year"><div class="skeleton" style="height:16px"></div></div></div>
+        </div>
+        <div id="expense-cat-list"><div class="skeleton" style="height:22px;margin-bottom:8px"></div><div class="skeleton" style="height:22px;margin-bottom:8px"></div><div class="skeleton" style="height:22px"></div></div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if features.dashboard.subs.sales_overview %}
+  <!-- SECTION 5: Revenue & Profit Trend — BIG -->
+  <p class="dash-section-label"><i class="fa-solid fa-chart-column"></i> Revenue & Profit Trend</p>
+  <div class="panel-card chart-big-card" style="margin-bottom:24px;">
+    <div class="panel-card-head">
+      <h3><i class="fa-solid fa-chart-bar"></i> Revenue & Profit Trend</h3>
+      <div class="panel-card-head-controls">
+        <div class="filter-btn-group">
+          <button class="filter-btn active" data-sales-range="7d">7D</button>
+          <button class="filter-btn" data-sales-range="30d">30D</button>
+          <button class="filter-btn" data-sales-range="mtd">MTD</button>
+          <button class="filter-btn" data-sales-range="ytd">YTD</button>
+        </div>
+        <input type="date" class="filter-date-input" id="sales-from" title="From date">
+        <span style="color:var(--clr-muted);font-size:.8rem;">to</span>
+        <input type="date" class="filter-date-input" id="sales-to" title="To date">
+        <button id="sales-custom-apply" class="btn-primary-sm"><i class="fa-solid fa-check"></i> Apply</button>
+        {% if features.pdf_export.subs.reports %}
+        <button class="btn-icon" id="chart-pdf-btn" data-tooltip="Download Report PDF"><i class="fa-solid fa-file-pdf"></i></button>
+        {% endif %}
+      </div>
+    </div>
+    <div class="panel-card-body">
+      <div class="chart-kpi-row">
+        <div class="chart-kpi"><span class="chart-kpi-dot" style="background:var(--clr-primary)"></span><div><div class="chart-kpi-label">Total Revenue</div><div class="chart-kpi-val" id="chart-total-revenue">—</div></div></div>
+        <div class="chart-kpi"><span class="chart-kpi-dot" style="background:var(--clr-success)"></span><div><div class="chart-kpi-label">Total Profit</div><div class="chart-kpi-val" id="chart-total-profit">—</div></div></div>
+        <div class="chart-kpi"><span class="chart-kpi-dot" style="background:var(--clr-warning)"></span><div><div class="chart-kpi-label">Avg Daily Revenue</div><div class="chart-kpi-val" id="chart-avg-revenue">—</div></div></div>
+        <div class="chart-kpi"><span class="chart-kpi-dot" style="background:var(--clr-purple)"></span><div><div class="chart-kpi-label">Peak Day</div><div class="chart-kpi-val" id="chart-peak-day">—</div></div></div>
+      </div>
+      <div class="chart-wrapper" style="height:340px;margin-top:10px;"><canvas id="sales-chart"></canvas></div>
+    </div>
+  </div>
+  {% endif %}
+
+  
+
+  {% if features.dashboard.subs.stock_overview %}
+  <!-- SECTION 7: Stock Overview -->
+  <p class="dash-section-label"><i class="fa-solid fa-warehouse"></i> Stock Overview</p>
+  <div class="dash-grid-3" style="margin-bottom:24px;">
+    <div class="panel-card">
+      <div class="panel-card-head">
+        <h3><i class="fa-solid fa-battery-low"></i> Low Stock Items</h3>
+        <div class="panel-card-head-controls">
+          <select class="filter-select" id="low-stock-threshold">
+            <option value="5">Under 5</option><option value="10">Under 10</option>
+            <option value="3">Under 3</option><option value="1">Out of Stock</option>
+          </select>
+          {% if features.pdf_export.subs.reports %}
+          <button class="btn-icon" data-pdf="low-stock" data-tooltip="PDF"><i class="fa-solid fa-file-pdf"></i></button>
+          {% endif %}
+        </div>
+      </div>
+      <div class="panel-card-body">
+        <input class="filter-search" placeholder="Search…" data-search-for="low-stock-table" style="width:100%;margin-bottom:10px;">
+        <div class="dash-table-scroll">
+          <table class="dash-table" id="low-stock-table">
+            <thead><tr><th>Item</th><th>Category</th><th>Units</th><th>Price</th></tr></thead>
+            <tbody id="low-stock-body"><tr><td colspan="4"><div class="skeleton"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-card-head">
+        <h3><i class="fa-solid fa-fire"></i> Fast Moving Items</h3>
+        <div class="panel-card-head-controls">
+          <div class="filter-btn-group">
+            <button class="filter-btn active" data-fast-days="30">30D</button>
+            <button class="filter-btn" data-fast-days="7">7D</button>
+            <button class="filter-btn" data-fast-days="90">90D</button>
+          </div>
+          {% if features.pdf_export.subs.reports %}
+          <button class="btn-icon" data-pdf="fast-moving" data-tooltip="PDF"><i class="fa-solid fa-file-pdf"></i></button>
+          {% endif %}
+        </div>
+      </div>
+      <div class="panel-card-body">
+        <div class="dash-table-scroll">
+          <table class="dash-table" id="fast-moving-table">
+            <thead><tr><th>#</th><th>Item</th><th>Category</th><th>Units</th><th>Revenue</th></tr></thead>
+            <tbody id="fast-moving-body"><tr><td colspan="5"><div class="skeleton"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-card-head">
+        <h3><i class="fa-solid fa-clock"></i> Stale Stock</h3>
+        <div class="panel-card-head-controls">
+          <div class="filter-btn-group">
+            <button class="filter-btn active" data-stale-days="30">30D</button>
+            <button class="filter-btn" data-stale-days="60">60D</button>
+            <button class="filter-btn" data-stale-days="90">90D</button>
+          </div>
+          {% if features.pdf_export.subs.reports %}
+          <button class="btn-icon" data-pdf="stale-stock" data-tooltip="PDF"><i class="fa-solid fa-file-pdf"></i></button>
+          {% endif %}
+        </div>
+      </div>
+      <div class="panel-card-body">
+        <div class="dash-table-scroll">
+          <table class="dash-table" id="stale-stock-table">
+            <thead><tr><th>Item</th><th>Category</th><th>Last Sold</th><th>Age</th><th>Units</th></tr></thead>
+            <tbody id="stale-stock-body"><tr><td colspan="5"><div class="skeleton"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if draft_sales_enabled and features.draft_invoices.subs.dashboard_card and perms.auth.view_dash_draft_reservations %}
+  {% comment %}
+  Gated on the deployment switch, the company's dashboard-card draft switch and the
+  permission, so a user without the right gets no card at all rather than a
+  permanently empty one -- and loadDraftCard() returns early when the element is
+  absent, so nothing is fetched either.
+  {% endcomment %}
+  <!-- SECTION 7b: Stock Reserved on Drafts -->
+  <p class="dash-section-label"><i class="fa-solid fa-file-pen"></i> Draft Invoices</p>
+  <div style="margin-bottom:24px;">
+    <div class="panel-card" id="draft-reservations-card">
+      <div class="panel-card-head">
+        <h3><i class="fa-solid fa-file-pen"></i> Stock Reserved on Drafts</h3>
+      </div>
+      <div class="panel-card-body">
+        <div class="draft-summary-chips">
+          <span class="draft-chip">
+            <span class="draft-chip-label">Open Drafts</span>
+            <span class="draft-chip-value" id="draft-open-count">0</span>
+          </span>
+          <span class="draft-chip">
+            <span class="draft-chip-label">Units Reserved</span>
+            <span class="draft-chip-value" id="draft-reserved-units">0</span>
+          </span>
+          <span class="draft-chip" id="draft-aged-chip" hidden>
+            <span class="draft-chip-label">Ageing</span>
+            <span class="draft-chip-value" id="draft-aged-count">0</span>
+          </span>
+          <span class="draft-chip">
+            <span class="draft-chip-label">Oldest (days)</span>
+            <span class="draft-chip-value" id="draft-oldest-days">0</span>
+          </span>
+        </div>
+        <div class="dash-table-scroll" style="max-height:280px;">
+          <table class="dash-table" id="draft-reservations-table">
+            <thead><tr>
+              <th>Draft #</th><th>Customer</th><th>Date</th>
+              <th>Reserved</th><th>Days Open</th>
+            </tr></thead>
+            <tbody><tr><td colspan="5"><div class="skeleton"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if features.dashboard.subs.top_parties %}
+  <!-- SECTION 8: Top Customers & Vendors -->
+  <p class="dash-section-label"><i class="fa-solid fa-trophy"></i> Top Customers & Vendors</p>
+  <div class="dash-grid-2" style="margin-bottom:24px;">
+    <div class="panel-card">
+      <div class="panel-card-head">
+        <h3><i class="fa-solid fa-star"></i> Top Customers</h3>
+        <div class="panel-card-head-controls">
+          <div class="filter-btn-group">
+            <button class="filter-btn active" data-party-range="all">All Time</button>
+            <button class="filter-btn" data-party-range="mtd">MTD</button>
+            <button class="filter-btn" data-party-range="ytd">YTD</button>
+          </div>
+          {% if features.pdf_export.subs.reports %}
+          <button class="btn-icon" data-pdf="top-customers" data-tooltip="PDF"><i class="fa-solid fa-file-pdf"></i></button>
+          {% endif %}
+        </div>
+      </div>
+      <div class="panel-card-body">
+        <div class="dash-table-scroll">
+          <table class="dash-table" id="top-customers-table">
+            <thead><tr><th>#</th><th>Customer</th><th>Invoices</th><th>Last</th><th>Total</th></tr></thead>
+            <tbody id="top-customers-body"><tr><td colspan="5"><div class="skeleton"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-card-head">
+        <h3><i class="fa-solid fa-building"></i> Top Vendors</h3>
+        <div class="panel-card-head-controls">
+          {% if features.pdf_export.subs.reports %}
+          <button class="btn-icon" data-pdf="top-vendors" data-tooltip="PDF"><i class="fa-solid fa-file-pdf"></i></button>
+          {% endif %}
+        </div>
+      </div>
+      <div class="panel-card-body">
+        <div class="dash-table-scroll">
+          <table class="dash-table" id="top-vendors-table">
+            <thead><tr><th>#</th><th>Vendor</th><th>Invoices</th><th>Last</th><th>Total</th></tr></thead>
+            <tbody id="top-vendors-body"><tr><td colspan="5"><div class="skeleton"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if features.dashboard.subs.receivables_aging %}
+  <!-- SECTION 9: Receivables Aging -->
+  <p class="dash-section-label"><i class="fa-solid fa-hourglass-half"></i> Receivables Aging</p>
+  <div class="panel-card" style="margin-bottom:24px;">
+    <div class="panel-card-head">
+      <h3><i class="fa-solid fa-scale-balanced"></i> Receivables by Age</h3>
+      <div class="panel-card-head-controls">
+        {% if features.pdf_export.subs.reports %}
+        <button class="btn-icon" data-pdf="aging" data-tooltip="PDF"><i class="fa-solid fa-file-pdf"></i></button>
+        {% endif %}
+      </div>
+    </div>
+    <div class="panel-card-body">
+      <div class="aging-buckets">
+        <div class="aging-bucket aging-overdue active" data-aging="overdue"><div class="ag-amount" id="aging-overdue-amount">—</div><div class="ag-label">Overdue (60+ days)</div><div class="ag-count" id="aging-overdue-count">—</div></div>
+        <div class="aging-bucket aging-medium" data-aging="medium"><div class="ag-amount" id="aging-medium-amount">—</div><div class="ag-label">Medium Risk (30-60 d)</div><div class="ag-count" id="aging-medium-count">—</div></div>
+        <div class="aging-bucket aging-fresh" data-aging="fresh"><div class="ag-amount" id="aging-fresh-amount">—</div><div class="ag-label">Fresh (&lt; 30 days)</div><div class="ag-count" id="aging-fresh-count">—</div></div>
+      </div>
+      <div class="dash-table-scroll">
+        <table class="dash-table" id="aging-table">
+          <thead><tr><th>Party</th><th>Balance</th><th>Last Activity</th><th>Age</th></tr></thead>
+          <tbody id="aging-table-body"><tr><td colspan="4"><div class="skeleton"></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- SECTION 10: Transactions + Expense Descriptions -->
+  {% if features.dashboard.subs.recent_transactions or features.dashboard.subs.expenses %}
+  <div class="dash-grid-bottom" style="margin-bottom:24px;">
+    {% if features.dashboard.subs.recent_transactions %}
+    <div class="panel-card">
+      <div class="panel-card-head">
+        <h3><i class="fa-solid fa-list-check"></i> Recent Transactions</h3>
+        <div class="panel-card-head-controls">
+          <div class="filter-btn-group">
+            <button class="filter-btn active" data-txn-type="all">All</button>
+            <button class="filter-btn" data-txn-type="Sale">Sales</button>
+            <button class="filter-btn" data-txn-type="Purchase">Purchase</button>
+            <button class="filter-btn" data-txn-type="Receipt">Receipt</button>
+            <button class="filter-btn" data-txn-type="Payment">Payment</button>
+          </div>
+          {% if features.pdf_export.subs.reports %}
+          <button class="btn-icon" data-pdf="transactions" data-tooltip="PDF"><i class="fa-solid fa-file-pdf"></i></button>
+          {% endif %}
+        </div>
+      </div>
+      <div class="panel-card-body">
+        <input class="filter-search" id="txn-search" placeholder="Search party or type…" style="width:100%;margin-bottom:12px;">
+        <div id="txn-feed" style="max-height:380px;overflow-y:auto;"></div>
+      </div>
+    </div>
+    {% endif %}
+    {% if features.dashboard.subs.expenses %}
+    <div class="panel-card">
+      <div class="panel-card-head">
+        <h3><i class="fa-solid fa-tags"></i> Top Expense Descriptions</h3>
+        <div class="panel-card-head-controls">
+          <div class="filter-btn-group">
+            <button class="filter-btn active" data-expense-range2="mtd">MTD</button>
+            <button class="filter-btn" data-expense-range2="ytd">YTD</button>
+            <button class="filter-btn" data-expense-range2="30d">30D</button>
+          </div>
+          {% if features.pdf_export.subs.reports %}
+          <button class="btn-icon" data-pdf="expenses" data-tooltip="PDF"><i class="fa-solid fa-file-pdf"></i></button>
+          {% endif %}
+        </div>
+      </div>
+      <div class="panel-card-body">
+        <div class="dash-table-scroll" style="max-height:400px;">
+          <table class="dash-table" id="expense-desc-table">
+            <thead><tr><th>#</th><th>Description</th><th>Category</th><th>Total</th><th>×</th></tr></thead>
+            <tbody id="expense-desc-body"><tr><td colspan="5"><div class="skeleton"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div><!-- /dash-root -->
+<script src="{% static 'js/home_script.js' %}"></script>
+{% else %}
+<!-- ══════════════════════════════════════════ HOME (dashboard switched off) -->
+<div class="dash-root">
+  <div class="dash-header">
+    <div class="dash-header-title">
+      <div class="dash-title-anim">
+        <div class="dash-title-icon"><i class="fa-solid fa-house"></i></div>
+        <div>
+          <h1 class="dash-title-text">Welcome</h1>
+          <p class="dash-subtitle">{{ request.tenant_company.name }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% include "home_templtes/quick_actions.html" with show_lists=False %}
+</div>
+{% endif %}
+{% endblock body %}

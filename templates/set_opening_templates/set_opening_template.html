@@ -1,0 +1,75 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Set Opening{% endblock title %}
+
+{% block SeperateCssFile %}
+<link rel="stylesheet" href="{% static 'css/set_opening.css' %}">
+{% endblock SeperateCssFile %}
+
+{% block body %}
+
+<!-- Page title bar -->
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:1.1rem;">
+  <div style="width:36px;height:36px;background:var(--brand-primary-light);border-radius:var(--radius-md);
+              display:flex;align-items:center;justify-content:center;color:var(--brand-primary);font-size:0.95rem;flex-shrink:0;">
+    <i class="fa-solid fa-sliders"></i>
+  </div>
+  <div>
+    <h2 style="margin:0;font-size:1.2rem;font-weight:700;letter-spacing:-0.02em;">Set Opening</h2>
+    <p style="margin:0;font-size:0.78rem;color:var(--text-tertiary);">Opening balances &amp; starting positions</p>
+  </div>
+</div>
+
+<div class="reports-wrapper">
+
+  <!-- ====== LEFT PANEL ====== -->
+  <aside class="left-panel">
+    <h3>Opening</h3>
+    <div class="report-buttons">
+      <button class="report-btn active" id="btn-opening-cash" onclick="selectOpening('cash')">
+        <i class="fa-solid fa-money-bill-wave" style="margin-right:7px;font-size:0.78rem;"></i>Opening Cash
+      </button>
+    </div>
+  </aside>
+
+  <!-- ====== RIGHT PANEL ====== -->
+  <section class="right-panel">
+
+    <!-- ── Opening Cash ── -->
+    <div id="opening-cash-section" style="display:block;">
+      <div class="form-section">
+
+        <div class="opening-current">
+          <span>Current opening cash in hand:</span>
+          <span class="amount" id="opening-cash-current">—</span>
+        </div>
+
+        <div class="filter-form">
+          <div class="filter-field">
+            <label for="opening-cash-input">Opening Cash in Hand</label>
+            <input type="number" id="opening-cash-input" step="0.01" min="0" placeholder="0.00">
+          </div>
+          <button type="button" class="generate-btn" id="opening-cash-save-btn">
+            <i class="fa-solid fa-floppy-disk"></i> Save
+          </button>
+          <span class="opening-status" id="opening-cash-status"></span>
+        </div>
+
+        <p class="opening-hint">
+          This records the company's starting cash position. It posts a balanced opening
+          entry and updates the cash balance everywhere. Re-saving updates the same entry
+          (it does not add up).
+        </p>
+
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<!-- Dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{% static 'js/set_opening.js' %}"></script>
+
+{% endblock body %}

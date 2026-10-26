@@ -1,0 +1,221 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Draft Invoice{% endblock title %}
+
+{% block SeperateCssFile %}
+<link rel="stylesheet" href="{% static 'css/purchasing_styling.css' %}">
+<link rel="stylesheet" href="{% static 'css/smart_description.css' %}">
+{% comment %}
+The draft screen reuses the Sale screen's shell rather than growing a
+stylesheet of its own: purchasing_styling.css already carries the card, the
+meta grid, the line-item rows and their responsive collapse. draft_styling.css
+adds only what the Sale screen has no concept of (status badge, explainer,
+hint, disabled look of a locked draft's actions, the history popup).
+
+Multi-line comments must use the comment tag: a multi-line hash-brace comment
+is not recognised and renders its prose onto the page.
+{% endcomment %}
+<link rel="stylesheet" href="{% static 'css/draft_styling.css' %}">
+{% endblock SeperateCssFile %}
+
+{% block body %}
+<div class="sale-page-wrapper">
+
+  <!-- ── TOP ACTION BAR ── -->
+  <div class="sale-topbar">
+    <div class="sale-topbar-left">
+      <button type="button" class="custom-btn btn-topbar" onclick="draftHistory()">
+        <i class="fa-solid fa-clock-rotate-left"></i> Draft History
+      </button>
+      <button type="button" class="custom-btn btn-topbar" onclick="draftDateWise()">
+        <i class="fa-solid fa-calendar-days"></i> By Date Range
+      </button>
+    </div>
+    <div class="sale-topbar-right">
+      {% if features.pdf_export.subs.documents %}
+      <button type="button" class="btn-pdf" onclick="downloadProforma()"
+              title="Download this draft as a Proforma Invoice">
+        <i class="fa-solid fa-file-pdf"></i> Proforma PDF
+      </button>
+      {% endif %}
+      <button type="button" class="custom-btn btn-topbar" onclick="newDraft()">
+        <i class="fa-solid fa-file-circle-plus"></i> New Draft
+      </button>
+    </div>
+  </div>
+
+  <!-- ── DRAFT CARD ── -->
+  <div class="sale-card">
+
+    <div class="sale-card-header">
+      <div class="sale-card-header-left">
+        <div class="sale-invoice-icon">📝</div>
+        <div>
+          <h2 class="sale-invoice-title">Draft Invoice</h2>
+          <span class="sale-invoice-id-badge" id="draftIdBadge">#NEW</span>
+          <span class="draft-status-badge status-open" id="draftStatusBadge">Open</span>
+          <span id="entryByBadge" class="draft-entry-badge" title="Entry By">
+            <i class="fa-solid fa-user-pen"></i>
+            <span id="entryByName">—</span>
+          </span>
+        </div>
+      </div>
+      <div class="sale-nav-pills">
+        <button type="button" class="nav-pill-btn" onclick="navigateDraft('previous')">
+          <i class="fa-solid fa-arrow-left"></i> Previous
+        </button>
+        <button type="button" class="nav-pill-btn" onclick="navigateDraft('next')">
+          Next <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    {% comment %}
+    The one sentence that explains the whole screen. It is deliberately on the
+    page rather than in a tooltip: an operator who does not know that a draft
+    holds stock without selling it will misread everything below.
+    {% endcomment %}
+    <p class="draft-explainer">
+      <i class="fa-solid fa-circle-info"></i>
+      <span>A draft <strong>reserves</strong> these serial numbers for this customer.
+      Nothing leaves stock, no invoice is raised and no balance moves until you
+      confirm the rate and convert it.</span>
+    </p>
+
+    <form onsubmit="submitDraft(event)" id="draftForm">
+      <div class="sale-card-body">
+
+        <div class="sale-meta-grid draft-meta-grid">
+          <div class="sale-field-group" id="partyFieldGroup">
+            <label class="sale-field-label" for="search_name"><i class="fa-solid fa-user"></i> Customer</label>
+            {% comment %}
+            receivable=1 limits the list to Customer and Both parties and never
+            offers a cash account: a draft is invoiced as a credit sale, so it
+            always reserves for a named customer with a receivable account. The
+            database refuses any other party either way.
+            {% endcomment %}
+            <div class="autocomplete-container">
+              <input type="text" id="search_name" name="search_name" class="sale-input"
+                     placeholder="Search customer name…" autocomplete="off"
+                     data-autocomplete-url="{% url 'parties:autocomplete_party' %}?receivable=1" required>
+              <div id="suggestions"></div>
+            </div>
+          </div>
+          <div class="sale-field-group">
+            <label class="sale-field-label" for="draft_date"><i class="fa-solid fa-calendar"></i> Draft Date</label>
+            <input type="date" id="draft_date" name="draft_date" class="sale-input">
+          </div>
+        </div>
+
+        <div class="sale-field-group draft-description-group">
+          <label class="sale-field-label" for="draft_description">
+            <i class="fa-solid fa-note-sticky"></i> Description <span class="sale-field-optional">(optional)</span>
+          </label>
+          <textarea id="draft_description" name="description" class="sale-input" data-smart-description
+                    rows="2" maxlength="1000" placeholder="Add a note for this draft…"></textarea>
+        </div>
+
+        <div class="sale-divider"></div>
+
+        <div class="items-section-header">
+          <div class="items-section-title">
+            <div class="title-icon">📦</div>
+            Reserved Items
+          </div>
+          <div class="items-action-bar">
+            <button type="button" class="custom-btn btn-add-item" id="addItemBtn" onclick="addItemRow()">
+              <i class="fa-solid fa-plus"></i> Add Item Row
+            </button>
+            <button type="button" class="custom-btn btn-bulk" id="bulkPasteBtn" onclick="openBulkSerialsDialog()"
+                    title="Paste multiple serials from Excel or CSV">
+              <i class="fa-solid fa-list"></i> Bulk Paste Serials
+            </button>
+          </div>
+        </div>
+
+        <div class="items-col-headers">
+          <span class="col-header">Item Name (auto-filled)</span>
+          <span class="col-header">Expected Rate</span>
+          <span class="col-header">Qty</span>
+          <span class="col-header"></span>
+          <span class="col-header">Serial Numbers</span>
+          <span class="col-header">Actions</span>
+        </div>
+
+        <p class="draft-hint">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>Enter a serial number — the item name fills automatically. The
+          <strong>Expected Rate is optional</strong>: leave it blank until the price
+          is agreed, and set the final rate when you convert.</span>
+        </p>
+
+        <div id="items"></div>
+
+      </div><!-- /.sale-card-body -->
+
+      <input type="hidden" id="current_draft_id" name="current_id" value="">
+
+      <div class="sale-card-footer">
+        <div class="sale-totals-group">
+          <div class="total-chip">
+            <span class="total-chip-label">Reserved Units</span>
+            <span class="total-chip-value" id="totalQtyCount">0</span>
+          </div>
+          <div class="total-chip">
+            <span class="total-chip-label">Unpriced Lines</span>
+            <span class="total-chip-value" id="unpricedLines">0</span>
+          </div>
+          {% comment %}
+          Labelled INDICATIVE, and the currency sits in the label rather than
+          beside the figure. Both are deliberate: an expected rate is not an
+          agreed one, and a currency glued to the figure with a no-break space
+          leaves the browser no legal break point, so it splits the digits.
+          {% endcomment %}
+          <div class="total-chip">
+            <span class="total-chip-label">Indicative Value ({{ currency|default:"PKR" }})</span>
+            <span class="total-chip-value amount-value" id="indicativeValue">0.00</span>
+          </div>
+        </div>
+        <div class="sale-actions">
+          <button type="submit" class="save-and-update-btn" id="saveBtn">
+            <i class="fa-solid fa-floppy-disk"></i> Save Draft
+          </button>
+          <button type="button" class="custom-btn btn-topbar" id="releaseBtn" onclick="releaseSerials()">
+            <i class="fa-solid fa-unlock"></i> Release Serials
+          </button>
+          <button type="button" class="delete-btn" id="cancelBtn" onclick="cancelDraft()">
+            <i class="fa-solid fa-ban"></i> Cancel Draft
+          </button>
+          <button type="button" class="delete-btn" id="deleteBtn" onclick="deleteDraft()">
+            <i class="fa-solid fa-trash"></i> Delete
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div><!-- /.sale-card -->
+
+</div><!-- /.sale-page-wrapper -->
+
+{% comment %}
+The company's base currency for every money label the scripts build (history,
+PDFs), read by draft_script.js and draft_reports.js.
+{% endcomment %}
+<script>
+  window.FINANCEE_CURRENCY = "{{ currency|default:'PKR'|escapejs }}";
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+{% comment %}
+autotable must load AFTER jsPDF and in the body, not from base.html: the copy
+in base.html's head runs before window.jspdf exists, so the plugin has no
+jsPDF to attach itself to and doc.autoTable is never defined -- which is how
+the source project's Proforma and Pending Drafts exports died on
+"doc.autoTable is not a function".
+{% endcomment %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="{% static 'js/smart_description.js' %}"></script>
+<script src="{% static 'js/report_pdf.js' %}"></script>
+<script src="{% static 'js/draft_reports.js' %}"></script>
+<script src="{% static 'js/draft_script.js' %}"></script>
+{% endblock body %}

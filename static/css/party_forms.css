@@ -1,0 +1,637 @@
+/* ============================================================
+   PARTY FORMS — Clean Light Professional Theme
+   Fonts: Playfair Display + DM Sans
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* ── CSS Variables ── */
+:root {
+  /* Aliased onto base_styling.css's semantic tokens. NOTE: --text-primary
+     and --text-secondary are deliberately NOT redefined here — this sheet
+     loads after base_styling.css, so redefining those names clobbered the
+     dark-mode flip for every element on the page. */
+  --bg-base:        var(--bg-page);
+  --bg-card:        var(--card-bg);
+  --bg-input:       var(--input-bg);
+  --bg-input-focus: var(--bg-surface);
+  --border:         var(--border-color);
+  --border-focus:   #6c63ff;
+  --accent:         #1e2d5e;
+  --accent-light:   #ede9ff;
+  --accent-2:       #10b981;
+  --accent-glow:    rgba(108,99,255,0.14);
+  --text-muted:     #a0a5be;
+  --danger:         #ef4444;
+  --danger-light:   #fef2f2;
+  --success:        #10b981;
+  --radius-card:    20px;
+  --radius-input:   11px;
+  --transition:     0.22s cubic-bezier(.4,0,.2,1);
+  --shadow-card:    0 4px 32px rgba(108,99,255,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-input:   0 1px 4px rgba(0,0,0,0.05);
+  --shadow-dropdown:0 12px 40px rgba(26,29,46,0.15), 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* ── Dark mode ──
+   This sheet declares its own indigo/navy palette rather than using the
+   application's blue, and it had no dark half at all. The neutrals above
+   alias onto base_styling.css and flipped correctly; these six did not,
+   and four of them were genuine defects on a #111827 card:
+
+     --accent      #1e2d5e is the colour of `.section-label`, `.lbl-icon`
+                   and five other pieces of TEXT. Navy on near-black is
+                   effectively invisible.
+     --accent-light #ede9ff backs the eyebrow chip, the search button, the
+                   h2 icon and the suggestion hover — pale lavender blocks
+                   reading as light-mode patches on a dark page.
+     --danger-light #fef2f2 backs `.not-found-banner`, whose text is
+                   --ink-red. That token flips to #fca5a5 in dark mode, so
+                   the banner was light red on near-white: unreadable.
+     --text-muted  #a0a5be is passable but is not the project's token.
+
+   The tints follow the translucent --tint-* convention from
+   base_styling.css so they sit on whatever surface is behind them. */
+:root.dark-mode {
+  --accent:         #a5b4fc;
+  --accent-light:   rgba(129, 140, 248, 0.16);
+  --accent-glow:    rgba(129, 140, 248, 0.22);
+  --danger-light:   rgba(239, 68, 68, 0.14);
+  --text-muted:     var(--text-tertiary);
+  --shadow-card:    0 4px 32px rgba(0, 0, 0, 0.38), 0 1px 4px rgba(0, 0, 0, 0.3);
+  --shadow-dropdown:0 12px 40px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* --accent is a text colour in seven places and a background in three.
+   Flipping it light fixes the seven and breaks the two that carry white
+   text on it, so those two take the ink they need explicitly. */
+:root.dark-mode .btn-submit,
+:root.dark-mode .btn-search:hover {
+  color: var(--gray-900);
+}
+
+/* ── Base Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ── Page Wrapper ── */
+.party-page-wrapper {
+  position: relative;
+  min-height: 100vh;
+  padding: 48px 20px 80px;
+  background:
+    radial-gradient(ellipse 700px 500px at 10% 0%, rgba(108,99,255,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 400px at 90% 100%, rgba(16,185,129,0.05) 0%, transparent 70%),
+    var(--bg-base);
+}
+
+/* ── Page Header ── */
+.party-page-header {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto 36px;
+  text-align: center;
+}
+
+.party-page-header .page-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+  padding: 5px 16px;
+  border: 1px solid rgba(108,99,255,0.20);
+  border-radius: 100px;
+  background: var(--accent-light);
+}
+
+.party-page-header .page-eyebrow .dot {
+  width: 6px; height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.65); }
+}
+
+.party-page-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 5vw, 38px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.party-page-header h1 span {
+  background: linear-gradient(135deg, var(--accent) 0%, #9f7aea 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.party-page-header p {
+  margin-top: 10px;
+  color: var(--text-secondary);
+  font-size: 14.5px;
+  font-weight: 400;
+}
+
+/* ── Main Card ── */
+.party-card {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 44px 48px;
+  box-shadow: var(--shadow-card);
+  animation: card-in 0.5s cubic-bezier(.16,1,.3,1) both;
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(24px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.party-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 32px; right: 32px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), #9f7aea, var(--accent-2));
+  border-radius: 0 0 4px 4px;
+  opacity: 0.7;
+}
+
+/* ── Form Grid ── */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px 28px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  animation: field-in 0.4s cubic-bezier(.16,1,.3,1) both;
+}
+
+.form-group.full-width { grid-column: 1 / -1; }
+
+.form-group:nth-child(1) { animation-delay: 0.06s; }
+.form-group:nth-child(2) { animation-delay: 0.10s; }
+.form-group:nth-child(3) { animation-delay: 0.14s; }
+.form-group:nth-child(4) { animation-delay: 0.18s; }
+.form-group:nth-child(5) { animation-delay: 0.22s; }
+.form-group:nth-child(6) { animation-delay: 0.26s; }
+
+@keyframes field-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Labels ── */
+label {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+label .lbl-icon {
+  color: var(--accent);
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+/* ── Inputs, Selects, Textareas ── */
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-input);
+  padding: 12px 15px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14.5px;
+  font-weight: 400;
+  color: var(--text-primary);
+  transition: var(--transition);
+  outline: none;
+  box-shadow: var(--shadow-input);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+  background: var(--bg-input-focus);
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3.5px var(--accent-glow), var(--shadow-input);
+}
+
+input[type="text"]:hover:not(:focus),
+input[type="number"]:hover:not(:focus),
+select:hover:not(:focus),
+textarea:hover:not(:focus) {
+  border-color: #c5cbe0;
+}
+
+/* Select arrow */
+.select-wrapper { position: relative; }
+
+.select-wrapper::after {
+  content: '▾';
+  position: absolute;
+  right: 13px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  font-size: 12px;
+}
+
+select { padding-right: 34px; cursor: pointer; }
+select option { background: var(--card-bg); color: var(--text-primary); }
+
+textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+
+/* ── Balance Row ── */
+.balance-row {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  gap: 12px;
+  align-items: end;
+}
+
+/* ── Divider ── */
+.form-divider {
+  grid-column: 1 / -1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border) 30%, var(--border) 70%, transparent);
+  margin: 4px 0;
+}
+
+/* ── Section Label ── */
+.section-label {
+  grid-column: 1 / -1;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: -6px;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, rgba(108,99,255,0.25), transparent);
+}
+
+/* ── Submit Button ── */
+.btn-submit {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 15px 32px;
+  margin-top: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--accent) 0%, #9f7aea 100%);
+  border: none;
+  border-radius: var(--radius-input);
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 20px rgba(108,99,255,0.30);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-submit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(108,99,255,0.40); }
+.btn-submit:hover::after { opacity: 1; }
+.btn-submit:active { transform: translateY(0); }
+.btn-submit .btn-icon { font-size: 17px; }
+
+.btn-submit.loading { pointer-events: none; opacity: 0.8; }
+
+.btn-submit.loading .btn-text::after {
+  content: '';
+  display: inline-block;
+  width: 13px; height: 13px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ════════════════════════════════════════════════
+   SEARCH SECTION  — z-index carefully managed so
+   the suggestions dropdown is NEVER clipped
+   ════════════════════════════════════════════════ */
+.search-section {
+  position: relative;
+  /* High z-index so this whole block sits above .party-card */
+  z-index: 10;
+  max-width: 680px;
+  margin: 0 auto 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  /* Extra bottom padding creates visual breathing room for open dropdown */
+  padding: 28px 36px 36px;
+  box-shadow: var(--shadow-card);
+  animation: card-in 0.42s cubic-bezier(.16,1,.3,1) both;
+  /* CRITICAL: no overflow:hidden here — dropdown must escape card boundary */
+}
+
+.search-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 32px; right: 32px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), #9f7aea, var(--accent-2));
+  border-radius: 0 0 4px 4px;
+  opacity: 0.7;
+}
+
+.search-section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.search-section h2 .h2-icon {
+  width: 30px; height: 30px;
+  background: var(--accent-light);
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: var(--accent);
+}
+
+.search-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  /* overflow visible so dropdown floats above everything */
+  overflow: visible;
+}
+
+.search-row .form-group { flex: 1; margin: 0; overflow: visible; }
+
+.btn-search {
+  padding: 12px 26px;
+  background: var(--accent-light);
+  border: 1.5px solid rgba(108,99,255,0.22);
+  border-radius: var(--radius-input);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.btn-search:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 4px 16px rgba(108,99,255,0.28);
+  transform: translateY(-1px);
+}
+
+/* ── Autocomplete Container & Dropdown ── */
+.autocomplete-container {
+  position: relative;
+  /* This is the ONLY positioned ancestor the dropdown cares about */
+}
+
+#suggestions {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  /* Must be higher than any card, header, or other stacking context */
+  z-index: 9999;
+  background: var(--card-bg);
+  border: 1.5px solid rgba(108,99,255,0.18);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow-dropdown);
+  animation: dropdown-in 0.16s ease both;
+}
+
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+#suggestions div {
+  padding: 11px 16px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #f0f2f8;
+}
+
+#suggestions div:last-child { border-bottom: none; }
+
+#suggestions div::before {
+  content: '◈';
+  font-size: 9px;
+  color: var(--accent);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+#suggestions div:hover,
+#suggestions div.active {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+#suggestions div:hover::before,
+#suggestions div.active::before { opacity: 1; }
+
+/* ── Not Found Banner ── */
+.not-found-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 18px;
+  background: var(--danger-light);
+  border: 1px solid rgba(239,68,68,0.20);
+  border-radius: var(--radius-input);
+  color: var(--ink-red);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  animation: shake 0.38s ease;
+}
+
+.not-found-banner::before {
+  content: '✕';
+  font-weight: 700;
+  width: 22px; height: 22px;
+  background: rgba(239,68,68,0.12);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%,60%  { transform: translateX(-5px); }
+  40%,80%  { transform: translateX(5px); }
+}
+
+/* ── Edit Mode Badge ── */
+.edit-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+  padding: 4px 12px;
+  background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.22);
+  border-radius: 100px;
+  margin-bottom: 16px;
+}
+
+.edit-mode-badge .dot-green {
+  width: 6px; height: 6px;
+  background: var(--accent-2);
+  border-radius: 50%;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .party-card    { padding: 28px 20px; }
+  .form-grid     { grid-template-columns: 1fr; }
+  .form-group.full-width { grid-column: 1; }
+  .btn-submit    { grid-column: 1; }
+  .search-row    { flex-direction: column; align-items: stretch; }
+  .search-section{ padding: 22px 20px 28px; }
+  .balance-row   { grid-template-columns: 1fr; }
+}
+
+/* ── SweetAlert2 Light Theme ── */
+.swal2-popup {
+  background: var(--bg-surface-alt) !important;
+  border: 1px solid #e8eaf2 !important;
+  border-radius: 20px !important;
+  font-family: 'DM Sans', sans-serif !important;
+  box-shadow: 0 20px 60px rgba(26,29,46,0.15) !important;
+}
+
+.swal2-title {
+  font-family: 'Playfair Display', serif !important;
+  color: var(--ink-blue) !important;
+  font-size: 21px !important;
+  font-weight: 600 !important;
+}
+
+.swal2-html-container {
+  color: var(--text-primary) !important;
+  font-size: 14px !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+
+.swal2-confirm {
+  background: linear-gradient(135deg, #6c63ff, #9f7aea) !important;
+  color: #fff !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+  padding: 11px 28px !important;
+  box-shadow: 0 4px 16px rgba(108,99,255,0.30) !important;
+}
+
+.swal2-icon.swal2-success { border-color: #10b981 !important; }
+.swal2-icon.swal2-success [class^=swal2-success-line] { background: #10b981 !important; }
+.swal2-icon.swal2-success .swal2-success-ring { border-color: rgba(16,185,129,0.25) !important; }
+
+.swal2-icon.swal2-error { border-color: #ef4444 !important; }
+.swal2-icon.swal2-error [class^=swal2-x-mark-line] { background: #ef4444 !important; }
+
+.swal2-timer-progress-bar { background: var(--accent) !important; }
