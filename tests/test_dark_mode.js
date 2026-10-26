@@ -62,7 +62,7 @@ check('cross-tab updates and cleared preferences agree with first visit', () => 
   e.events.storage({key: null, newValue: null}); assert(e.dark());
 });
 for (const template of ['base/base.html', 'authentication_templates/login_template.html',
-                        'tenancy_templates/subscription_suspended.html']) {
+                        'local/setup.html']) {
   check(`${template} applies the same preference before stylesheets`, () => {
     const html = fs.readFileSync(path.join(root, 'templates', template), 'utf8');
     const script = html.match(/<script>([\s\S]*?)<\/script>/);

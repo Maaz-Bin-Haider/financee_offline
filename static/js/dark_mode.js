@@ -5,7 +5,7 @@
  * Dark is the default, matching Accounting: only an explicit 'light' turns
  * it off. Missing values, blocked storage and the admin's 'auto' value all
  * use dark. The <head> scripts in base.html, the
- * login page and the suspended page apply the class before first paint; this
+ * login and first-run setup pages apply the class before first paint; this
  * file owns the sidebar toggle. Every place that decides the theme must
  * agree -- see PROJECT_CONTEXT.md, Dark Mode.
  */

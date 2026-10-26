@@ -62,7 +62,7 @@ LINKS = {
 
 
 def _zone():
-    return zoneinfo.ZoneInfo(settings.ACTIVITY_TIMEZONE)
+    return zoneinfo.ZoneInfo(request.general_settings.timezone)
 
 
 def _today():
@@ -108,7 +108,7 @@ def team_activity_page(request):
     if not request.user.has_perm(PERMISSION):
         messages.error(request, "You do not have permission to view Team Activity!")
         return redirect("home:home")
-    tz = settings.ACTIVITY_TIMEZONE
+    tz = request.general_settings.timezone
     with connection.cursor() as cursor:
         cursor.execute(queries.USERS, {'company':request.general_settings.pk})
         users = [{"id": r[0], "username": r[1], "active": r[2]} for r in cursor.fetchall()]
@@ -120,7 +120,7 @@ def team_activity_page(request):
     years = list(range(today.year, max(2000,min(first or today.year, today.year)) - 1, -1))
     start_user = busiest[0] if busiest else (users[0]["id"] if users else None)
     return render(request, "activity_templates/team_activity.html", {
-        "activity_page": {"timezone": settings.ACTIVITY_TIMEZONE, "scope": scope(request),
+        "activity_page": {"timezone": request.general_settings.timezone, "scope": scope(request),
             "company": request.general_settings.name, "company_id": request.general_settings.pk,
             "users": users, "years": years, "today": today.isoformat(),
             "user": start_user, "thresholds": list(figures.THRESHOLDS),
@@ -149,7 +149,7 @@ def user_year(request):
         if not 2000 <= year <= today.year:
             return _json_error("Pick a year.", 400)
     start, end = figures.period(today, year)
-    params = {"tz": settings.ACTIVITY_TIMEZONE, "user": user["id"],
+    params = {"tz": request.general_settings.timezone, "user": user["id"],
               "start": start.isoformat(), "end": end.isoformat()}
     with connection.cursor() as cursor:
         cursor.execute(queries.DAY_COUNTS, params)
@@ -194,7 +194,7 @@ def user_day(request):
     except ValueError:
         return _json_error("Pick a day.", 400)
     with connection.cursor() as cursor:
-        cursor.execute(queries.DAY_EVENTS, {"tz": settings.ACTIVITY_TIMEZONE, "user": user["id"],
+        cursor.execute(queries.DAY_EVENTS, {"tz": request.general_settings.timezone, "user": user["id"],
                                             "day": day.isoformat()})
         rows = cursor.fetchall()
     truncated = len(rows)>1000
@@ -227,7 +227,7 @@ def team(request):
     today = _today()
     this_monday = today - datetime.timedelta(days=today.weekday())
     weeks_from = this_monday - datetime.timedelta(weeks=11)
-    tz = settings.ACTIVITY_TIMEZONE
+    tz = request.general_settings.timezone
     params = {"company": request.general_settings.pk, "tz": tz, "from7": (today - datetime.timedelta(days=6)).isoformat(),
               "from30": (today - datetime.timedelta(days=29)).isoformat(),
               "weeks_from": weeks_from.isoformat()}
@@ -278,7 +278,7 @@ def watch(request):
         return _json_error("Pick 7, 30 or 90 days.", 400)
     today = _today()
     start = today - datetime.timedelta(days=days - 1)
-    rows = watch_rows({"tz": settings.ACTIVITY_TIMEZONE, "from": start.isoformat(),
+    rows = watch_rows({"tz": request.general_settings.timezone, "from": start.isoformat(),
                        "old_days": OLD_DOCUMENT_DAYS, "open_hour": OPENING_HOUR,
                        "burst": FAILED_SIGN_IN_BURST, "limit": WATCH_LIMIT})
     links=record_links(request,[(r[3],"delete" if r[0]=="delete" else "update",r[4]) for r in rows])
