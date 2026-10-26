@@ -4,6 +4,7 @@ Never operates a source stack or removes a volume. No normal start pulls images.
 """
 import argparse, json, os, secrets, subprocess, sys, time, urllib.request
 from pathlib import Path
+from location import selected
 ROOT=Path(__file__).resolve().parents[1]
 parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('command',choices=['init','build','up','stop','status','test','business','check'])
@@ -28,16 +29,22 @@ if args.command=='init':
     composefile.write_text(text+f'HTTP_PORT={port}\nCUSTOMER_DIR={customer}\nRUNTIME_ENV_FILE={envfile}\n')
     print('Created isolated configuration; no database initialized.');sys.exit(0)
 if not envfile.exists() or not composefile.exists():raise SystemExit('Run init first. Existing data will not be replaced.')
+compose_values=dict(line.split('=',1) for line in composefile.read_text().splitlines() if '=' in line)
+backup_location=selected(customer,os.environ.get('BACKUP_DIR',compose_values.get('BACKUP_DIR',customer/'Backups')))
+child_env=dict(os.environ,BACKUP_DIR=str(backup_location))
 base=['docker','compose','-p',project,'--env-file',str(composefile),'-f',str(ROOT/'runtime/compose.yml')]
-def run(*parts,**kwargs):return subprocess.run(base+list(parts),cwd=ROOT,check=True,**kwargs)
+def run(*parts,**kwargs):return subprocess.run(base+list(parts),cwd=ROOT,check=True,env=child_env,**kwargs)
 def app(*parts):return run('run','--rm','web',*parts)
 if args.command=='build':run('build','web')
 elif args.command=='up':
     # Docker refuses collisions; do not open a browser until product health is verified.
+    run('stop','web','backup')
     run('up','-d','--wait','db','redis')
+    run('run','--rm','--no-deps','--pull','never','backup','python','-m','local.backups.cli','recover')
     app('python','manage.py','migrate','--noinput')
     app('python','manage.py','collectstatic','--noinput')
-    run('up','-d','--no-build','--pull','never','web','nginx')
+    run('up','-d','--no-build','--pull','never','web','nginx','backup')
+    run('exec','-T','nginx','nginx','-s','reload')
     url=f'http://127.0.0.1:{port}'
     for attempt in range(30):
         try:

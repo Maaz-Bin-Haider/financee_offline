@@ -18,21 +18,37 @@ services:
     pull_policy: never
     command: ["redis-server", "--maxmemory", "64mb", "--maxmemory-policy", "allkeys-lru"]
   web:
-    image: financee-offline:0.3.0-phase3
+    stop_grace_period: 75s
+    image: financee-offline:0.4.0-phase4
     pull_policy: never
     build:
       context: ..
       dockerfile: runtime/Dockerfile
     env_file: ${RUNTIME_ENV_FILE}
     environment:
+      OFFLINE_DATABASE_VOLUME: ${COMPOSE_PROJECT_NAME}_database
+      OFFLINE_CUSTOMER_ROOT: /customer
+      OFFLINE_BACKUP_DIR: /backups
+      OFFLINE_BACKUP_DISPLAY_DIR: ${BACKUP_DIR:-${CUSTOMER_DIR}/Backups}
       DB_HOST: db
       DB_PORT: '5432'
       REDIS_URL: redis://redis:6379/0
       MEDIA_ROOT: /customer/Data/media
       SECURE_COOKIES: 'False'
-    volumes: ["${CUSTOMER_DIR}:/customer", "static:/app/staticfiles"]
+    volumes:
+      - "${CUSTOMER_DIR}:/customer"
+      - "static:/app/staticfiles"
+      - type: bind
+        source: ${BACKUP_DIR:-${CUSTOMER_DIR}/Backups}
+        target: /backups
+        bind: {create_host_path: false}
     depends_on:
       db: {condition: service_healthy}
+  backup:
+    extends: {service: web}
+    command: ["python", "-m", "local.backups.cli", "worker"]
+    restart: unless-stopped
+    stop_grace_period: 30s
   nginx:
     image: nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10
     pull_policy: never

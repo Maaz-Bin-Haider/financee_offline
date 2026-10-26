@@ -38,3 +38,17 @@ needed for Docker Desktop's published loopback port. Browser CSP denies remote
 resources/connections; inline scripts/styles remain required by existing screens.
 The test is scoped service/browser-origin isolation, not a host Wi-Fi or OS-reboot
 certification. Native platform/release verification remains at later gates.
+
+## Phase 4 recovery
+
+`python tests/test_backups.py` runs inside the test backup container and refuses
+any environment other than `financee_offline_test`. It uses a private temporary
+customer folder, real PostgreSQL 16 dumps/restores and its own candidate DBs.
+It covers archive/path/corruption/space/permission failures, retention, locks,
+stream draining, hard interruption, missed-day catch-up, later-posting rewind,
+rescue protection and session expiry. It removes only candidates it created.
+
+`python3 tests/run_backup_crossarch.py` uses the cached pinned AMD64 PostgreSQL
+image in a networkless disposable container and compares every table/sequence
+fingerprint after ARM64 → emulated Linux AMD64 → ARM64. It is a logical portability
+test, not native Windows/macOS installation certification.

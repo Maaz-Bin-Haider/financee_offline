@@ -49,7 +49,10 @@ def redirect_to_home(request):
 
 from local.views import setup, health
 
+from local.backups.views import backups
+
 urlpatterns = [
+    path('admin/local-backups/', backups, name='local_backups'),
     path('setup/', setup, name='local_setup'),
     path('health/', health, name='local_health'),
     path('', redirect_to_home, name='home_redirect'),

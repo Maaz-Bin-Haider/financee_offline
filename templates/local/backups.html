@@ -1,0 +1,21 @@
+{% extends "admin/base_site.html" %}
+{% block title %}Local Backups | Financee{% endblock %}
+{% block content %}
+<h1>Local Backups</h1>
+<p>Daily ZIP backups run while Financee is running. If your device was off or asleep, one catch-up backup runs on the next start.</p>
+<dl>
+<dt>Backup folder</dt><dd>{{ backup_folder }}</dd>
+<dt>Status</dt><dd>{{ status.message }}</dd>
+{% if pending %}<dt>Requested</dt><dd>Backup Now is queued. Refresh this page shortly.</dd>{% endif %}
+{% if status.last_success %}
+<dt>Last completed normal backup</dt><dd>{{ status.last_success.created_utc }} (UTC)</dd>
+<dt>ZIP file</dt><dd>{{ status.last_success.filename }}</dd>
+<dt>Next automatic backup</dt><dd>Next local calendar day while running, or on startup if a day was missed.</dd>
+{% else %}<dt>Next automatic backup</dt><dd>Due after company setup, while the local backup service is running.</dd>{% endif %}
+{% if status.last_error %}<dt>Needs attention</dt><dd role="alert">{{ status.last_error }}</dd>{% endif %}
+</dl>
+<form method="post">{% csrf_token %}<button type="submit" class="default">Backup Now</button></form>
+<p>Keep additional copies of your ZIPs on storage you control. The latest 30 completed normal ZIPs are kept; rescue copies are retained separately.</p>
+<p>Restore Backup and Open Backups Folder are local maintenance operations. The desktop maintenance controls arrive with the launcher; this development build provides them through the local maintenance command.</p>
+<p><a href="{% url 'admin:index' %}">Back to administration</a> · <a href="/home/">Dashboard</a></p>
+{% endblock %}

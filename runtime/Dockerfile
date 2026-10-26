@@ -1,4 +1,11 @@
+FROM postgres:16@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d AS pgtools
+RUN mkdir -p /pgtools/bin /pgtools/lib /pgtools/notices && \
+    cp /usr/lib/postgresql/16/bin/pg_dump /usr/lib/postgresql/16/bin/pg_restore /pgtools/bin/ && \
+    ldd /pgtools/bin/pg_dump /pgtools/bin/pg_restore | awk '/=> \/.* \(/ {print $3}' | sort -u | \
+    while read lib; do cp -L "$lib" /pgtools/lib/; done && \
+    cp -a /usr/share/doc /pgtools/notices/debian-doc
 FROM python:3.12-slim@sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea
+COPY --from=pgtools /pgtools /opt/pg16
 WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PYTHONPATH=/app
 COPY requirements-lock.txt .

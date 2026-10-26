@@ -8,7 +8,7 @@ import django;django.setup()
 from django.conf import settings
 from django.db import connection
 assert settings.DATABASES['default']['NAME']=='financee_offline_review','Owned review database required'
-assert sys.argv[1] in ('phase3_before','phase3_after')
+assert sys.argv[1] in ('phase3_before','phase3_after','phase4_before','phase4_after')
 with connection.cursor() as c:
  c.execute("SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename NOT LIKE 'django_%' AND tablename NOT IN ('auth_user','activity_events') ORDER BY tablename")
  tables=[row[0] for row in c.fetchall()]
@@ -25,8 +25,8 @@ with connection.cursor() as c:
 root=Path(settings.MEDIA_ROOT)
 result['media']={str(f.relative_to(root)):hashlib.sha256(f.read_bytes()).hexdigest() for f in sorted(root.rglob('*')) if f.is_file()}
 out=Path('/customer/Cache')/(sys.argv[1]+'.json');out.write_text(json.dumps(result,indent=2)+'\n')
-if sys.argv[1]=='phase3_after':
- before=json.loads((out.parent/'phase3_before.json').read_text());after=json.loads(out.read_text())
+if sys.argv[1].endswith('_after'):
+ before=json.loads((out.parent/(sys.argv[1].replace('_after','_before')+'.json')).read_text());after=json.loads(out.read_text())
  assert before==after,'Review state changed; inspect private snapshots.'
  print('Review profile, users/permissions, business rows and media hashes unchanged.')
 else:print('Review preservation snapshot saved privately.')

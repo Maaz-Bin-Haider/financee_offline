@@ -454,3 +454,28 @@ class OfflinePresentationTests(TestCase):
         self.assertNotContains(response,'https://')
         from django.contrib.staticfiles.storage import staticfiles_storage
         self.assertContains(response,staticfiles_storage.url('vendor/sweetalert2/dist/sweetalert2.all.min.js'))
+
+class BackupAdminTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.owner=get_user_model().objects.create_superuser('backup_owner',password=PASSWORD)
+        cls.reader=get_user_model().objects.create_user('backup_staff',password=PASSWORD,is_staff=True)
+        GeneralSettings.objects.create(name='Backup Test',base_currency_id='AED')
+    def test_owner_can_queue_and_see_local_status(self):
+        from unittest.mock import patch
+        from local.backups.engine import Engine
+        from local.backups.files import read
+        with tempfile.TemporaryDirectory() as folder:
+            e=Engine(Path(folder),Path(folder)/'Backups')
+            with patch('local.backups.views.Engine',return_value=e):
+                self.client.force_login(self.owner)
+                self.assertContains(self.client.get('/admin/local-backups/'),'Backup Now')
+                self.assertEqual(self.client.post('/admin/local-backups/').status_code,302)
+                self.assertTrue(read(e.control/'backup-request.json')['id'])
+                self.assertContains(self.client.get('/admin/local/generalsettings/1/change/'),'Local Backups')
+    def test_staff_cannot_request_backups_and_csrf_is_required(self):
+        self.client.force_login(self.reader)
+        self.assertEqual(self.client.get('/admin/local-backups/').status_code,403)
+        self.assertEqual(self.client.post('/admin/local-backups/').status_code,403)
+        client=Client(enforce_csrf_checks=True);client.force_login(self.owner)
+        self.assertEqual(client.post('/admin/local-backups/').status_code,403)

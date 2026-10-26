@@ -73,6 +73,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'local.backups.gate.MaintenanceMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -256,3 +257,14 @@ DRAFT_AGE_WARNING_DAYS = env.int("DRAFT_AGE_WARNING_DAYS", default=30)
 TEAM_ACTIVITY_ENABLED = env.bool("TEAM_ACTIVITY_ENABLED", default=True)
 TEAM_ACTIVITY_RECORDING_ENABLED = env.bool("TEAM_ACTIVITY_RECORDING_ENABLED", default=True)
 ACTIVITY_TIMEZONE = env("ACTIVITY_TIMEZONE", default="Asia/Karachi")
+
+# One atomic pointer couples the database and media generation after recovery.
+OFFLINE_CUSTOMER_ROOT = env('OFFLINE_CUSTOMER_ROOT', default='')
+if OFFLINE_CUSTOMER_ROOT:
+    from local.backups.config import active
+    _active_generation = active(Path(OFFLINE_CUSTOMER_ROOT))
+    DATABASES['default']['NAME'] = _active_generation['database']
+    MEDIA_ROOT = Path(OFFLINE_CUSTOMER_ROOT) / _active_generation['media']
+    PRIVATE_MEDIA_ROOT = MEDIA_ROOT / 'private'
+
+    OFFLINE_GENERATION = _active_generation['generation']

@@ -14,6 +14,7 @@ class GeneralSettingsAdmin(admin.ModelAdmin):
         ('Local module availability',{'fields':('enabled_modules',),'classes':('collapse',)}),
     )
     readonly_fields = ('currency_status',)
+    change_form_template = 'local/generalsettings_change.html'
     def has_add_permission(self, request): return False
     def has_delete_permission(self, request, obj=None): return False
     @admin.display(description='Currency status')
