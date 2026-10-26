@@ -27,3 +27,5 @@ dist/
 *.app/
 
 node_modules/
+# Vendored upstream dist/ files are source inputs for the offline build.
+!static/vendor/**
