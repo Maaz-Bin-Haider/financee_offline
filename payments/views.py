@@ -886,7 +886,7 @@ def get_payment(request):
                     
                     return JsonResponse({
                         "error": "No payment found.",
-                        "info": "Can't Find this payment may be some Internet issue!."
+                        "info": "Unable to load this payment. Please retry or restart Financee if this continues."
                     }, status=404)
     except DatabaseError:
          return JsonResponse({"error": "Database error."}, status=500)

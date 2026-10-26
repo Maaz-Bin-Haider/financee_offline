@@ -5,6 +5,6 @@ COPY requirements-lock.txt .
 RUN pip install --no-cache-dir -r requirements-lock.txt
 COPY . .
 RUN SECRET_KEY=build-only-unused-key DEBUG=False DB_NAME=build DB_USER=build DB_PASSWORD=build DB_HOST=none DB_PORT=5432 python manage.py collectstatic --noinput
-RUN useradd -u 10001 appuser && chown -R appuser:appuser /app
+RUN useradd -m -u 10001 appuser && chown -R appuser:appuser /app
 USER appuser
 CMD ["gunicorn","financee.wsgi:application","--bind","0.0.0.0:8000","--workers","2","--threads","2","--timeout","60","--access-logfile","-"]

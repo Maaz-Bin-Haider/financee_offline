@@ -213,6 +213,26 @@ class LocalCoreTests(TestCase):
             self.client.logout()
             self.assertEqual(self.client.get(f'/attachments/purchase/{pid}/pdf/download/').status_code,302)
 
+    def test_multipart_purchase_records_activity_and_private_attachment(self):
+        self.client.force_login(self.owner)
+        for query, data in [('add_party_from_json',{'party_name':'Offline Vendor','party_type':'Vendor','created_by_id':str(self.owner.pk)}),
+                            ('add_item_from_json',{'item_name':'Offline Device','sale_price':200,'created_by_id':str(self.owner.pk)})]:
+            scalar('SELECT '+query+'(%s::jsonb)',[json.dumps(data)])
+        payload={'action':'submit','party_name':'Offline Vendor','purchase_date':'2026-10-01',
+                 'items':[{'item_name':'Offline Device','qty':1,'unit_price':'100.25','serials':[{'serial':'OFFLINE-FILE-1'}]}]}
+        contents=b'%PDF-1.4 disposable upload'
+        with tempfile.TemporaryDirectory() as folder, override_settings(PRIVATE_MEDIA_ROOT=folder):
+            response=self.client.post('/purchase/purchasing/',{'payload':json.dumps(payload),
+                'attachment_pdf':SimpleUploadedFile('offline.pdf',contents,content_type='application/pdf')})
+            self.assertTrue(response.json().get('success'),response.content)
+            pid=scalar('SELECT purchase_invoice_id FROM purchaseinvoices')
+            self.assertEqual(scalar('SELECT total_amount FROM purchaseinvoices'),Decimal('100.25'))
+            self.assertEqual(scalar("SELECT count(*) FROM activity_events WHERE kind='purchase' AND action='create' AND user_id=%s",[self.owner.pk]),1)
+            response=self.client.get(f'/attachments/purchase/{pid}/pdf/download/')
+            self.assertEqual(b''.join(response.streaming_content),contents)
+            event=scalar("SELECT document_date::text FROM activity_events WHERE kind='purchase' AND action='create'")
+            self.assertEqual(event,'2026-10-01')
+
     def test_confirmed_source_sql_contract_on_fresh_schema(self):
         import hashlib
         contract=json.loads((Path(__file__).resolve().parents[1]/'tests/sql_source_contract.json').read_text())
@@ -387,3 +407,50 @@ class LocalCoreTests(TestCase):
         self.assertEqual(response.status_code,200)
         self.assertTrue(response.content.startswith(b'%PDF-'))
         self.assertIn(b'/FontFile2',response.content)
+
+class OfflinePresentationTests(TestCase):
+    """Render real screens and verify all declared resources resolve locally."""
+    @classmethod
+    def setUpTestData(cls):
+        cls.owner=get_user_model().objects.create_superuser('offline_owner',password=PASSWORD)
+        GeneralSettings.objects.create(name='Offline Company',base_currency_id='AED')
+    def test_active_screens_have_only_resolvable_local_resources(self):
+        from html.parser import HTMLParser
+        from django.contrib.staticfiles.storage import staticfiles_storage
+        from urllib.parse import urlsplit
+        class Resources(HTMLParser):
+            def __init__(self):super().__init__();self.urls=[]
+            def handle_starttag(self,tag,attrs):
+                attrs=dict(attrs)
+                if tag in ('script','link','img','source','iframe'):
+                    target=attrs.get('src') or attrs.get('href')
+                    if target:self.urls.append(target)
+        self.client.force_login(self.owner)
+        paths=['/home/','/purchase/purchasing/','/sale/sales/','/payments/payment/',
+               '/receipts/receipt/','/contra/contra/','/saleReturn/create-sale-return/',
+               '/purchaseReturn/create-purchase-return/','/items/items-dash/',
+               '/parties/parties-dash/','/accountsReports/cash-ledger/',
+               '/accountsReports/stock-summary/','/accountsReports/monthly-position/',
+               '/set-opening/','/owner-equity/','/month-close/','/sales-reports/',
+               '/opening-stock/','/draft/','/draft/convert/screen/',
+               '/draft/return/screen/','/draft/pending/screen/','/activity/',
+               '/admin/','/admin/local/generalsettings/1/change/']
+        for path in paths:
+            with self.subTest(path=path):
+                response=self.client.get(path)
+                self.assertEqual(response.status_code,200)
+                parser=Resources();parser.feed(response.content.decode())
+                for resource in parser.urls:
+                    url=urlsplit(resource)
+                    self.assertFalse(url.netloc,resource)
+                    if resource.startswith('/static/'):
+                        self.assertTrue(staticfiles_storage.exists(url.path.removeprefix('/static/')),resource)
+                if path=='/home/':
+                    self.assertContains(response,'AED')
+                    self.assertNotContains(response,'PKR')
+    def test_login_works_without_remote_resources(self):
+        response=self.client.get('/authentication/login/')
+        self.assertEqual(response.status_code,200)
+        self.assertNotContains(response,'https://')
+        from django.contrib.staticfiles.storage import staticfiles_storage
+        self.assertContains(response,staticfiles_storage.url('vendor/sweetalert2/dist/sweetalert2.all.min.js'))

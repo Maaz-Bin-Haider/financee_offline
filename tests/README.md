@@ -23,3 +23,18 @@ round-trip checks. `test_currency_concurrency.py` creates/removes only its own
 explicit offline race database. `test_business_exports.js` exercises actual PDF/CSV
 export generators using developer-only jsPDF/autotable dependencies. Font build
 coverage and notices live in static/fonts/financee; runtime needs no FontTools.
+
+## Phase 3 offline presentation
+
+`python3 tests/test_offline_assets.py` checks vendored hashes/licenses, local
+resource targets, dependency ordering and runtime isolation settings.
+`python3 tests/test_offline_http.py` runs **inside the test web container only**;
+it refuses other databases, creates unique disposable fixtures, signs in through
+Nginx, fetches every retained screen and CSS/font dependency without a resource
+cache, posts a purchase with a PDF, and checks private preview/download, Spotlight
+and activity. Results stay in the ignored test customer Cache folder.
+Business services use an internal Docker network. Nginx alone joins the bridge
+needed for Docker Desktop's published loopback port. Browser CSP denies remote
+resources/connections; inline scripts/styles remain required by existing screens.
+The test is scoped service/browser-origin isolation, not a host Wi-Fi or OS-reboot
+certification. Native platform/release verification remains at later gates.

@@ -834,7 +834,7 @@ def _serial_get_sale_summary(request):
                     return JsonResponse({"success": False, "message": "No Sale Invoices found in the given date range!"})
             except Exception as e:
                 logger.exception('swallowed exception in %s', __name__)
-                return JsonResponse({"success": False, "message": "Unable fetch Sale Invoices, Check your Internet Connection!"})
+                return JsonResponse({"success": False, "message": "Unable fetch Sale Invoices, Please retry or restart Financee if this continues."})
         # if no date is specified then fetch last 20 sale invoice summary
         else:
             
@@ -847,7 +847,7 @@ def _serial_get_sale_summary(request):
                     return JsonResponse({"success": False, "message": "No Sale Invoices found"})
             except Exception as e:
                 
-                return JsonResponse({"success": False, "message": "Unable fetch Sale Invoices, Check your Internet Connection!"})
+                return JsonResponse({"success": False, "message": "Unable fetch Sale Invoices, Please retry or restart Financee if this continues."})
         
         # now sending to frontend
 

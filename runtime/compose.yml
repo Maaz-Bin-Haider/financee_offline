@@ -18,7 +18,7 @@ services:
     pull_policy: never
     command: ["redis-server", "--maxmemory", "64mb", "--maxmemory-policy", "allkeys-lru"]
   web:
-    image: financee-offline:0.2.0-phase2
+    image: financee-offline:0.3.0-phase3
     pull_policy: never
     build:
       context: ..
@@ -39,6 +39,16 @@ services:
     ports: ["127.0.0.1:${HTTP_PORT}:80"]
     volumes: ["./nginx.conf:/etc/nginx/nginx.conf:ro", "static:/app/staticfiles:ro"]
     depends_on: [web]
+    networks: [default, entry]
 volumes:
   database:
   static:
+
+# Only the loopback web port is exposed; business services have no internet route.
+networks:
+  default:
+    internal: true
+  # Docker Desktop needs a bridge on the proxy to publish its loopback port.
+  # The application, database and cache never join this entry network.
+  entry:
+    driver: bridge

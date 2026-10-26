@@ -34,5 +34,5 @@ def health(request):
     with connection.cursor() as cur:
         cur.execute('SELECT version FROM offline_schema_version WHERE id=true')
         row = cur.fetchone()
-    return JsonResponse({'product':'Financee_Offline','build':'0.2.0-phase2','schema':row[0] if row else None,
+    return JsonResponse({'product':'Financee_Offline','build':'0.3.0-phase3','schema':row[0] if row else None,
                          'setup_complete':GeneralSettings.objects.exists()})

@@ -888,7 +888,7 @@ def get_receipt(request):
                     
                     return JsonResponse({
                         "error": "No receipt found.",
-                        "info": "Can't Find this receipt may be some Internet issue!."
+                        "info": "Unable to load this receipt. Please retry or restart Financee if this continues."
                     }, status=404)
     except DatabaseError:
          return JsonResponse({"error": "Database error."}, status=500)

@@ -86,8 +86,6 @@ doc.autoTable would never be defined.
 <script>
   window.DRAFT_AGE_WARNING_DAYS = Number("{{ age_warning_days|default:30|escapejs }}") || 30;
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 <script src="{% static 'js/report_pdf.js' %}"></script>
 <script src="{% static 'js/draft_reports.js' %}"></script>
 <script src="{% static 'js/pending_drafts_page.js' %}"></script>

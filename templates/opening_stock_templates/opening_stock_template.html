@@ -153,7 +153,6 @@
   window.OS_PERMS = { canDelete: {{ can_delete|yesno:"true,false" }}, canReclass: {{ can_reclass|yesno:"true,false" }} };
   window.OS_AUTOCOMPLETE_ITEM_URL = "{% url 'items:autocomplete_item' %}";
 </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{% static 'js/opening_stock_page.js' %}"></script>
 
 {% endblock body %}

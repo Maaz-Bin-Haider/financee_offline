@@ -14,7 +14,14 @@ class ActivityMiddleware(MiddlewareMixin):
         if not settings.TEAM_ACTIVITY_RECORDING_ENABLED: return
         if request.method == 'POST' and request.resolver_match.view_name in (work.DOCUMENTS | work.EXTRAS | work.CASH):
             try:
-                payload = json.loads(request.body or '{}') if request.content_type == 'application/json' else request.POST.dict()
+                if request.content_type == 'application/json':
+                    payload = json.loads(request.body or '{}')
+                elif request.content_type.startswith('multipart/form-data') and 'payload' in request.POST:
+                    # Transaction forms put their JSON in a multipart field when
+                    # attaching files. Observe the same validated payload as the view.
+                    payload = json.loads(request.POST['payload'])
+                else:
+                    payload = request.POST.dict()
                 request.activity_payload = payload if isinstance(payload,dict) else {}
                 work.capture_document_date(request,request.activity_payload)
             except Exception:
