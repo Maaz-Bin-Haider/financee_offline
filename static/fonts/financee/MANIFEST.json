@@ -1,0 +1,48 @@
+{
+  "family": "Financee Sans",
+  "licence": "SIL OFL 1.1, with preserved DejaVu/Bitstream/Arev notices",
+  "files": {
+    "FinanceeSans-normal.ttf": {
+      "sha256": "4f0c11f8c92d1957a7f27e2bb44b326f625ecd89eca352f41dbb0bd74e28a172",
+      "catalogue_symbols": 32
+    },
+    "FinanceeSans-bold.ttf": {
+      "sha256": "eca150810b86254c47017a23ed8e04fba62e887ea74f4f057bd3e2a218cbdbfd",
+      "catalogue_symbols": 32
+    },
+    "FinanceeSans-italic.ttf": {
+      "sha256": "4d4c1d7bee50c4189ecc5e3330e8c419b1ce06557bcfbf902961d3a95afbd429",
+      "catalogue_symbols": 32
+    },
+    "FinanceeSans-bolditalic.ttf": {
+      "sha256": "0d171f44345ae36a5e765d6e827024fceb718ebabbb8be3812fcf2f00f995233",
+      "catalogue_symbols": 32
+    }
+  },
+  "sources": {
+    "DejaVuSans.ttf": {
+      "sha256": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
+      "version": "Version 2.37"
+    },
+    "DejaVuSans-Bold.ttf": {
+      "sha256": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
+      "version": "Version 2.37"
+    },
+    "DejaVuSans-Oblique.ttf": {
+      "sha256": "4af75fa16ee6d3ad43e1ecec41862c24954af26a55c6bb1ebb27bd486a50f5f4",
+      "version": "Version 2.37"
+    },
+    "DejaVuSans-BoldOblique.ttf": {
+      "sha256": "eb436dca0c2594b73d8b603b892e374fdfd8d885d25ffb4f18df4c4c0b49e50f",
+      "version": "Version 2.37"
+    },
+    "NotoNaskhArabic-Regular.ttf": {
+      "sha256": "c9a039ce48a477243c1eb7d561b13de115cfd651d8a83fa42e2f4d63c2e11b00",
+      "version": "Version 2.021; ttfautohint (v1.8.4.16-eb64)"
+    },
+    "NotoSansBengali-Regular.ttf": {
+      "sha256": "6300c5370cd688b0641343de4c786de6d412bb6c578d129dae75e93a0322dcab",
+      "version": "Version 2.002; ttfautohint (v1.8) -l 8 -r 50 -G 200 -x 14 -D beng -f none -a qsq -X \"\""
+    }
+  }
+}

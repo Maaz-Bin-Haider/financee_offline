@@ -163,9 +163,10 @@ function oeExportPDF() {
   if (!_oeRows.length) { Alerts.notify("There are no entries yet.", { title: "Nothing to export" }); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
+  window.FinanceeBusiness.preparePDF(doc);
   doc.setFontSize(15); doc.text("Owner Equity — Withdrawals & Capital", 14, 18);
   doc.setFontSize(10);
-  doc.text("Generated " + new Date().toLocaleDateString("en-PK"), 14, 25);
+  doc.text("Generated " + window.FinanceeBusiness.stamp(), 14, 25);
 
   doc.autoTable({
     startY: 32,
@@ -192,7 +193,7 @@ function oeExportPDF() {
     styles: { fontStyle: "bold" },
   });
 
-  doc.save("owner_equity_" + new Date().toISOString().slice(0, 10) + ".pdf");
+  doc.save("owner_equity_" + window.FinanceeBusiness.today() + ".pdf");
   if (globalThis.FinanceeActivity) globalThis.FinanceeActivity.exported("pdf");
 }
 
@@ -210,10 +211,10 @@ function oeExportCSV() {
   rows.push(["Withdrawn", _oeSummary.total_withdrawals].map(esc));
   rows.push(["Net contributed", _oeSummary.net_contributed].map(esc));
 
-  const blob = new Blob([rows.map((r) => r.join(",")).join("\n")], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([window.FinanceeBusiness.csvPrefix(), rows.map((r) => r.join(",")).join("\n")], { type: "text/csv;charset=utf-8;" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "owner_equity_" + new Date().toISOString().slice(0, 10) + ".csv";
+  a.download = "owner_equity_" + window.FinanceeBusiness.today() + ".csv";
   document.body.appendChild(a); a.click(); a.remove();
   if (globalThis.FinanceeActivity) globalThis.FinanceeActivity.exported("csv");
   URL.revokeObjectURL(a.href);
@@ -221,7 +222,7 @@ function oeExportCSV() {
 
 document.addEventListener("DOMContentLoaded", () => {
   const dt = document.getElementById("oe-date");
-  if (dt) dt.value = new Date().toISOString().slice(0, 10);
+  if (dt) dt.value = window.FinanceeBusiness.today();
   document.getElementById("oe-save-btn")?.addEventListener("click", oeSave);
   document.getElementById("oe-download-pdf")?.addEventListener("click", oeExportPDF);
   document.getElementById("oe-download-csv")?.addEventListener("click", oeExportCSV);

@@ -174,7 +174,7 @@
     pendingRows(payload).forEach(function (row) {
       lines.push(row.map(csvCell).join(","));
     });
-    return lines.join("\n");
+    return (root && root.FinanceeBusiness ? root.FinanceeBusiness.csvPrefix() : "") + lines.join("\n");
   }
 
   /* ── the Pending Drafts PDF ───────────────────────────────────────── */

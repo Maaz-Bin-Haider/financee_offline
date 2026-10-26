@@ -75,7 +75,7 @@ class LocalCoreTests(TestCase):
         self.assertFalse(apps.is_installed('tenancy'))
         self.assertFalse(apps.is_installed('reportmailer'))
         self.assertFalse(Permission.objects.filter(codename__in=['send_reports','manage_report_email']).exists())
-        self.assertEqual(scalar('SELECT version FROM offline_schema_version'),1)
+        self.assertEqual(scalar('SELECT version FROM offline_schema_version'),2)
     def test_removed_routes(self):
         with self.assertRaises(Resolver404): resolve('/report-email/')
         self.client.force_login(self.owner)
@@ -223,7 +223,7 @@ class LocalCoreTests(TestCase):
             actual={name:dict(body_sha256=hashlib.sha256(body.encode()).hexdigest(),result=result,volatility=volatility,strict=strict,security_definer=security) for name,body,result,volatility,strict,security in cur.fetchall()}
         for name,expected in contract['functions'].items():
             with self.subTest(function=name):self.assertEqual(actual.pop(name,None),expected)
-        self.assertEqual(set(actual),{'local_profile_guard()','local_profile_no_truncate()'})
+        self.assertEqual(set(actual),{'local_profile_guard()','local_profile_no_truncate()','local_currency_posting_lock()'})
 
     def test_saved_currency_reaches_dashboard_and_transaction_pages(self):
         import re
@@ -274,3 +274,91 @@ class LocalCoreTests(TestCase):
         html=response.content.decode()
         self.assertIn('\\u003C/script\\u003E',html)
         self.assertNotIn('· </script>',html)
+
+    def settings_payload(self, **changes):
+        from .features import FEATURE_GROUPS
+        values={'name':'Local Test Company','base_currency':'AED','symbol_override':'Dhs','timezone':'Asia/Dubai','contact_email':'accounts@example.test','phone':'+971 50 1234567','address':'Office 12, Dubai','enabled_modules':list(FEATURE_GROUPS)}
+        values.update(changes);return values
+
+    def test_owner_settings_editor_and_normal_user_denial(self):
+        self.client.force_login(self.user)
+        self.assertEqual(self.client.get('/admin/local/generalsettings/1/change/').status_code,302)
+        self.client.force_login(self.owner)
+        response=self.client.post('/admin/local/generalsettings/1/change/',self.settings_payload())
+        self.assertEqual(response.status_code,302)
+        profile=GeneralSettings.objects.get()
+        self.assertEqual((profile.name,profile.base_currency_id,profile.currency_symbol,profile.timezone),('Local Test Company','AED','Dhs','Asia/Dubai'))
+        self.assertEqual(profile.disabled_features,[])
+        self.assertEqual(self.client.get('/home/').context['business_config']['address'],'Office 12, Dubai')
+        bad=self.client.post('/admin/local/generalsettings/1/change/',self.settings_payload(timezone='Not/AZone'))
+        self.assertEqual(bad.status_code,200)
+        self.assertEqual(GeneralSettings.objects.get().timezone,'Asia/Dubai')
+
+    def test_local_module_guards_hide_and_deny_without_removing_permissions(self):
+        self.grant('view_purchase','create_purchase')
+        self.client.force_login(self.user)
+        GeneralSettings.objects.filter(pk=1).update(disabled_features=['purchases','stock_reports','draft_invoices'])
+        home=self.client.get('/home/').content.decode()
+        self.assertNotIn('href="/purchase/purchasing/"',home)
+        self.assertNotIn('href="/draft/"',home)
+        self.assertEqual(self.client.get('/purchase/purchasing/',HTTP_X_REQUESTED_WITH='XMLHttpRequest').status_code,403)
+        self.assertEqual(self.client.post('/purchase/purchasing/',data='{}',content_type='application/json').status_code,403)
+        self.assertEqual(self.client.get('/accountsReports/stock-summary/',HTTP_X_REQUESTED_WITH='XMLHttpRequest').status_code,403)
+        self.assertEqual(self.client.get('/draft/get/',HTTP_X_REQUESTED_WITH='XMLHttpRequest').status_code,403)
+        self.assertContains(self.client.get('/home/'),'themeToggle')
+        self.assertTrue(get_user_model().objects.get(pk=self.user.pk).has_perm('auth.create_purchase'))
+        GeneralSettings.objects.filter(pk=1).update(disabled_features=[])
+        self.assertEqual(self.client.get('/purchase/purchasing/').status_code,200)
+
+    def test_module_values_are_validated_in_model_and_database(self):
+        profile=GeneralSettings.objects.get();profile.disabled_features=['subscription']
+        with self.assertRaises(ValidationError):profile.save()
+        with self.assertRaises(IntegrityError),transaction.atomic():GeneralSettings.objects.filter(pk=1).update(disabled_features=['subscription'])
+        with self.assertRaises(IntegrityError),transaction.atomic():GeneralSettings.objects.filter(pk=1).update(disabled_features={})
+
+    def test_base_currency_form_error_and_symbol_edit_after_posting(self):
+        from .forms import GeneralSettingsForm
+        self.execute("INSERT INTO journalentries(description) VALUES('Settings guard test')")
+        form=GeneralSettingsForm(data=self.settings_payload(),instance=GeneralSettings.objects.get())
+        self.assertFalse(form.is_valid());self.assertIn('base_currency',form.errors)
+        self.client.force_login(self.owner)
+        response=self.client.post('/admin/local/generalsettings/1/change/',self.settings_payload(base_currency='AED'))
+        self.assertEqual(response.status_code,302)
+        profile=GeneralSettings.objects.get()
+        self.assertEqual(profile.base_currency_id,'USD')
+        self.assertEqual(profile.symbol_override,'Dhs')
+
+    def test_saved_timezone_applies_to_python_sql_and_is_reset(self):
+        from .middleware import LocalAccessMiddleware
+        from django.utils import timezone
+        from django.http import HttpResponse
+        GeneralSettings.objects.filter(pk=1).update(timezone='Asia/Dubai')
+        request=RequestFactory().get('/home/');request.user=self.owner
+        middleware=LocalAccessMiddleware(lambda request:HttpResponse())
+        middleware.process_request(request)
+        self.assertEqual(timezone.get_current_timezone_name(),'Asia/Dubai')
+        self.assertEqual(scalar("SELECT current_setting('TimeZone')"),'Asia/Dubai')
+        self.assertEqual(str(scalar("SELECT ('2026-10-26 20:30:00Z'::timestamptz)::date")),'2026-10-27')
+        middleware.process_response(request,HttpResponse())
+        self.assertEqual(scalar("SELECT current_setting('TimeZone')"),'UTC')
+
+    def test_disabling_drafts_keeps_existing_serial_reservations_protected(self):
+        uid=self.owner.pk
+        for kind,name in [('Vendor','Vendor'),('Customer','Customer')]:
+            scalar('SELECT add_party_from_json(%s::jsonb)',[json.dumps({'party_name':name,'party_type':kind,'created_by_id':str(uid)})])
+        scalar('SELECT add_item_from_json(%s::jsonb)',[json.dumps({'item_name':'Device','sale_price':200,'created_by_id':str(uid)})])
+        vendor=scalar("SELECT party_id FROM parties WHERE party_name='Vendor'")
+        customer=scalar("SELECT party_id FROM parties WHERE party_name='Customer'")
+        scalar('SELECT create_purchase(%s,%s,%s::jsonb,%s)',[vendor,'2026-10-01',json.dumps([dict(item_name='Device',qty=1,unit_price=100,serials=[{'serial':'RESERVED-1'}])]),uid])
+        lines=json.dumps([dict(item_name='Device',qty=1,unit_price=150,serials=['RESERVED-1'])])
+        scalar('SELECT create_draft(%s,%s,%s::jsonb,%s)',[customer,'2026-10-02',lines,uid])
+        before=scalar('SELECT count(*) FROM journallines')
+        GeneralSettings.objects.filter(pk=1).update(disabled_features=['draft_invoices'])
+        with self.assertRaises(DatabaseError),transaction.atomic():scalar('SELECT create_sale(%s,%s,%s::jsonb,%s)',[customer,'2026-10-03',lines,uid])
+        self.assertTrue(scalar("SELECT is_reserved FROM get_serial_number_details('RESERVED-1')"))
+        self.assertEqual(scalar('SELECT count(*) FROM journallines'),before)
+
+    def test_local_pdf_setting_blocks_admin_export(self):
+        self.client.force_login(self.owner)
+        GeneralSettings.objects.filter(pk=1).update(disabled_features=['pdf_export'])
+        self.assertEqual(self.client.get(f'/admin/user-activity/{self.owner.pk}/pdf/').status_code,403)

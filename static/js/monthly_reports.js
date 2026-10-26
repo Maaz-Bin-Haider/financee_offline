@@ -53,7 +53,7 @@ function mprSelectReport(type) {
    1. COMPANY POSITION (Balance Sheet)
    ════════════════════════════════════════════════════════════════════════ */
 function mprRenderPositionForm() {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = window.FinanceeBusiness.today();
   document.getElementById('mpr-form-container').innerHTML = `
     <div class="mpr-filter-card">
       <div class="filter-field">
@@ -141,7 +141,7 @@ function mprRenderPosition(data) {
    2. INCOME STATEMENT (Profit & Loss)  — auto-calculated
    ════════════════════════════════════════════════════════════════════════ */
 function mprRenderIncomeForm() {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = window.FinanceeBusiness.today();
   const first = today.slice(0, 8) + '01';
   document.getElementById('mpr-form-container').innerHTML = `
     <div class="mpr-filter-card">
@@ -249,6 +249,7 @@ function mprPdfPosition() {
   const d = _mprLastData; if (!d) return;
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
+  window.FinanceeBusiness.preparePDF(doc);
   doc.setFontSize(15); doc.text('Company Position', 14, 18);
   doc.setFontSize(10); doc.text('As of ' + mprFmtDate(d.as_of_date), 14, 25);
 
@@ -278,6 +279,7 @@ function mprPdfIncome() {
   const d = _mprLastData; if (!d) return;
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
+  window.FinanceeBusiness.preparePDF(doc);
   doc.setFontSize(15); doc.text('Income Statement', 14, 18);
   doc.setFontSize(10);
   doc.text(mprFmtDate(d.from_date) + ' to ' + mprFmtDate(d.to_date), 14, 25);
@@ -326,7 +328,7 @@ function mprPrintElement(elId, title) {
     .mpr-net-bar,.mpr-income-banner{margin-top:12px;padding:10px;font-weight:700;
       display:flex;justify-content:space-between;background:#ecfdf5;}
     .mpr-loss{background:#fef2f2;}</style></head>
-    <body>${el.innerHTML}</body></html>`);
+    <body>${window.FinanceeBusiness.printStyles()}${window.FinanceeBusiness.printHeader()}${el.innerHTML}</body></html>`);
   w.document.close(); w.focus(); setTimeout(() => { w.print(); w.close(); }, 250);
 }
 function mprPrintPosition() { mprPrintElement('mpr-position-card', 'Company Position'); }

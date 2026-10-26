@@ -1,3 +1,4 @@
+from django.utils import timezone
 # from django.shortcuts import render,redirect
 
 import logging
@@ -776,7 +777,7 @@ def _serial_create_sale_return(request):
                     sale_return_date = datetime.strptime(data.get("return_date"), "%Y-%m-%d").date()
 
                     # Future Date Restriction
-                    if sale_return_date > date.today():
+                    if sale_return_date > timezone.localdate():
                         return JsonResponse({"success": False, "message": "Sale Return date cannot be in the future."})
 
                     # Making Date again Str
@@ -1095,7 +1096,7 @@ def _serial_get_sale_return_summary(request):
                 to_date = datetime.strptime(to_date_str, "%Y-%m-%d").date()
 
                 # Future Date Restriction
-                if from_date > date.today() or to_date > date.today():
+                if from_date > timezone.localdate() or to_date > timezone.localdate():
                     return JsonResponse({"success": False, "message": "Dates can't be in Future"})
 
                 # Making Date again Str

@@ -1,3 +1,4 @@
+from django.utils import timezone
 from activity.recorder import record as record_activity
 from django.shortcuts import render, redirect
 from django.db import connection, DatabaseError, IntegrityError
@@ -61,7 +62,7 @@ def make_contra(request):
 
             try:
                 contra_date = datetime.strptime(contra_date_str, "%Y-%m-%d").date()
-                if contra_date > date.today():
+                if contra_date > timezone.localdate():
                     messages.error(request, "Date cannot be in the future.")
                     return render(request, "contra_templates/contra.html", ctx)
                 contra_date = contra_date.strftime("%Y-%m-%d")
@@ -234,7 +235,7 @@ def get_contras_date_wise(request):
         try:
             from_date = datetime.strptime(from_date_str, "%Y-%m-%d").date()
             to_date = datetime.strptime(to_date_str, "%Y-%m-%d").date()
-            if from_date > date.today() or to_date > date.today():
+            if from_date > timezone.localdate() or to_date > timezone.localdate():
                 return JsonResponse({"error": "Dates can't be in the future"}, status=400)
         except (ValueError, TypeError):
             return JsonResponse({"error": "Invalid date format. Use YYYY-MM-DD."}, status=400)

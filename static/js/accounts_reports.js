@@ -73,7 +73,7 @@ function _clearTable() {
 
 // ── Cash Ledger ──────────────────────────────────────────────
 function renderCashLedgerForm() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = window.FinanceeBusiness.today();
   const yrStart = `${new Date().getFullYear()}-01-01`;
 
   $("#report-form-container").html(`
@@ -97,7 +97,7 @@ function renderCashLedgerForm() {
 
 // ── Party Ledger ─────────────────────────────────────────────
 function renderLedgerForm() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = window.FinanceeBusiness.today();
 
   $("#report-form-container").html(`
     <div class="filter-form">
@@ -324,6 +324,7 @@ $(document).on("click", "#download_pdf", function () {
   if (!rowData.length) { Alerts.warning("Nothing visible to export.", { title: "No Data" }); return; }
 
   const doc    = new jsPDF("p", "pt", "a4");
+  window.FinanceeBusiness.preparePDF(doc);
   const pW     = doc.internal.pageSize.width;
   const pH     = doc.internal.pageSize.height;
   const today  = new Date().toLocaleDateString("en-PK", { day: "2-digit", month: "short", year: "numeric" });
@@ -393,7 +394,7 @@ $(document).on("click", "#download_pdf", function () {
     drawFooter(i, totalPg);
   }
 
-  doc.save(`${m.title.replace(/\s+/g, "_")}_${new Date().toISOString().split("T")[0]}.pdf`);
+  doc.save(`${m.title.replace(/\s+/g, "_")}_${window.FinanceeBusiness.today()}.pdf`);
   if (globalThis.FinanceeActivity) globalThis.FinanceeActivity.exported("pdf");
 });
 
@@ -433,10 +434,10 @@ $(document).on("click", "#download_csv", function () {
     if (row.length && !row[0].includes("No records")) rows.push(row);
   });
 
-  const blob = new Blob([rows.map(r => r.join(",")).join("\n")], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([window.FinanceeBusiness.csvPrefix(), rows.map(r => r.join(",")).join("\n")], { type: "text/csv;charset=utf-8;" });
   const a = Object.assign(document.createElement("a"), {
     href: URL.createObjectURL(blob),
-    download: `${m.title.replace(/\s+/g,"_")}_${new Date().toISOString().split("T")[0]}.csv`,
+    download: `${m.title.replace(/\s+/g,"_")}_${window.FinanceeBusiness.today()}.csv`,
     style: "display:none",
   });
   document.body.appendChild(a); a.click(); document.body.removeChild(a);

@@ -518,7 +518,7 @@
     const vbox = document.getElementById("vendor_suggestions");
     if (vendor && vbox) setupAutocomplete(vendor, vbox, vendor.dataset.autocompleteUrl, null);
     const dateEl = document.getElementById("as_of_date");
-    if (dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0, 10);
+    if (dateEl && !dateEl.value) dateEl.value = window.FinanceeBusiness.today();
     if (document.getElementById("items")) addItemRow(false);
     const addBtn = document.getElementById("add-item-btn");
     if (addBtn) addBtn.addEventListener("click", () => addItemRow(true));

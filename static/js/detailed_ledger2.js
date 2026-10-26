@@ -1094,7 +1094,7 @@
 // //       doc.setPage(i);
 // //       doc.setFontSize(7); doc.setTextColor(140);
 // //       doc.text(`Page ${i} of ${total}`, pageW - 18, pageH - 12, { align: "right" });
-// //       doc.text(`Generated: ${new Date().toLocaleString("en-PK")}`, 18, pageH - 12);
+// //       doc.text(`Generated: ${window.FinanceeBusiness.stamp()}`, 18, pageH - 12);
 // //       doc.setTextColor(0);
 // //     }
 // //   }
@@ -1944,7 +1944,7 @@
 //       doc.setPage(i);
 //       doc.setFontSize(7); doc.setTextColor(140);
 //       doc.text(`Page ${i} of ${total}`, pageW - 18, pageH - 12, { align: "right" });
-//       doc.text(`Generated: ${new Date().toLocaleString("en-PK")}`, 18, pageH - 12);
+//       doc.text(`Generated: ${window.FinanceeBusiness.stamp()}`, 18, pageH - 12);
 //       doc.setTextColor(0);
 //     }
 //   }
@@ -3388,7 +3388,7 @@
 //       doc.setPage(i);
 //       doc.setFontSize(7); doc.setTextColor(140);
 //       doc.text(`Page ${i} of ${total}`, pageW - 18, pageH - 12, { align: "right" });
-//       doc.text(`Generated: ${new Date().toLocaleString("en-PK")}`, 18, pageH - 12);
+//       doc.text(`Generated: ${window.FinanceeBusiness.stamp()}`, 18, pageH - 12);
 //       doc.setTextColor(0);
 //     }
 //   }
@@ -4242,6 +4242,7 @@ function downloadLedger2PDF(withDetails) {
 
   const orientation = withDetails ? "p" : "l";
   const doc  = new jsPDF(orientation, "pt", "a4");
+  window.FinanceeBusiness.preparePDF(doc);
   const pageW = doc.internal.pageSize.width;
   const pageH = doc.internal.pageSize.height;
 
@@ -4265,7 +4266,7 @@ function downloadLedger2PDF(withDetails) {
       doc.setPage(i);
       doc.setFontSize(7); doc.setTextColor(140);
       doc.text(`Page ${i} of ${total}`, pageW - 18, pageH - 12, { align: "right" });
-      doc.text(`Generated: ${new Date().toLocaleString("en-PK")}`, 18, pageH - 12);
+      doc.text(`Generated: ${window.FinanceeBusiness.stamp()}`, 18, pageH - 12);
       doc.setTextColor(0);
     }
   }
@@ -4512,7 +4513,7 @@ function downloadLedger2CSV() {
     ]);
   });
   const csv  = lines.map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([window.FinanceeBusiness.csvPrefix(), csv], { type: "text/csv;charset=utf-8;" });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement("a");
   a.href = url; a.download = `Ledger_${d.partyName.replace(/\s+/g, "_")}_${d.fromDate}.csv`;
@@ -4560,7 +4561,7 @@ function initLedger2Autocomplete() {
 
 /* ── Form ──────────────────────────────────────────────────── */
 function renderLedger2Form() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = window.FinanceeBusiness.today();
   const yearStart = `${new Date().getFullYear()}-01-01`;
   document.getElementById("ledger2-form-area").innerHTML = `
     <div class="l2-form-row">

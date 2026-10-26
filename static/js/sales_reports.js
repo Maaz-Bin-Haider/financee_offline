@@ -115,13 +115,9 @@ let SR = { key: null, rows: [], totals: {}, columns: [], chart: null, sort: { co
 /* ---------- date helpers ---------- */
 function iso(d) { return d.toISOString().slice(0, 10); }
 function setRange(which) {
-  const now = new Date();
-  let from, to;
-  if (which === "this_month") { from = new Date(now.getFullYear(), now.getMonth(), 1); to = now; }
-  else if (which === "last_month") { from = new Date(now.getFullYear(), now.getMonth() - 1, 1); to = new Date(now.getFullYear(), now.getMonth(), 0); }
-  else if (which === "this_year") { from = new Date(now.getFullYear(), 0, 1); to = now; }
-  document.getElementById("sr-from").value = iso(from);
-  document.getElementById("sr-to").value = iso(to);
+  const range = window.FinanceeBusiness.range(which);
+  document.getElementById("sr-from").value = range.from;
+  document.getElementById("sr-to").value = range.to;
   document.querySelectorAll("#sr-quick .sr-chip").forEach((c) => c.classList.toggle("active", c.dataset.range === which));
 }
 
@@ -362,6 +358,7 @@ function exportPDF() {
   const { jsPDF } = window.jspdf;
   const landscape = SR.columns.length > 6;
   const doc = new jsPDF({ orientation: landscape ? "landscape" : "portrait", unit: "mm", format: "a4" });
+  window.FinanceeBusiness.preparePDF(doc);
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
   const BRAND = [37, 99, 235];
@@ -408,7 +405,7 @@ function exportPDF() {
       doc.setFont("helvetica", "italic"); doc.setTextColor(120, 130, 145); doc.setFontSize(7);
       doc.text("Developed by Maaz", 12, pageH - 4);
       doc.setFont("helvetica", "normal"); doc.setTextColor(120, 130, 145);
-      doc.text(`${new Date().toLocaleDateString("en-PK")}   ·   Page ${data.pageNumber}`, pageW - 12, pageH - 6, { align: "right" });
+      doc.text(`${window.FinanceeBusiness.stamp()}   ·   Page ${data.pageNumber}`, pageW - 12, pageH - 6, { align: "right" });
     },
   });
   doc.save(cfg.title.replace(/\s+/g, "_").toLowerCase() + "_" + from + "_" + to + ".pdf");
@@ -423,7 +420,7 @@ function exportCSV() {
   const lines = [SR.columns.map((c) => esc(c.label)).join(",")];
   SR.rows.forEach((row) => lines.push(SR.columns.map((c) => esc(exportRaw(c, row[c.k]))).join(",")));
   if (cfg.totals) lines.push(SR.columns.map((c, i) => esc(i === 0 ? "Total" : (cfg.totals.includes(c.k) ? SR.totals[c.k] : ""))).join(","));
-  const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([window.FinanceeBusiness.csvPrefix(), lines.join("\n")], { type: "text/csv;charset=utf-8;" });
   const a = document.createElement("a");
   const from = document.getElementById("sr-from").value, to = document.getElementById("sr-to").value;
   a.href = URL.createObjectURL(blob);

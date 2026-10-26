@@ -43,8 +43,12 @@
     };
   </script>
 
+  {{ business_config|json_script:"financee-business" }}
   {{ currency_config|json_script:"financee-currency" }}
   <script src="{% static 'js/currency.js' %}"></script>
+  <script src="{% static 'js/business.js' %}"></script>
+  <script src="{% static 'js/pdf_fonts.js' %}"></script>
+  <link id="financee-business-style" rel="stylesheet" href="{% static 'css/business.css' %}">
 
   {% if activity_config %}
   {{ activity_config|json_script:"activity-config" }}
@@ -229,6 +233,7 @@
         <!-- Footer -->
         <div class="sidebar-footer">
             <div class="user_name"><i class="fa-solid fa-user"></i>  <span id="username">-</span></div>
+            {% if request.user.is_superuser %}<a href="{% url 'admin:local_generalsettings_change' 1 %}" class="user_name">General Settings</a>{% endif %}
             {% if request.general_settings %}
             <div class="user_name company_name"><i class="fa-solid fa-building"></i>  <span id="companyname">{{ request.general_settings.name }}</span></div>
             {% endif %}
@@ -249,6 +254,7 @@
     <main class="main-content">
       <i class="fa-solid fa-bars menu-toggle" id="menuToggle"></i>
 
+      {% if general_settings %}<div class="financee-business-context"><span>{{ general_settings.name }}</span><span>Amounts: {{ currency_code }} · <bdi>{{ currency_symbol }}</bdi>{% if currency_label != currency_code %} · Display: {{ currency_label }}{% endif %} · {{ general_settings.timezone }}</span></div>{% endif %}
       {% block body %}
       {% endblock body %}
     </main>

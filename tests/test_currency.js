@@ -5,6 +5,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const root = path.resolve(__dirname,'..');
 const money = require(path.join(root,'static/js/currency.js'));
+const business = require(path.join(root,'static/js/business.js'))({timezone:'UTC'});
 let count=0;
 function check(name,fn){fn();count++;console.log('PASS:',name);}
 check('AED amount label uses saved code and two decimal precision',()=>assert.equal(money({code:'AED'}).format('1234.5'),'AED 1,234.50'));
@@ -26,7 +27,7 @@ function dashboard(config){
  class PDF{constructor(){this.tables=[];pdfs.push(this);this.lastAutoTable={finalY:30};}setFontSize(){}setTextColor(){}text(){}autoTable(t){this.tables.push(t);}addImage(){}addPage(){}save(){}}
  const context=vm.createContext({console,Intl,Date,URLSearchParams,encodeURIComponent,setTimeout,clearTimeout,
  document:{cookie:'',body:{style:{}},addEventListener(){},getElementById:el,querySelectorAll(){return [];},querySelector(){return null;}},
- window:{FinanceeMoney:money(config),jspdf:{jsPDF:PDF}},localStorage:{getItem(){return null;},setItem(){}},
+ window:{FinanceeMoney:money(config),FinanceeBusiness:{...business,preparePDF:doc=>doc},jspdf:{jsPDF:PDF}},localStorage:{getItem(){return null;},setItem(){}},
  Chart:class{constructor(ctx,opts){chart=opts;}destroy(){}},
  fetch:async url=>({ok:true,json:async()=>({status:'ok',data:responses[url.split('?')[0]]})})});
  vm.runInContext(fs.readFileSync(path.join(root,'static/js/home_script.js'),'utf8'),context);

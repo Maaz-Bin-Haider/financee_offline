@@ -188,9 +188,10 @@ function mcExportPDF() {
   if (!_mcClosed.length) { Alerts.notify("No months have been closed yet.", { title: "Nothing to export" }); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
+  window.FinanceeBusiness.preparePDF(doc);
   doc.setFontSize(15); doc.text("Month-End Close — Profit Log", 14, 18);
   doc.setFontSize(10);
-  doc.text("Generated " + new Date().toLocaleDateString("en-PK"), 14, 25);
+  doc.text("Generated " + window.FinanceeBusiness.stamp(), 14, 25);
 
   doc.autoTable({
     startY: 32,
@@ -218,7 +219,7 @@ function mcExportPDF() {
     styles: { fontStyle: "bold" },
   });
 
-  doc.save("month_end_close_" + new Date().toISOString().slice(0, 10) + ".pdf");
+  doc.save("month_end_close_" + window.FinanceeBusiness.today() + ".pdf");
   if (globalThis.FinanceeActivity) globalThis.FinanceeActivity.exported("pdf");
 }
 
@@ -237,10 +238,10 @@ function mcExportCSV() {
   rows.push(["Total profit recognised", _mcTotals.total_closed_profit].map(esc));
   rows.push(["Retained Earnings balance", _mcTotals.retained_earnings_balance].map(esc));
 
-  const blob = new Blob([rows.map((r) => r.join(",")).join("\n")], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([window.FinanceeBusiness.csvPrefix(), rows.map((r) => r.join(",")).join("\n")], { type: "text/csv;charset=utf-8;" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "month_end_close_" + new Date().toISOString().slice(0, 10) + ".csv";
+  a.download = "month_end_close_" + window.FinanceeBusiness.today() + ".csv";
   document.body.appendChild(a); a.click(); a.remove();
   if (globalThis.FinanceeActivity) globalThis.FinanceeActivity.exported("csv");
   URL.revokeObjectURL(a.href);

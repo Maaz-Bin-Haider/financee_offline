@@ -853,7 +853,7 @@
 
 //   items.forEach((item, idx) => {
 //     const rowH = 7 + Math.ceil(item.serials.length / 4) * 4;
-//     if (y + rowH > 270) { doc.addPage(); y = 20; }
+//     if (y + rowH > 252) { doc.addPage(); y = 20; }
 
 //     // Alternating row bg
 //     if (idx % 2 === 0) {
@@ -890,7 +890,7 @@
 
 //   // ── Total band ──
 //   y += 4;
-//   if (y > 260) { doc.addPage(); y = 20; }
+//   if (y > 250) { doc.addPage(); y = 20; }
 //   doc.setFillColor(30, 58, 95);
 //   doc.rect(PL - 2, y, W - (PL - 2) * 2, 10, "F");
 //   doc.setTextColor(255, 255, 255);
@@ -1541,7 +1541,7 @@ function buildAndSubmit(event) {
 
   const partyName   = document.getElementById("search_name").value.trim();
   let   saleDate    = document.getElementById("sale_date").value;
-  if (!saleDate) saleDate = new Date().toISOString().slice(0, 10);
+  if (!saleDate) saleDate = window.FinanceeBusiness.today();
 
   if (!partyName) {
     // Swal.fire({ icon: "warning", title: "Missing Customer",
@@ -1862,7 +1862,7 @@ window.addEventListener("DOMContentLoaded", () => {
   // Start with 3 blank rows
   for (let i = 0; i < 3; i++) addItemRow(false);
   calculateTotal();
-  document.getElementById("sale_date").value = new Date().toISOString().slice(0, 10);
+  document.getElementById("sale_date").value = window.FinanceeBusiness.today();
   if (window.DocumentAttachments) {
     DocumentAttachments.init("sale", () => document.getElementById("current_sale_id")?.value || "");
   }
@@ -1903,6 +1903,7 @@ function downloadInvoicePDF() {
   // Use jsPDF
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  window.FinanceeBusiness.preparePDF(doc,'documents');
 
   const W = 210, PL = 14, PR = 196;
   let y = 0;
@@ -1918,12 +1919,12 @@ function downloadInvoicePDF() {
   doc.text("SALE INVOICE", PL, 18);
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
-  doc.text("Financee Accounting System", PL, 26);
+  window.FinanceeBusiness.invoiceIdentity(doc, PL, 26, 85, 11);
 
   // Invoice meta (top-right)
   doc.setFontSize(9);
   doc.text(`Invoice #: ${invoiceId || "DRAFT"}`, PR, 14, { align: "right" });
-  doc.text(`Date: ${saleDate || new Date().toLocaleDateString()}`, PR, 22, { align: "right" });
+  doc.text(`Date: ${saleDate || window.FinanceeBusiness.dateLabel()}`, PR, 22, { align: "right" });
   doc.text(`Customer: ${partyName}`, PR, 30, { align: "right" });
 
   y = 52;
@@ -1959,7 +1960,7 @@ function downloadInvoicePDF() {
 
   items.forEach((item, idx) => {
     const rowH = 7 + Math.ceil(item.serials.length / 4) * 4;
-    if (y + rowH > 270) { doc.addPage(); y = 20; }
+    if (y + rowH > window.FinanceeBusiness.bodyBottom(doc)) { doc.addPage(); y = 20; }
 
     // Alternating row bg
     if (idx % 2 === 0) {
@@ -1996,7 +1997,7 @@ function downloadInvoicePDF() {
 
   // ── Total band ──
   y += 4;
-  if (y > 260) { doc.addPage(); y = 20; }
+  if (y + 18 > window.FinanceeBusiness.bodyBottom(doc)) { doc.addPage(); y = 20; }
   doc.setFillColor(30, 58, 95);
   doc.rect(PL - 2, y, W - (PL - 2) * 2, 10, "F");
   doc.setTextColor(255, 255, 255);
@@ -2121,7 +2122,7 @@ function filterSaleTable(query) {
 
 function saleHistory()   { fetchSaleSummary(); }
 function saleDateWise()  {
-  const today = new Date().toISOString().split("T")[0];
+  const today = window.FinanceeBusiness.today();
   Alerts.dialog({  /* was Swal.fire — centered input dialog, standardized animation */
     title: "📅 Select Date Range",
     html: `

@@ -1737,7 +1737,7 @@
 //   doc.text("PURCHASE INVOICE", PL, 18);
 //   doc.setFont("helvetica","normal");
 //   doc.setFontSize(10);
-//   doc.text("Finance Management System", PL, 27);
+//   window.FinanceeBusiness.invoiceIdentity(doc, PL, 27, 85, 11);
 //   doc.setFontSize(9);
 //   doc.text(`Invoice #: ${invoiceId||"DRAFT"}`, PR, 14, {align:"right"});
 //   doc.text(`Date: ${purchDate||new Date().toLocaleDateString()}`, PR, 22, {align:"right"});
@@ -1778,7 +1778,7 @@
 //     const snLines = Math.ceil(item.serials.length / 2);
 //     const rowH = 8 + snLines * 5;
 
-//     if (y + rowH > 270) { doc.addPage(); y = 20; }
+//     if (y + rowH > 252) { doc.addPage(); y = 20; }
 
 //     if (idx % 2 === 0) {
 //       doc.setFillColor(248,250,252);
@@ -1817,7 +1817,7 @@
 
 //   // Total band
 //   y += 4;
-//   if (y > 264) { doc.addPage(); y=20; }
+//   if (y > 250) { doc.addPage(); y=20; }
 //   doc.setFillColor(15,40,80);
 //   doc.rect(PL-2, y, W-(PL-2)*2, 10, "F");
 //   doc.setTextColor(255,255,255);
@@ -2771,7 +2771,7 @@
 //     const snLines = Math.ceil(item.serials.length / 2);
 //     const rowH = 8 + snLines * 5;
 
-//     if (y + rowH > 270) { doc.addPage(); y = 20; }
+//     if (y + rowH > 252) { doc.addPage(); y = 20; }
 
 //     if (idx % 2 === 0) {
 //       doc.setFillColor(248,250,252);
@@ -2810,7 +2810,7 @@
 
 //   // Total band
 //   y += 4;
-//   if (y > 264) { doc.addPage(); y=20; }
+//   if (y > 250) { doc.addPage(); y=20; }
 //   doc.setFillColor(15,40,80);
 //   doc.rect(PL-2, y, W-(PL-2)*2, 10, "F");
 //   doc.setTextColor(255,255,255);
@@ -3366,7 +3366,7 @@ function buildAndSubmit(event) {
 
   const partyName = document.getElementById("search_name").value.trim();
   let purchaseDate = document.getElementById("purchase_date").value;
-  if (!purchaseDate) purchaseDate = new Date().toISOString().slice(0,10);
+  if (!purchaseDate) purchaseDate = window.FinanceeBusiness.today();
 
   if (!partyName) {
     // Swal.fire({ icon:"warning", title:"Missing Vendor",
@@ -3478,7 +3478,7 @@ document.querySelectorAll('button[type="submit"]').forEach(btn => {
 window.addEventListener("DOMContentLoaded", () => {
   for (let i = 0; i < 3; i++) addItemRow(false);
   calculateTotal();
-  document.getElementById("purchase_date").value = new Date().toISOString().slice(0,10);
+  document.getElementById("purchase_date").value = window.FinanceeBusiness.today();
   if (window.DocumentAttachments) {
     DocumentAttachments.init("purchase", () => document.getElementById("current_purchase_id")?.value || "");
   }
@@ -3754,6 +3754,7 @@ function downloadInvoicePDF() {
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation:"portrait", unit:"mm", format:"a4" });
+  window.FinanceeBusiness.preparePDF(doc,'documents');
   const W=210, PL=14, PR=196;
   let y=0;
 
@@ -3766,10 +3767,10 @@ function downloadInvoicePDF() {
   doc.text("PURCHASE INVOICE", PL, 18);
   doc.setFont("helvetica","normal");
   doc.setFontSize(10);
-  doc.text("Finance Management System", PL, 27);
+  window.FinanceeBusiness.invoiceIdentity(doc, PL, 27, 85, 11);
   doc.setFontSize(9);
   doc.text(`Invoice #: ${invoiceId||"DRAFT"}`, PR, 14, {align:"right"});
-  doc.text(`Date: ${purchDate||new Date().toLocaleDateString()}`, PR, 22, {align:"right"});
+  doc.text(`Date: ${purchDate||window.FinanceeBusiness.dateLabel()}`, PR, 22, {align:"right"});
   doc.text(`Vendor: ${partyName}`, PR, 30, {align:"right"});
 
   y = 54;
@@ -3807,7 +3808,7 @@ function downloadInvoicePDF() {
     const snLines = Math.ceil(item.serials.length / 2);
     const rowH = 8 + snLines * 5;
 
-    if (y + rowH > 270) { doc.addPage(); y = 20; }
+    if (y + rowH > window.FinanceeBusiness.bodyBottom(doc)) { doc.addPage(); y = 20; }
 
     if (idx % 2 === 0) {
       doc.setFillColor(248,250,252);
@@ -3846,7 +3847,7 @@ function downloadInvoicePDF() {
 
   // Total band
   y += 4;
-  if (y > 264) { doc.addPage(); y=20; }
+  if (y + 18 > window.FinanceeBusiness.bodyBottom(doc)) { doc.addPage(); y=20; }
   doc.setFillColor(15,40,80);
   doc.rect(PL-2, y, W-(PL-2)*2, 10, "F");
   doc.setTextColor(255,255,255);
@@ -3972,7 +3973,7 @@ function filterPurchaseTable(query) {
 
 function purchaseHistory()  { fetchPurchaseSummary(); }
 function purchaseDateWise() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = window.FinanceeBusiness.today();
   Alerts.dialog({  /* was Swal.fire — centered input dialog, standardized animation */
     title:"📅 Select Date Range",
     html:`

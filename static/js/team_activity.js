@@ -664,7 +664,7 @@
     function downloadCsv(title, rows, day) {
       if (invalidated || (root.financeeFeatureEnabled && !root.financeeFeatureEnabled("excel_export"))) return;
       const header = [["Company", `${data.company} (#${data.company_id})`], ["Time zone", data.timezone]];
-      const blob = new Blob([csv(header.concat(rows))], { type: "text/csv;charset=utf-8;" });
+      const blob = new Blob([root.FinanceeBusiness.csvPrefix(), csv(header.concat(rows))], { type: "text/csv;charset=utf-8;" });
       const a = doc.createElement("a");
       a.href = URL.createObjectURL(blob);
       a.download = `${title.replace(/[^\w]+/g, "_")}_${day || (state.answer ? state.answer.today : "")}.csv`;

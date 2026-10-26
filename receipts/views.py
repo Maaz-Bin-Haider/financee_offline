@@ -1,3 +1,4 @@
+from django.utils import timezone
 from activity.recorder import record as record_activity
 # from django.shortcuts import render,redirect
 
@@ -712,7 +713,7 @@ def make_receipt(request):
                 receipt_date = datetime.strptime(receipt_date_str, "%Y-%m-%d").date()
 
                 # Future Date Restriction
-                if receipt_date > date.today():
+                if receipt_date > timezone.localdate():
                     messages.error(request, "Receipt date cannot be in the future.")
                     return render(request,"receipts_templates/receipt.html",data)
 
@@ -949,7 +950,7 @@ def get_receipts_date_wise(request):
             to_date = datetime.strptime(to_date_str, "%Y-%m-%d").date()
 
             # Future Date Restriction
-            if from_date > date.today() or to_date > date.today():
+            if from_date > timezone.localdate() or to_date > timezone.localdate():
                 return JsonResponse({"error": "Dates can't be in Future"}, status=400)
 
             # Making Date again Str

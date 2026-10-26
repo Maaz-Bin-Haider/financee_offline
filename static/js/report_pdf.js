@@ -204,6 +204,7 @@
       unit: unit,
       format: "a4",
     });
+    if (typeof window !== "undefined" && window.FinanceeBusiness) window.FinanceeBusiness.preparePDF(doc,/proforma/i.test(o.title)?'documents':'reports');
     var pW = doc.internal.pageSize.width;
     var pH = doc.internal.pageSize.height;
 

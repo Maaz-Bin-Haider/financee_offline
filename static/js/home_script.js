@@ -57,13 +57,7 @@ function rankBadge(n) {
   return `<span class="rank-badge ${cls}">${n}</span>`;
 }
 function rangeToParams(range) {
-  const now=new Date(), s=d=>d.toISOString().slice(0,10);
-  if(range==="today")  return {from:s(now), to:s(now)};
-  if(range==="7d")  { const d=new Date(now); d.setDate(d.getDate()-7); return {from:s(d),to:s(now)}; }
-  if(range==="30d") { const d=new Date(now); d.setDate(d.getDate()-30); return {from:s(d),to:s(now)}; }
-  if(range==="mtd") { const d=new Date(now.getFullYear(),now.getMonth(),1); return {from:s(d),to:s(now)}; }
-  if(range==="ytd") { const d=new Date(now.getFullYear(),0,1); return {from:s(d),to:s(now)}; }
-  return {};
+  return window.FinanceeBusiness.range(range);
 }
 
 async function apiFetch(url, params={}, method="GET", body=null) {
@@ -102,7 +96,7 @@ function getCsrf() {
 // INIT
 // ══════════════════════════════════════════════════════════════════════════
 document.addEventListener("DOMContentLoaded", () => {
-  $("dash-date").textContent = new Date().toLocaleDateString("en-PK",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
+  $("dash-date").textContent = window.FinanceeBusiness.dateLabel(null,{weekday:"long",year:"numeric",month:"long",day:"numeric"});
   initDashboard();
   bindEvents();
 });
@@ -134,7 +128,7 @@ async function initDashboard() {
 // SMART ALERTS — popup, dismiss-for-today via localStorage
 // ══════════════════════════════════════════════════════════════════════════
 async function loadSmartAlerts() {
-  const today = new Date().toISOString().slice(0,10);
+  const today = window.FinanceeBusiness.today();
   const dismissed = localStorage.getItem("dash_alerts_dismissed");
   if(dismissed === today) return; // suppressed for today
 
@@ -158,7 +152,7 @@ async function loadSmartAlerts() {
 
 // Bell click → always show
 $("dash-alerts-bell")?.addEventListener("click", async () => {
-  const today = new Date().toISOString().slice(0,10);
+  const today = window.FinanceeBusiness.today();
   localStorage.removeItem("dash_alerts_dismissed"); // force reload
   await loadSmartAlerts();
   showModal("alerts-modal-overlay");
@@ -166,7 +160,7 @@ $("dash-alerts-bell")?.addEventListener("click", async () => {
 
 $("alerts-modal-ok")?.addEventListener("click", () => {
   if($("alerts-dismiss-today").checked) {
-    localStorage.setItem("dash_alerts_dismissed", new Date().toISOString().slice(0,10));
+    localStorage.setItem("dash_alerts_dismissed", window.FinanceeBusiness.today());
   }
   closeModal("alerts-modal-overlay");
 });
@@ -274,7 +268,8 @@ document.addEventListener("click", async e => {
 $("chart-pdf-btn")?.addEventListener("click", async () => {
   const {jsPDF} = window.jspdf;
   const doc = new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
-  const ts  = new Date().toLocaleDateString("en-PK");
+  window.FinanceeBusiness.preparePDF(doc);
+  const ts  = window.FinanceeBusiness.stamp();
 
   // Title
   doc.setFontSize(18); doc.setTextColor(30,41,59);
@@ -318,7 +313,7 @@ $("chart-pdf-btn")?.addEventListener("click", async () => {
       styles:{fontSize:8}, headStyles:{fillColor:[59,130,246]},
     });
   }
-  doc.save(`revenue_profit_${new Date().toISOString().slice(0,10)}.pdf`);
+  doc.save(`revenue_profit_${window.FinanceeBusiness.today()}.pdf`);
   if (globalThis.FinanceeActivity) globalThis.FinanceeActivity.exported("pdf");
 });
 
@@ -340,8 +335,8 @@ $("cash-kpi-card")?.addEventListener("click", function () {
   // Opens the ledger only while the Cash Ledger report is on (data-ledger).
   if (this.dataset.ledger !== "1") return;
   // Pre-fill last 7 days
-  const now = new Date();
-  const from7 = new Date(now); from7.setDate(from7.getDate()-6);
+  const now = window.FinanceeBusiness.calendar();
+  const from7 = new Date(now); from7.setUTCDate(from7.getUTCDate()-6);
   $("cash-from").value = from7.toISOString().slice(0,10);
   $("cash-to").value   = now.toISOString().slice(0,10);
   showModal("cash-modal-overlay");
@@ -409,9 +404,10 @@ $("cash-pdf-btn")?.addEventListener("click", () => {
   if(!cashLedgerData.length) return;
   const {jsPDF} = window.jspdf;
   const doc = new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
+  window.FinanceeBusiness.preparePDF(doc);
   doc.setFontSize(16); doc.text("Cash Ledger", 14, 16);
   doc.setFontSize(9); doc.setTextColor(100);
-  doc.text(`Period: ${$("cash-from").value} to ${$("cash-to").value}  |  Generated: ${new Date().toLocaleDateString("en-PK")}`, 14, 22);
+  doc.text(`Period: ${$("cash-from").value} to ${$("cash-to").value}  |  Generated: ${window.FinanceeBusiness.stamp()}`, 14, 22);
   doc.autoTable({
     startY:26,
     head:[["Date","Journal #","Party","Description","Debit","Credit","Balance"]],
@@ -999,6 +995,7 @@ function exportSectionPdf(section) {
   if (!pdfOn()) return;
   const {jsPDF} = window.jspdf;
   const doc = new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
+  window.FinanceeBusiness.preparePDF(doc);
   const titles = {
     "low-stock":"Low Stock Items","fast-moving":"Fast Moving Items","stale-stock":"Stale Stock",
     "top-customers":"Top Customers","top-vendors":"Top Vendors","aging":"Receivables Aging",
@@ -1010,7 +1007,7 @@ function exportSectionPdf(section) {
     "expenses":"expense-desc-table",
   };
   doc.setFontSize(15); doc.text(titles[section]||section, 14, 16);
-  doc.setFontSize(8); doc.setTextColor(100); doc.text("Generated: "+new Date().toLocaleDateString("en-PK"),14,22);
+  doc.setFontSize(8); doc.setTextColor(100); doc.text("Generated: "+window.FinanceeBusiness.stamp(),14,22);
   if(section==="transactions") {
     doc.autoTable({startY:26,head:[["Date","Type","Party","Amount"]],
       body:allTxns.map(t=>[t.txn_date,t.type,t.party_name,fmt(t.amount)]),
@@ -1018,7 +1015,7 @@ function exportSectionPdf(section) {
   } else if(tableIds[section]) {
     doc.autoTable({html:"#"+tableIds[section],startY:26,styles:{fontSize:8},headStyles:{fillColor:[59,130,246]}});
   }
-  doc.save(`${section}_${new Date().toISOString().slice(0,10)}.pdf`);
+  doc.save(`${section}_${window.FinanceeBusiness.today()}.pdf`);
   if (globalThis.FinanceeActivity) globalThis.FinanceeActivity.exported("pdf");
 }
 
@@ -1026,10 +1023,11 @@ function exportModalPdf(title, tableId) {
   if (!pdfOn()) return;
   const {jsPDF} = window.jspdf;
   const doc = new jsPDF({unit:"mm",format:"a4"});
+  window.FinanceeBusiness.preparePDF(doc);
   doc.setFontSize(15); doc.text(title, 14, 16);
-  doc.setFontSize(8); doc.setTextColor(100); doc.text("Generated: "+new Date().toLocaleDateString("en-PK"),14,22);
+  doc.setFontSize(8); doc.setTextColor(100); doc.text("Generated: "+window.FinanceeBusiness.stamp(),14,22);
   doc.autoTable({html:"#"+tableId,startY:26,styles:{fontSize:8},headStyles:{fillColor:[59,130,246]}});
-  doc.save(`${title.replace(/\s+/g,"_").toLowerCase()}_${new Date().toISOString().slice(0,10)}.pdf`);
+  doc.save(`${title.replace(/\s+/g,"_").toLowerCase()}_${window.FinanceeBusiness.today()}.pdf`);
   if (globalThis.FinanceeActivity) globalThis.FinanceeActivity.exported("pdf");
 }
 

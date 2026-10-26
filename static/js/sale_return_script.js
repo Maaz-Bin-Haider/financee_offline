@@ -649,7 +649,7 @@ function submitSaleReturn(event) {
     return;
   }
 
-  const returnDate = document.getElementById("return_date").value || new Date().toISOString().slice(0, 10);
+  const returnDate = document.getElementById("return_date").value || window.FinanceeBusiness.today();
   const serials    = Array.from(document.querySelectorAll("#serials .serial-input"))
                        .map(i => i.value.trim()).filter(Boolean);
 
@@ -874,7 +874,7 @@ $(document).ready(function () {
 
   // Initialise with 3 blank rows
   for (let i = 0; i < 3; i++) addSerial(false);
-  document.getElementById("return_date").value = new Date().toISOString().slice(0, 10);
+  document.getElementById("return_date").value = window.FinanceeBusiness.today();
 });
 
 // ── History / Date-wise modals ────────────────────────────────────────────────
@@ -951,7 +951,7 @@ function filterSaleReturnTable(q) {
 function saleReturnHistory()  { fetchSaleReturnSummary(); }
 
 function saleReturnDateWise() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = window.FinanceeBusiness.today();
   Alerts.dialog({  /* was Swal.fire — centered input dialog, standardized animation */
     title: "📅 Select Date Range",
     html: `<label>From Date</label><br>
@@ -987,6 +987,7 @@ function downloadReturnPDF() {
   const totalAmt  = document.getElementById("totalReturnAmount")?.textContent || "0.00";
 
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  window.FinanceeBusiness.preparePDF(doc,'documents');
   const W = 210, margin = 18;
 
   // Header band
@@ -1038,7 +1039,7 @@ function downloadReturnPDF() {
     doc.text(item || "—",   margin + 60, y + 4, { maxWidth: 68 });
     doc.text(price || "—",  margin + 130, y + 4);
     y += 7;
-    if (y > 270) { doc.addPage(); y = 20; }
+    if (y > window.FinanceeBusiness.bodyBottom(doc) - 10) { doc.addPage(); y = 20; }
   });
 
   // Footer line

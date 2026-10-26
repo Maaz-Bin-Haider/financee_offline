@@ -45,10 +45,10 @@ expected=contract['functions']
 missing=sorted(set(expected)-set(actual))
 changed=sorted(name for name in set(expected)&set(actual) if expected[name]!=actual[name])
 extra=sorted(set(actual)-set(expected))
-allowed_extra=['local_profile_guard()','local_profile_no_truncate()']
+allowed_extra=['local_currency_posting_lock()','local_profile_guard()','local_profile_no_truncate()']
 assert not missing, ('Missing functions',missing)
 assert not changed, ('Changed financial definitions',changed)
 assert extra==allowed_extra, ('Unexpected function additions',extra)
 if len(sys.argv)>1:contract_path.write_text(json.dumps(contract,indent=2)+'\n')
-print(f'SQL provenance PASS: {len(expected)} retained definitions match confirmed source; {len(contract["removed_email_functions"])} email functions intentionally removed; 2 local profile guards added.')
+print(f'SQL provenance PASS: {len(expected)} retained definitions match confirmed source; {len(contract["removed_email_functions"])} email functions intentionally removed; 3 local integrity guards added.')
 conn.close()

@@ -22,7 +22,8 @@ class GeneralSettings(models.Model):
     timezone = models.CharField(max_length=64, default='Asia/Karachi')
     contact_email = models.EmailField(blank=True)
     phone = models.CharField(max_length=64, blank=True)
-    address = models.TextField(blank=True)
+    address = models.TextField(blank=True, max_length=300)
+    disabled_features = models.JSONField(default=list, blank=True)
     class Meta:
         verbose_name = 'General Settings'
         verbose_name_plural = 'General Settings'
@@ -31,12 +32,23 @@ class GeneralSettings(models.Model):
     def currency_symbol(self): return self.symbol_override or self.base_currency.symbol
     def feature_enabled(self, key):
         from .features import all_feature_keys
-        return key in all_feature_keys()
+        disabled = self.disabled_features or []
+        return key in all_feature_keys() and key not in disabled and key.split('.',1)[0] not in disabled
     def clean(self):
         super().clean()
         try: ZoneInfo(self.timezone)
         except (ZoneInfoNotFoundError, ValueError): raise ValidationError({'timezone':'Choose a valid IANA timezone.'})
         if self.pk != 1: raise ValidationError('Only one business is allowed.')
+        from .features import all_feature_keys
+        if not isinstance(self.disabled_features,list) or any(not isinstance(key,str) or key not in all_feature_keys() for key in self.disabled_features):
+            raise ValidationError({'disabled_features':'Choose valid local modules.'})
+        if self.pk and not self._state.adding:
+            from django.db import connection
+            old = type(self).objects.filter(pk=self.pk).values_list('base_currency_id',flat=True).first()
+            if old is not None and old != self.base_currency_id:
+                with connection.cursor() as cur:
+                    cur.execute('SELECT EXISTS(SELECT 1 FROM journalentries)')
+                    if cur.fetchone()[0]: raise ValidationError({'base_currency':'Base currency is locked after financial activity. The display symbol can still change.'})
     def save(self, *args, **kwargs):
         self.full_clean()
         return super().save(*args, **kwargs)

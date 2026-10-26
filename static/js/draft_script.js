@@ -100,9 +100,7 @@ function escapeHtml(value) {
 }
 
 function todayISO() {
-  const now = new Date();
-  return new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-    .toISOString().slice(0, 10);
+  return window.FinanceeBusiness.today();
 }
 
 function currencyCode() {

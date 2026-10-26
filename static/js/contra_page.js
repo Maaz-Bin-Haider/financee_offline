@@ -299,7 +299,7 @@ function fetchContras(url) {
 $("#btnOldContras").on("click", function () { fetchContras("/contra/get-old-contras/"); });
 
 $("#btnContrasDateWise").on("click", function () {
-  const today = new Date().toISOString().split("T")[0];
+  const today = window.FinanceeBusiness.today();
   Alerts.dialog({  /* was Swal.fire — centered input dialog, standardized animation */
     title: "Filter by Date Range",
     html: `

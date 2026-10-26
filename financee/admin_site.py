@@ -347,7 +347,7 @@ def _money(v):
         return str(v)
 
 
-def _render_activity_pdf(user, entries, summary, totals, date_from, date_to, schema):
+def _render_activity_pdf(user, entries, summary, totals, date_from, date_to, schema, profile=None):
     """Build a polished, light/professional PDF of a user's detailed activity."""
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import A4
@@ -358,6 +358,15 @@ def _render_activity_pdf(user, entries, summary, totals, date_from, date_to, sch
         SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, KeepTogether,
     )
 
+    from pathlib import Path
+    from html import escape
+    from django.conf import settings
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    for label,style in [('FinanceeSans','normal'),('FinanceeSans-Bold','bold')]:
+        if label not in pdfmetrics.getRegisteredFontNames():pdfmetrics.registerFont(TTFont(label,str(settings.BASE_DIR/'static/fonts/financee'/('FinanceeSans-'+style+'.ttf'))))
+    company=profile.name if profile else SYSTEM_NAME
+    currency=(profile.base_currency_id+' · '+profile.currency_symbol) if profile else ''
     BRAND = colors.HexColor("#2563eb")
     BRAND_DARK = colors.HexColor("#1d4ed8")
     INK = colors.HexColor("#0f172a")
@@ -368,22 +377,22 @@ def _render_activity_pdf(user, entries, summary, totals, date_from, date_to, sch
     HEADBG = colors.HexColor("#1e293b")
 
     styles = getSampleStyleSheet()
-    p_title = ParagraphStyle("p_title", parent=styles["Normal"], fontName="Helvetica-Bold",
+    p_title = ParagraphStyle("p_title", parent=styles["Normal"], fontName="FinanceeSans-Bold",
                              fontSize=18, textColor=colors.white, leading=22)
-    p_sub = ParagraphStyle("p_sub", parent=styles["Normal"], fontName="Helvetica",
+    p_sub = ParagraphStyle("p_sub", parent=styles["Normal"], fontName="FinanceeSans",
                            fontSize=9, textColor=colors.HexColor("#dbeafe"), leading=12)
-    p_h2 = ParagraphStyle("p_h2", parent=styles["Normal"], fontName="Helvetica-Bold",
+    p_h2 = ParagraphStyle("p_h2", parent=styles["Normal"], fontName="FinanceeSans-Bold",
                           fontSize=12, textColor=INK, leading=15, spaceBefore=6, spaceAfter=6)
-    p_cell = ParagraphStyle("p_cell", parent=styles["Normal"], fontName="Helvetica",
+    p_cell = ParagraphStyle("p_cell", parent=styles["Normal"], fontName="FinanceeSans",
                             fontSize=8.5, textColor=INK, leading=11)
-    p_cell_b = ParagraphStyle("p_cell_b", parent=p_cell, fontName="Helvetica-Bold")
+    p_cell_b = ParagraphStyle("p_cell_b", parent=p_cell, fontName="FinanceeSans-Bold")
     p_cell_r = ParagraphStyle("p_cell_r", parent=p_cell, alignment=TA_RIGHT)
-    p_th = ParagraphStyle("p_th", parent=styles["Normal"], fontName="Helvetica-Bold",
+    p_th = ParagraphStyle("p_th", parent=styles["Normal"], fontName="FinanceeSans-Bold",
                           fontSize=7.5, textColor=colors.white, leading=10)
     p_th_r = ParagraphStyle("p_th_r", parent=p_th, alignment=TA_RIGHT)
-    p_meta_k = ParagraphStyle("p_meta_k", parent=styles["Normal"], fontName="Helvetica",
+    p_meta_k = ParagraphStyle("p_meta_k", parent=styles["Normal"], fontName="FinanceeSans",
                               fontSize=8.5, textColor=MUTED, leading=12)
-    p_meta_v = ParagraphStyle("p_meta_v", parent=styles["Normal"], fontName="Helvetica-Bold",
+    p_meta_v = ParagraphStyle("p_meta_v", parent=styles["Normal"], fontName="FinanceeSans-Bold",
                               fontSize=8.5, textColor=INK, leading=12)
 
     buf = io.BytesIO()
@@ -399,7 +408,7 @@ def _render_activity_pdf(user, entries, summary, totals, date_from, date_to, sch
     def header_band():
         inner = Table([[
             Paragraph("User Activity Report", p_title),
-            Paragraph(SYSTEM_NAME + "<br/>" + SYSTEM_TAGLINE, ParagraphStyle(
+            Paragraph(escape(company) + "<br/>" + escape(currency), ParagraphStyle(
                 "brand_r", parent=p_sub, alignment=TA_RIGHT)),
         ]], colWidths=[content_w * 0.6, content_w * 0.4])
         inner.setStyle(TableStyle([
@@ -423,6 +432,7 @@ def _render_activity_pdf(user, entries, summary, totals, date_from, date_to, sch
     generated = timezone.localtime().strftime("%d %b %Y, %I:%M %p") if timezone.is_aware(timezone.now()) else datetime.datetime.now().strftime("%d %b %Y, %I:%M %p")
 
     meta = Table([
+        [Paragraph("Company",p_meta_k),Paragraph(escape(company),p_meta_v),Paragraph("Currency",p_meta_k),Paragraph(escape(currency),p_meta_v)],
         [Paragraph("User", p_meta_k), Paragraph(f"{user.username} ({user.get_full_name() or '—'})", p_meta_v),
          Paragraph("Role", p_meta_k), Paragraph(role, p_meta_v)],
         [Paragraph("Email", p_meta_k), Paragraph(user.email or "—", p_meta_v),
@@ -530,7 +540,7 @@ def _render_activity_pdf(user, entries, summary, totals, date_from, date_to, sch
         canvas.setLineWidth(0.5)
         y = 12 * mm
         canvas.line(doc_.leftMargin, y + 6, doc_.leftMargin + doc_.width, y + 6)
-        canvas.setFont("Helvetica", 7.5)
+        canvas.setFont("FinanceeSans", 7.5)
         canvas.setFillColor(MUTED)
         canvas.drawString(doc_.leftMargin, y,
                           f"{SYSTEM_NAME} — {SYSTEM_TAGLINE}   ·   Developed by {DEVELOPER}")
@@ -668,6 +678,8 @@ class FinanceeAdminSite(admin.AdminSite):
 
     # ── User Activity PDF export ──
     def user_activity_pdf_view(self, request, user_id):
+        if not request.general_settings.feature_enabled('pdf_export.reports'):
+            return HttpResponse('PDF export is disabled in local General Settings.',status=403)
         try:
             user = User.objects.prefetch_related("groups").get(pk=user_id)
         except User.DoesNotExist:
@@ -678,7 +690,7 @@ class FinanceeAdminSite(admin.AdminSite):
         entries, summary, totals = build_detailed_activity(user_id, date_from, date_to)
         schema = _app_schema()
 
-        pdf_bytes = _render_activity_pdf(user, entries, summary, totals, date_from, date_to, schema)
+        pdf_bytes = _render_activity_pdf(user, entries, summary, totals, date_from, date_to, schema, request.general_settings)
 
         filename = f"{SYSTEM_NAME}_activity_{user.username}.pdf"
         resp = HttpResponse(pdf_bytes, content_type="application/pdf")

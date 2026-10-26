@@ -18,7 +18,7 @@ services:
     pull_policy: never
     command: ["redis-server", "--maxmemory", "64mb", "--maxmemory-policy", "allkeys-lru"]
   web:
-    image: financee-offline:0.1.1-phase1
+    image: financee-offline:0.2.0-phase2
     pull_policy: never
     build:
       context: ..

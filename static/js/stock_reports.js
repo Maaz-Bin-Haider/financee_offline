@@ -62,7 +62,7 @@ function selectReport(type) {
 // ═══════════════════════════════════════════
 
 function renderHistoryForm() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = window.FinanceeBusiness.today();
   $("#report-form-container").html(`
     <div class="filter-form">
       <div class="filter-field autocomplete-container">
@@ -290,6 +290,7 @@ $(document).on("click", "#download_pdf", function () {
   if (!rowData.length) { Alerts.warning("Nothing visible to export.", { title: "No Data" }); return; }
 
   const doc   = new jsPDF("l", "pt", "a4");   // landscape — stock tables tend to be wide
+  window.FinanceeBusiness.preparePDF(doc);
   const pW    = doc.internal.pageSize.width;
   const pH    = doc.internal.pageSize.height;
   const today = new Date().toLocaleDateString("en-PK", { day: "2-digit", month: "short", year: "numeric" });
@@ -337,7 +338,7 @@ $(document).on("click", "#download_pdf", function () {
   const totalPg = doc.internal.getNumberOfPages();
   for (let i = 1; i <= totalPg; i++) { doc.setPage(i); drawHeader(i, totalPg); drawFooter(i, totalPg); }
 
-  doc.save(`${m.title.replace(/\s+/g, "_")}_${new Date().toISOString().split("T")[0]}.pdf`);
+  doc.save(`${m.title.replace(/\s+/g, "_")}_${window.FinanceeBusiness.today()}.pdf`);
   if (globalThis.FinanceeActivity) globalThis.FinanceeActivity.exported("pdf");
 });
 
@@ -369,8 +370,8 @@ $(document).on("click", "#download_csv", function () {
   });
 
   const a = Object.assign(document.createElement("a"), {
-    href: URL.createObjectURL(new Blob([rows.map(r => r.join(",")).join("\n")], { type: "text/csv;charset=utf-8;" })),
-    download: `${m.title.replace(/\s+/g,"_")}_${new Date().toISOString().split("T")[0]}.csv`,
+    href: URL.createObjectURL(new Blob([window.FinanceeBusiness.csvPrefix(), rows.map(r => r.join(",")).join("\n")], { type: "text/csv;charset=utf-8;" })),
+    download: `${m.title.replace(/\s+/g,"_")}_${window.FinanceeBusiness.today()}.csv`,
     style: "display:none",
   });
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
