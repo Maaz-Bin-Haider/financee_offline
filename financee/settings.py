@@ -113,7 +113,7 @@ WSGI_APPLICATION = 'financee.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'local.postgresql',
         'OPTIONS': {'options': '-c search_path=public'},
         'NAME': env('DB_NAME'),
         'USER': env('DB_USER'),

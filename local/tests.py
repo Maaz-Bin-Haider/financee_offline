@@ -362,3 +362,20 @@ class LocalCoreTests(TestCase):
         self.client.force_login(self.owner)
         GeneralSettings.objects.filter(pk=1).update(disabled_features=['pdf_export'])
         self.assertEqual(self.client.get(f'/admin/user-activity/{self.owner.pk}/pdf/').status_code,403)
+
+    def test_local_database_timezone_preserves_instants_and_dst_offsets(self):
+        import datetime
+        from .middleware import LocalAccessMiddleware
+        from django.http import HttpResponse
+        for zone in ['Asia/Dubai','America/New_York']:
+            GeneralSettings.objects.filter(pk=1).update(timezone=zone)
+            request=RequestFactory().get('/home/');request.user=self.owner
+            middleware=LocalAccessMiddleware(lambda request:HttpResponse())
+            middleware.process_request(request)
+            first=scalar("SELECT '2026-11-01 05:30:00Z'::timestamptz")
+            second=scalar("SELECT '2026-11-01 06:30:00Z'::timestamptz")
+            self.assertEqual(first.astimezone(datetime.timezone.utc),datetime.datetime(2026,11,1,5,30,tzinfo=datetime.timezone.utc))
+            self.assertEqual(second-first,datetime.timedelta(hours=1))
+            get_user_model().objects.filter(pk=self.user.pk).update(last_login=second)
+            self.assertEqual(get_user_model().objects.get(pk=self.user.pk).last_login.astimezone(datetime.timezone.utc),datetime.datetime(2026,11,1,6,30,tzinfo=datetime.timezone.utc))
+            middleware.process_response(request,HttpResponse())
