@@ -14,7 +14,7 @@ output=root/'static/fonts/financee';output.mkdir(parents=True,exist_ok=True)
 base=Path(sys.argv[1]);arabic=TTFont(sys.argv[2]);bengali=TTFont(sys.argv[3])
 manifest={'family':'Financee Sans','licence':'SIL OFL 1.1, with preserved DejaVu/Bitstream/Arev notices','files':{},'sources':{}}
 for path in [base/'DejaVuSans.ttf',base/'DejaVuSans-Bold.ttf',base/'DejaVuSans-Oblique.ttf',base/'DejaVuSans-BoldOblique.ttf',Path(sys.argv[2]),Path(sys.argv[3])]:
- font=TTFont(path);manifest['sources'][path.name]={'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'version':font['name'].getDebugName(5)}
+ font=TTFont(path);manifest['sources'][path.name]={'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'version':font['name'].getDebugName(5),'copyright':font['name'].getDebugName(0)}
 styles={'normal':('DejaVuSans.ttf','Regular'),'bold':('DejaVuSans-Bold.ttf','Bold'),'italic':('DejaVuSans-Oblique.ttf','Italic'),'bolditalic':('DejaVuSans-BoldOblique.ttf','Bold Italic')}
 encoded={}
 for style,(file,display) in styles.items():

@@ -379,3 +379,11 @@ class LocalCoreTests(TestCase):
             get_user_model().objects.filter(pk=self.user.pk).update(last_login=second)
             self.assertEqual(get_user_model().objects.get(pk=self.user.pk).last_login.astimezone(datetime.timezone.utc),datetime.datetime(2026,11,1,6,30,tzinfo=datetime.timezone.utc))
             middleware.process_response(request,HttpResponse())
+
+    def test_admin_activity_pdf_embeds_local_unicode_font_and_identity(self):
+        GeneralSettings.objects.filter(pk=1).update(base_currency_id='EUR',symbol_override='€',name='Owner PDF Test')
+        self.client.force_login(self.owner)
+        response=self.client.get(f'/admin/user-activity/{self.owner.pk}/pdf/')
+        self.assertEqual(response.status_code,200)
+        self.assertTrue(response.content.startswith(b'%PDF-'))
+        self.assertIn(b'/FontFile2',response.content)

@@ -363,8 +363,9 @@ def _render_activity_pdf(user, entries, summary, totals, date_from, date_to, sch
     from django.conf import settings
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.ttfonts import TTFont
-    for label,style in [('FinanceeSans','normal'),('FinanceeSans-Bold','bold')]:
+    for label,style in [('FinanceeSans','normal'),('FinanceeSans-Bold','bold'),('FinanceeSans-Italic','italic'),('FinanceeSans-BoldItalic','bolditalic')]:
         if label not in pdfmetrics.getRegisteredFontNames():pdfmetrics.registerFont(TTFont(label,str(settings.BASE_DIR/'static/fonts/financee'/('FinanceeSans-'+style+'.ttf'))))
+    pdfmetrics.registerFontFamily('FinanceeSans',normal='FinanceeSans',bold='FinanceeSans-Bold',italic='FinanceeSans-Italic',boldItalic='FinanceeSans-BoldItalic')
     company=profile.name if profile else SYSTEM_NAME
     currency=(profile.base_currency_id+' · '+profile.currency_symbol) if profile else ''
     BRAND = colors.HexColor("#2563eb")

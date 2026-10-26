@@ -22,27 +22,33 @@
   "sources": {
     "DejaVuSans.ttf": {
       "sha256": "7da195a74c55bef988d0d48f9508bd5d849425c1770dba5d7bfc6ce9ed848954",
-      "version": "Version 2.37"
+      "version": "Version 2.37",
+      "copyright": "Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved.\nCopyright (c) 2006 by Tavmjong Bah. All Rights Reserved.\nDejaVu changes are in public domain\n"
     },
     "DejaVuSans-Bold.ttf": {
       "sha256": "e6476c1b80502924294eed40894c5b18e06c181444ca953e5334262df9c27724",
-      "version": "Version 2.37"
+      "version": "Version 2.37",
+      "copyright": "Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved.\nCopyright (c) 2006 by Tavmjong Bah. All Rights Reserved.\nDejaVu changes are in public domain\n"
     },
     "DejaVuSans-Oblique.ttf": {
       "sha256": "4af75fa16ee6d3ad43e1ecec41862c24954af26a55c6bb1ebb27bd486a50f5f4",
-      "version": "Version 2.37"
+      "version": "Version 2.37",
+      "copyright": "Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved.\nCopyright (c) 2006 by Tavmjong Bah. All Rights Reserved.\nDejaVu changes are in public domain\n"
     },
     "DejaVuSans-BoldOblique.ttf": {
       "sha256": "eb436dca0c2594b73d8b603b892e374fdfd8d885d25ffb4f18df4c4c0b49e50f",
-      "version": "Version 2.37"
+      "version": "Version 2.37",
+      "copyright": "Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved.\nCopyright (c) 2006 by Tavmjong Bah. All Rights Reserved.\nDejaVu changes are in public domain\n"
     },
     "NotoNaskhArabic-Regular.ttf": {
       "sha256": "c9a039ce48a477243c1eb7d561b13de115cfd651d8a83fa42e2f4d63c2e11b00",
-      "version": "Version 2.021; ttfautohint (v1.8.4.16-eb64)"
+      "version": "Version 2.021; ttfautohint (v1.8.4.16-eb64)",
+      "copyright": "Copyright 2022 The Noto Project Authors (https://github.com/notofonts/arabic)"
     },
     "NotoSansBengali-Regular.ttf": {
       "sha256": "6300c5370cd688b0641343de4c786de6d412bb6c578d129dae75e93a0322dcab",
-      "version": "Version 2.002; ttfautohint (v1.8) -l 8 -r 50 -G 200 -x 14 -D beng -f none -a qsq -X \"\""
+      "version": "Version 2.002; ttfautohint (v1.8) -l 8 -r 50 -G 200 -x 14 -D beng -f none -a qsq -X \"\"",
+      "copyright": "Copyright 2017-2022 Google Inc. All Rights Reserved."
     }
   }
 }
