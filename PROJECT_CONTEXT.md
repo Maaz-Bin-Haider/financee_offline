@@ -1,7 +1,8 @@
 # Financee Offline context
 
-2026-10-26, Asia/Karachi. Owner authorized Phase 3 after Phase 2 review. Phase 4 is authorized and implemented; final recovery/controller tests and
-review deployment are in progress. Stop at the Phase 4 owner gate.
+2026-10-26, Asia/Karachi. Owner authorized Phase 4 and later resumed after a
+usage-limit interruption. **Phase 4 is complete; stop for owner review before
+Phase 5.**
 Later phases retain their individual review gates. No push/publication authorized.
 
 Independent repo /Users/swisstech/Development/Financee_Offline, branch
@@ -11,11 +12,12 @@ Confirmed application baseline 96fd8b9dc4105870bc76cbb2b443bf5c36da2d66, workflo
 Provenance and original imported hashes remain in SOURCE_PROVENANCE.md and
 SOURCE_FILES_SHA256.json. Approved requirements/plan are preserved locally.
 
-Current review build **0.3.0-phase3**, schema **2**, core commit ef14c04785b82d07c5773d9e089ffdd73f4d86fc.
-Image sha256:cc6c0760abf2b70ad45d9721d8d7e2b8eb542233b94ed410b7a962d073751e24 (linux/arm64).
+Current review build **0.4.0-phase4**, schema **2**, core commit 36e77f93bf024d1c85e8030a4f25f8985429ee68.
+Image sha256:49a9f3dc7e91ff12a07da8a8754b01706259019e857e9f277e087391edf5a75a (linux/arm64).
 Review http://127.0.0.1:18766/home/; owner General Settings at
-/admin/local/generalsettings/1/change/. Existing company, AED, timezone, users,
-financial/media rows and login preserved; all 24 local modules enabled.
+/admin/local/generalsettings/1/change/, Local Backups at /admin/local-backups/.
+Existing company, AED, timezone, users, permissions, all business rows/media and
+login preserved; all 24 local modules enabled. No review restore was executed.
 No universal password or sample business data is installed in the review business.
 
 Architecture: one public PostgreSQL business dataset beside Django auth and a
@@ -42,8 +44,8 @@ Owned stable project financee_offline_review, loopback 18766; customer folder
 .runtime/review, database volume financee_offline_review_database. Test resources
 financee_offline_test are disposable and separate. DB/cache have no host ports;
 no app container mounts Docker's socket. Runtime credentials remain independent
-and ignored. Developer pre-Phase2 rescue ZIP retained under .runtime/review/Backups;
-it is not the Phase 4 customer backup implementation or a restore certification.
+and ignored. Developer pre-Phase2 rescue ZIP remains historical. Phase 4 now produces verified
+format-1 ZIPs in .runtime/review/Backups; test restores use disposable data only.
 
 Phase 3 bundles pinned libraries/fonts/icons with licenses and per-file hashes,
 removes CDN includes and the unused eval-dependent ExcelJS global include, and
@@ -56,8 +58,29 @@ resources pass. Source SQL remains 190 unchanged definitions. Cold service resta
 with pulls disabled and fresh local browser origin verified; host Wi-Fi and OS
 reboot were not changed/tested. See docs/PHASE3_REVIEW.md and PHASE3_RESULTS.json.
 
-Remaining gates: Phase 4
-scheduled ZIP backups and candidate restore; Phase 5 native launcher; Phases 6/7
+Phase 4 adds local pg_dump/pg_restore 16 tools from the pinned server image,
+ZIP64 database/media/config recovery points, full member hashes, bounded shared
+request/stream draining plus SQL table locks, atomic publication, 30 normal-copy
+retention, protected rescue/foreign ZIPs, daily/catch-up worker, owner status and
+Backup Now. Config/active.json atomically couples database/media generations and
+records the owned database volume. Restore validates a candidate against complete
+row/sequence fingerprints and unchanged SQL, expires candidate sessions/cache,
+and requires restart health verification. Startup rolls back incomplete switches.
+The old DB/media and rescue ZIPs are retained. Worker/web never mount Docker's
+socket. Backup-folder selection/inspect/confirmed restore/recover/open-folder are
+available through runtime/maintenance.py; the packaged GUI belongs to Phase 5.
+
+37 core tests, 17 recovery/fault cases, 328 business assertions and 1530 HTTP checks
+pass, with 190 source SQL definitions unchanged. Actual restore/restart, preserved
+credentials, selected-folder scheduling, no duplicate on same-day restart and
+interrupted-switch startup rollback pass on the test installation. A real ARM64
+→ emulated Linux AMD64 → ARM64 logical round trip matches every table/sequence
+fingerprint. This does not certify native OS installers/reboots. Automatic and
+owner-UI review ZIPs validate; the latest observed review pause was 0.097 seconds
+on this small dataset. Review business/profile/user/media hashes remain equal.
+See docs/PHASE4_REVIEW.md and PHASE4_RESULTS.json for commands, limits and evidence.
+
+Remaining gates: Phase 5 native launcher; Phases 6/7
 real Windows10/11 x64 and signed/notarized Apple Silicon installers; Phase 8 safe
 manual installer upgrades/recovery; Phase 9 release CI/distribution with explicit
 owner authorization. No Intel Mac/Windows ARM package in v1. Current fonts cover

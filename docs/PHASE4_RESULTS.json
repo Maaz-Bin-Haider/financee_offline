@@ -1,0 +1,59 @@
+{
+  "build": "0.4.0-phase4",
+  "schema": 2,
+  "backup_format": 1,
+  "core_commit": "36e77f93bf024d1c85e8030a4f25f8985429ee68",
+  "image_id": "sha256:49a9f3dc7e91ff12a07da8a8754b01706259019e857e9f277e087391edf5a75a",
+  "platform": "linux/arm64",
+  "checks": {
+    "django_core_tests": 37,
+    "backup_recovery_cases": 17,
+    "business_assertions": 328,
+    "http_checks": 1530,
+    "http_screens": 43,
+    "http_local_resources": 147,
+    "offline_asset_checks": 1185,
+    "source_sql_functions_unchanged": 190
+  },
+  "controller": {
+    "confirmed_restore_and_web_restart": true,
+    "sessions_expired": true,
+    "runtime_credentials_preserved": true,
+    "previous_database_media_rescue_retained": true,
+    "startup_rollback_of_unverified_switch": true,
+    "selected_folder_automatic_backup": true,
+    "same_day_restart_no_duplicate": true,
+    "backup_sha256": "2b7bcc51e25fd5bb03e2b288011752424f026a4295d34ec23b4c40fbc58edb8c",
+    "measured_pause_seconds": 0.254
+  },
+  "logical_cross_architecture": {
+    "roundtrip": "ARM64 -> emulated Linux AMD64 -> ARM64",
+    "source_sql_functions": 190,
+    "all_table_sequence_fingerprints_match": true,
+    "attachments_and_journal_integrity": true,
+    "postgres_major": 16
+  },
+  "review_backup": {
+    "verified": true,
+    "filename": "Financee_Offline_Backup_2026-10-26_213136_471aca3c7b5c4c5fb7338d1167745d1a.zip",
+    "sha256": "adef00b31ad5f8719e23a0ac868576637f52c1c4295757c25a7e225b14c79ee9",
+    "bytes": 89089,
+    "pause_seconds": 0.097,
+    "company_currency": "AED",
+    "worker_due": false,
+    "backup_now_ui_completed": true
+  },
+  "preservation": {
+    "review_before_after_equal": true,
+    "public_table_fingerprints": 35,
+    "users_permissions_media_preserved": true,
+    "review_restore_executed": false,
+    "source_repositories_clean_unchanged": true
+  },
+  "limits": [
+    "The packaged maintenance GUI/desktop launcher is Phase 5; this build provides a development CLI for inspect/restore/recover/folder selection.",
+    "Cross-architecture test used emulated Linux AMD64 on an ARM64 host; native Windows/macOS installation, sleep/reboot and recovery tests remain pending.",
+    "ZIP64 paths are exercised with forced ZIP64 members; multi-gigabyte/disk exhaustion hardware benchmarks are not claimed.",
+    "Missed-day/retention/crash cases use controlled test clocks, verified ZIP fixtures and injected failures; not a 30-day live observation."
+  ]
+}
