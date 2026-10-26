@@ -1,0 +1,50 @@
+{
+  "build": "0.3.0-phase3",
+  "schema": 2,
+  "core_commit": "ef14c04785b82d07c5773d9e089ffdd73f4d86fc",
+  "image_id": "sha256:cc6c0760abf2b70ad45d9721d8d7e2b8eb542233b94ed410b7a962d073751e24",
+  "platform": "linux/arm64",
+  "checks": {
+    "django_core": 35,
+    "business_assertions": 328,
+    "frontend_js": 76,
+    "offline_asset_license_hash": 1185,
+    "http_checks": 1530,
+    "http_screens": 43,
+    "http_local_resources": 147,
+    "retained_source_sql_functions": 190
+  },
+  "preservation": {
+    "review_snapshot_equal": true,
+    "table_fingerprints": 35,
+    "users_permissions_media_unchanged": true,
+    "saved_currency": "AED",
+    "source_repositories_clean_unchanged": true
+  },
+  "offline_scope": {
+    "business_network_internal": true,
+    "web_only_on_internal_network": true,
+    "public_ip_and_dns_host_tcp_connections_blocked": true,
+    "browser_csp_local_resources_only": true,
+    "http_resource_cache_used": false,
+    "fresh_browser_origin": "localhost:18767",
+    "cold_service_restart_with_no_pulls": true,
+    "host_wifi_disconnected": false,
+    "os_reboot_tested": false
+  },
+  "browser_checks": [
+    "local login and alert",
+    "historical chart: revenue 44240.00 / profit 8820.00",
+    "two-page PDF exported from browser; identity/currency/totals extracted; first page rendered",
+    "Spotlight serial results with stock/cost",
+    "Team Activity interface",
+    "purchase layout at desktop and 390x844 in both themes",
+    "review AED dashboard with existing session"
+  ],
+  "limits": [
+    "Native Windows10/11 and macOS installers, signing and OS reboot verification remain later phases.",
+    "Host Wi-Fi was not changed; the test used application egress isolation and a browser local-origin resource policy.",
+    "No Phase 4 backup/restore certification; no native Excel workbook feature added."
+  ],
+  "http_evidence_sha256": "e822bba48d74837673c727561d1e17f0b4c5a01481b6cdbef62d0d0c446fa903"
+}
