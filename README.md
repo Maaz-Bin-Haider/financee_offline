@@ -1,12 +1,13 @@
 # Financee Offline
 
-Phase 1 local review build: **0.1.0-phase1**. Independent Django/PostgreSQL
+Phase 1 local review build: **0.1.1-phase1**. Independent Django/PostgreSQL
 single-device edition imported from confirmed application release `96fd8b9`.
 Both reference systems remain read-only. No Git remote or publication exists.
 
-Open **http://127.0.0.1:18766/setup/** on this development machine. Create your
-company and owner username/password. No default login exists. The separate review
-database starts empty, apart from currencies, permissions, COA and cash sentinels.
+Open **http://127.0.0.1:18766/home/** for an existing company. On a fresh
+installation, start at **http://127.0.0.1:18766/setup/**. Create your
+company and owner username/password. No default login exists. Each fresh installation
+starts empty, apart from currencies, permissions, COA and cash sentinels.
 After setup, use `/authentication/login/`; manage users/groups and General Settings
 through Admin. Keep review data disposable until backups are implemented.
 

@@ -62,3 +62,7 @@ core tests (including 40 page/currency combinations) and 17 JS currency checks
 covering actual dashboard cards, chart axis/tooltips and PDF data. Existing 41
 frontend checks also pass. Unicode PDF font certification and other later phase
 gates remain pending; this patch does not complete the whole Phase 2/3 scope.
+
+Currency patch deployed and browser verified: core commit a7c104d5beb9da99d44e5502f64437d7455ae0d9,
+image sha256:d7678230f8ddabbb54b934aad67960b22ba5f6628bcd4c56736726447c8081f7. Existing AED, users and business/media counts preserved.
+See docs/CURRENCY_REVIEW_FIX.md for the cause, scope and actual verification.
