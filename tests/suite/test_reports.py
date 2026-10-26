@@ -152,21 +152,7 @@ def run(t: Tester):
 
 
 def _build_has_receivables_fix():
-    """Whether the RUNNING build's own tenant template carries the fix.
-
-    The Phase 3B rehearsal runs the current tests inside an older published
-    image, which provisions tenants from its own baked template — one that
-    predates this fix, so those tenants legitimately cannot satisfy the checks
-    below. Feature-detect against the running build rather than the tenant, the
-    same way the suite feature-detected the cash path until it was ported
-    everywhere. Once the fixed image is deployed this is always true and every
-    tenant is asserted strictly, so genuine drift still fails.
-    """
-    template = Path(__file__).resolve().parents[2] / "tenancy/sql/tenant_template.sql"
-    try:
-        return "jl.account_id = p.ar_account_id" in template.read_text(encoding="utf-8")
-    except OSError:
-        return False
+    return True  # Offline v1 requires the confirmed source fix; never skip coverage.
 
 
 def _receivables_exclude_expenses(t, g, d):

@@ -33,25 +33,18 @@
       <div class="kpi-icon"><i class="fa-solid fa-bolt"></i></div>
       <div><div class="kpi-val">{{ kpi_total_actions }}</div><div class="kpi-label">Recorded Actions</div></div>
     </div>
-    <div class="fin-kpi slate">
-      <div class="kpi-icon"><i class="fa-solid fa-building"></i></div>
-      <div><div class="kpi-val">{{ kpi_companies }}</div><div class="kpi-label">Client Companies</div></div>
+
     </div>
-    <div class="fin-kpi red">
-      <div class="kpi-icon"><i class="fa-solid fa-lock"></i></div>
-      <div><div class="kpi-val">{{ kpi_blocked_companies }}</div><div class="kpi-label">Blocked Subscriptions</div></div>
+
     </div>
   </div>
 
+  <p><a href="{% url 'admin:local_generalsettings_change' 1 %}">General Settings</a></p>
   <!-- Quick links -->
   <div class="fin-quicklinks">
     <a class="fin-quicklink" href="{% url 'admin:user_activity' %}"><i class="fa-solid fa-chart-line"></i> User Activity</a>
     <a class="fin-quicklink" href="{% url 'admin:auth_user_changelist' %}"><i class="fa-solid fa-users"></i> Manage Users</a>
     <a class="fin-quicklink" href="{% url 'admin:auth_group_changelist' %}"><i class="fa-solid fa-layer-group"></i> Manage Groups</a>
-    <a class="fin-quicklink" href="{% url 'admin:tenancy_company_changelist' %}"><i class="fa-solid fa-building"></i> Companies &amp; Subscriptions</a>
-    <a class="fin-quicklink" href="{% url 'admin:tenancy_subscriptionpayment_changelist' %}"><i class="fa-solid fa-file-invoice-dollar"></i> Subscription Payments</a>
-    <a class="fin-quicklink" href="{% url 'admin:tenancy_billingsettings_changelist' %}"><i class="fa-solid fa-envelope-circle-check"></i> Billing &amp; Email Settings</a>
-    <a class="fin-quicklink" href="{% url 'admin:tenancy_subscriptionemaillog_changelist' %}"><i class="fa-solid fa-envelope-open-text"></i> Sent Emails</a>
   </div>
 
   <div class="fin-note">

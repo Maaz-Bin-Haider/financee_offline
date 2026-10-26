@@ -69,16 +69,8 @@ def get_attachment_root():
     return Path(getattr(settings, "PRIVATE_MEDIA_ROOT", settings.BASE_DIR / "media" / "private")) / "document_attachments"
 
 
-def get_tenant_schema():
-    membership = getattr(getattr(connection, "tenant", None), "schema_name", None)
-    if membership:
-        return membership
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT current_schema()")
-            return cursor.fetchone()[0]
-    except Exception:
-        return "unknown"
+def installation_media_key():
+    return "business"
 
 
 def check_document_type(document_type):
@@ -123,7 +115,7 @@ def validate_upload(uploaded_file, file_kind):
 
 def attachments_feature_enabled(request):
     """Per-company feature flag (admin-controlled). No tenant company = enabled."""
-    company = getattr(request, "tenant_company", None)
+    company = getattr(request, "general_settings", None)
     return company is None or company.feature_enabled("attachments")
 
 
@@ -141,10 +133,10 @@ def validate_request_attachments(request):
 
 
 def _storage_path(document_type, document_id, file_kind, uploaded_file):
-    tenant_schema = get_tenant_schema()
+    media_key = installation_media_key()
     ext = Path(uploaded_file.name).suffix.lower()
     filename = f"{file_kind}_{uuid.uuid4().hex}{ext}"
-    relative = Path(tenant_schema) / document_type / str(document_id) / filename
+    relative = Path(media_key) / document_type / str(document_id) / filename
     absolute = get_attachment_root() / relative
     return relative.as_posix(), absolute
 
@@ -306,7 +298,7 @@ def delete_document_attachments(document_type, document_id):
     for path in paths:
         _delete_file(path)
 
-    directory = get_attachment_root() / get_tenant_schema() / document_type / str(document_id)
+    directory = get_attachment_root() / installation_media_key() / document_type / str(document_id)
     try:
         if directory.exists():
             os.rmdir(directory)

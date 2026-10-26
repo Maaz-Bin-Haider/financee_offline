@@ -84,12 +84,11 @@ FIRST_YEAR = """
 # Every account, for the user picker -- inactive ones too: their history stays.
 USERS = """
     SELECT * FROM (SELECT u.id, u.username, u.is_active FROM public.auth_user u
-JOIN public.tenancy_membership m ON m.user_id=u.id AND m.company_id=%(company)s
 UNION ALL
 SELECT h.user_id, h.username, false FROM (
  SELECT DISTINCT ON (e.user_id) e.user_id, e.username FROM activity_events e
  WHERE e.user_id IS NOT NULL
- AND NOT EXISTS(SELECT 1 FROM public.tenancy_membership m WHERE m.company_id=%(company)s AND m.user_id=e.user_id)
+ AND NOT EXISTS(SELECT 1 FROM public.auth_user a WHERE a.id=e.user_id)
  ORDER BY e.user_id, e.at DESC, e.event_id DESC
 ) h) people ORDER BY lower(username), id LIMIT 1000
 """
@@ -137,12 +136,11 @@ TEAM = f"""
            {_LAST_WORK.format(user="u.id")} AS last_work,
            {_LAST_SIGN_IN.format(user="u.id")} AS last_sign_in
     FROM (SELECT u.id, u.username, u.is_active FROM public.auth_user u
-JOIN public.tenancy_membership m ON m.user_id=u.id AND m.company_id=%(company)s
 UNION ALL
 SELECT h.user_id, h.username, false FROM (
  SELECT DISTINCT ON (e.user_id) e.user_id, e.username FROM activity_events e
  WHERE e.user_id IS NOT NULL
- AND NOT EXISTS(SELECT 1 FROM public.tenancy_membership m WHERE m.company_id=%(company)s AND m.user_id=e.user_id)
+ AND NOT EXISTS(SELECT 1 FROM public.auth_user a WHERE a.id=e.user_id)
  ORDER BY e.user_id, e.at DESC, e.event_id DESC
 ) h) u
     LEFT JOIN LATERAL (

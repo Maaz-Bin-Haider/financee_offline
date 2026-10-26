@@ -49,18 +49,7 @@ ACTIVITY_SOURCES = [
 
 
 def _app_schema():
-    """The PostgreSQL schema the application's tables live in (e.g. 'public')."""
-    try:
-        with connection.cursor() as cur:
-            cur.execute("""
-                SELECT table_schema FROM information_schema.tables
-                WHERE table_name = 'items' AND table_type = 'BASE TABLE'
-                LIMIT 1
-            """)
-            row = cur.fetchone()
-            return row[0] if row else "public"
-    except Exception:
-        return "public"
+    return "public"
 
 
 def _collect_activity():
@@ -599,22 +588,12 @@ class FinanceeAdminSite(admin.AdminSite):
         extra_context = extra_context or {}
         rows, schema = build_user_activity()
 
-        # Subscription overview: how many client companies are currently
-        # blocked (paid-until + grace passed, or manually suspended).
-        from tenancy.models import BLOCKED_STATES, Company
-        companies = list(Company.objects.filter(is_active=True))
-        blocked_companies = sum(
-            1 for c in companies if c.subscription_state() in BLOCKED_STATES
-        )
-
         extra_context.update({
             "kpi_total_users": User.objects.count(),
             "kpi_superusers": User.objects.filter(is_superuser=True).count(),
             "kpi_active_users": User.objects.filter(is_active=True).count(),
             "kpi_groups": Group.objects.count(),
             "kpi_total_actions": sum(r["total_actions"] for r in rows),
-            "kpi_companies": len(companies),
-            "kpi_blocked_companies": blocked_companies,
             "kpi_schema": schema,
         })
         return super().index(request, extra_context)
@@ -711,30 +690,8 @@ class FinanceeAdminSite(admin.AdminSite):
 financee_admin_site = FinanceeAdminSite(name="financee_admin")
 
 class FinanceeUserAdmin(UserAdmin):
-    """
-    Avoid destructive user deletes in a schema-per-tenant system.
-
-    Tenant business tables keep user ids for audit columns across every schema.
-    Deactivating a user preserves audit history and avoids cross-schema FK/admin
-    collector failures.
-    """
-
-    def has_delete_permission(self, request, obj=None):
-        if obj is None:
-            return super().has_delete_permission(request, obj)
-        if hasattr(obj, "membership"):
-            return False
-        return super().has_delete_permission(request, obj)
-
-    def delete_model(self, request, obj):
-        if hasattr(obj, "membership"):
-            messages.error(
-                request,
-                "This user is linked to a company. Deactivate the user instead of deleting it.",
-            )
-            return
-        return super().delete_model(request, obj)
-
+    """Deactivate local accounts instead of deleting financial attribution."""
+    def has_delete_permission(self, request, obj=None): return False
 
 # Register the same models the stock admin exposed (Users & Groups).
 financee_admin_site.register(User, FinanceeUserAdmin)

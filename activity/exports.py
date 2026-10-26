@@ -37,7 +37,7 @@ def record_export(request):
         if not target.allowed(request):raise ValueError()
         if source.startswith('activity:') and not enabled(request):raise ValueError()
         feature='pdf_export.'+('documents' if document else 'reports') if fmt=='pdf' else 'excel_export'
-        if not request.tenant_company.feature_enabled(feature):raise ValueError()
+        if not request.general_settings.feature_enabled(feature):raise ValueError()
     except (ValueError,TypeError,KeyError,signing.BadSignature):
         return JsonResponse({'recorded':False,'error':'Generate an authorized report or document before exporting.'},status=400)
     key='export:'+hashlib.sha256(f'{fmt}:{source}'.encode()).hexdigest()

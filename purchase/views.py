@@ -680,7 +680,7 @@ def _purchase_payload_matches_current(purchase_id, data, purchase_date):
 
 @login_required
 def purchasing(request):
-    from tenancy.capabilities import serial_inventory_view
+    from local.capabilities import serial_inventory_view
     return serial_inventory_view(request, _serial_purchasing)
 
 
@@ -1089,7 +1089,7 @@ def _serial_purchasing(request):
 
 @login_required
 def get_purchase(request):
-    from tenancy.capabilities import serial_inventory_view
+    from local.capabilities import serial_inventory_view
     return serial_inventory_view(request, _serial_get_purchase)
 
 
@@ -1194,7 +1194,7 @@ def _serial_get_purchase(request):
 
 @login_required
 def get_purchase_summary(request):
-    from tenancy.capabilities import serial_inventory_view
+    from local.capabilities import serial_inventory_view
     return serial_inventory_view(request, _serial_get_purchase_summary)
 
 

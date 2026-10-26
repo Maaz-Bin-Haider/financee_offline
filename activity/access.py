@@ -3,15 +3,12 @@ from django.conf import settings
 from django.db import DatabaseError, connection, transaction
 from django.http import JsonResponse
 from financee.security import rate_limit_response
-from tenancy.models import BLOCKED_STATES, Membership
 
 
 def enabled(request, *, manager=True):
     user=getattr(request,'user',None)
-    company=getattr(request,'tenant_company',None)
-    if not user or not user.is_authenticated or not user.is_active or not company or not getattr(request,'tenant_is_active',False): return False
-    if not company.is_active or company.subscription_state() in BLOCKED_STATES: return False
-    if not Membership.objects.filter(user_id=user.pk,company_id=company.pk,user__is_active=True).exists(): return False
+    company=getattr(request,'general_settings',None)
+    if not user or not user.is_authenticated or not user.is_active or not company or not getattr(request,'installation_ready',False): return False
     return not manager or (settings.TEAM_ACTIVITY_ENABLED and company.feature_enabled('team_activity') and user.has_perm('auth.view_team_activity'))
 
 

@@ -4,7 +4,7 @@ import logging
 import re
 from django.conf import settings
 from django.db import connection, transaction
-from tenancy.models import Membership, PROVISIONING_READY
+from django.contrib.auth import get_user_model
 
 logger = logging.getLogger(__name__)
 ACTIONS = frozenset(('create','update','delete','convert','cancel','release','run','export','sign_in','sign_out','sign_in_failed'))
@@ -41,18 +41,10 @@ def record(request, action, kind, record_id=None, label='', *, user=None,
         return False
     try:
         with transaction.atomic():
-            member = Membership.objects.select_related('company','user').filter(user_id=user.pk).first()
-            if not member or (not member.user.is_active and action != 'sign_in_failed'):
-                return False
-            company = member.company
-            if not company.is_active or company.provisioning_state != PROVISIONING_READY:
-                return False
-            if kind != 'session' and getattr(request, 'tenant_company', None) and request.tenant_company.pk != company.pk:
-                return False
-            schema = company.schema_name
-            if not re.fullmatch(r'tenant_company_[1-9][0-9]*', schema):
-                return False
-            table = connection.ops.quote_name(schema) + '.activity_events'
+            actor = get_user_model().objects.filter(pk=user.pk).first()
+            if not actor or (not actor.is_active and action != 'sign_in_failed'): return False
+            schema = 'public'
+            table = 'public.activity_events'
             with connection.cursor() as cur:
                 if dedupe_key:
                     # A concurrent duplicate never delays a successful business save.
@@ -64,7 +56,7 @@ def record(request, action, kind, record_id=None, label='', *, user=None,
                     if cur.fetchone(): return False
                 cur.execute(f'''INSERT INTO {table}(user_id,username,action,kind,record_id,label,source,ip,dedupe_key,document_date)
                     VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)''',
-                    [user.pk,member.user.get_username()[:150],action,kind,as_id(record_id),plain(label),source,ip,dedupe_key,document_date])
+                    [user.pk,actor.get_username()[:150],action,kind,as_id(record_id),plain(label),source,ip,dedupe_key,document_date])
         return True
     except Exception as exc:
         # Never let a missing/drifting log abort the caller's transaction or disclose SQL.

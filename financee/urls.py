@@ -47,7 +47,11 @@ def redirect_to_home(request):
     else:
         return redirect('authentication:login')
 
+from local.views import setup, health
+
 urlpatterns = [
+    path('setup/', setup, name='local_setup'),
+    path('health/', health, name='local_health'),
     path('', redirect_to_home, name='home_redirect'),
     path('admin/', financee_admin_site.urls),
     path('parties/', include(parties_urls,namespace='parties')),
@@ -71,5 +75,4 @@ urlpatterns = [
     path('draft/', include(draft_urls, namespace='draft')),
     path('activity/', include('activity.urls', namespace='activity')),
     path('spotlight/', include('spotlight.urls', namespace='spotlight')),
-    path('report-email/', include('reportmailer.urls', namespace='reportmailer')),
 ]

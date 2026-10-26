@@ -65,10 +65,9 @@ INSTALLED_APPS = [
     'sales_reports',
     'contra',
     'opening_stock',
-    'tenancy',
+    'local',
     'attachments',
     'draft',
-    'reportmailer',
     'spotlight',
     'activity',
 ]
@@ -79,7 +78,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'tenancy.middleware.TenantSchemaMiddleware',
+    'local.middleware.LocalAccessMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'activity.middleware.ActivityMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -97,10 +96,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'tenancy.context_processors.subscription_notice',
-                'tenancy.context_processors.company_features',
+                'local.context_processors.installation',
                 'draft.context_processors.draft_feature',
-                'reportmailer.context_processors.report_email_feature',
                 'spotlight.context_processors.spotlight',
                 'activity.context_processors.activity',
             ],
@@ -117,6 +114,7 @@ WSGI_APPLICATION = 'financee.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
+        'OPTIONS': {'options': '-c search_path=public'},
         'NAME': env('DB_NAME'),
         'USER': env('DB_USER'),
         'PASSWORD': env('DB_PASSWORD'),
@@ -163,7 +161,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = Path(env('MEDIA_ROOT', default=str(BASE_DIR / '.runtime' / 'Data' / 'media')))
 PRIVATE_MEDIA_ROOT = MEDIA_ROOT / 'private'
 
 STORAGES = {
@@ -192,11 +190,7 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
 
 
-# --- 3. Persistent DB connections -------------------------------------------
-# Reuse connections for ~60s instead of opening a new one per request. Safe with
-# the tenancy middleware because the start-of-request SET search_path overwrites
-# any stale value before a single query runs. Big win given the dashboard's
-# ~15-call fan-out. Keep workers*threads below Postgres max_connections.
+# Reuse local public connections; there is no request-level schema switching.
 DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)
 
 # --- 4. Production security flags (only enforce when DEBUG is off) -----------
@@ -205,7 +199,7 @@ if not DEBUG:
     # but on a real domain served over plain HTTP the browser drops them and
     # every form fails CSRF ("CSRF cookie required"). Until TLS is set up, set
     # SECURE_COOKIES=False in the server .env; remove it again once HTTPS works.
-    SECURE_COOKIES = env.bool("SECURE_COOKIES", default=True)
+    SECURE_COOKIES = env.bool("SECURE_COOKIES", default=False)
     SESSION_COOKIE_SECURE = SECURE_COOKIES
     CSRF_COOKIE_SECURE = SECURE_COOKIES
     SESSION_COOKIE_HTTPONLY = True
@@ -249,12 +243,6 @@ else:
         }
     }
 
-# --- 7. Tenancy guardrails --------------------------------------------------
-# Cross-tenant admin activity is useful for small installations but expensive
-# at scale. Keep it opt-in in the hardened copy.
-TENANCY_CROSS_TENANT_ACTIVITY = env.bool("TENANCY_CROSS_TENANT_ACTIVITY", default=False)
-TENANT_SCHEMA_VERSION = env.int("TENANT_SCHEMA_VERSION", default=6)
-
 # --- 8. Draft sale invoices (proforma) -------------------------------------
 # Deployment-wide switch; each company also has its own `draft_invoices`
 # feature flag in the admin. Switching drafts off hides the screens only: the
@@ -263,11 +251,6 @@ TENANT_SCHEMA_VERSION = env.int("TENANT_SCHEMA_VERSION", default=6)
 DRAFT_SALES_ENABLED = env.bool("DRAFT_SALES_ENABLED", default=True)
 # After how many days an open draft is flagged as ageing.
 DRAFT_AGE_WARNING_DAYS = env.int("DRAFT_AGE_WARNING_DAYS", default=30)
-
-# Company report mail uses its own tenant configuration, never billing SMTP or
-# a process-wide password. Operators may allow additional public SMTP providers.
-REPORT_EMAIL_ENABLED = env.bool("REPORT_EMAIL_ENABLED", default=True)
-REPORT_EMAIL_SMTP_HOSTS = env.list("REPORT_EMAIL_SMTP_HOSTS", default=["smtp.gmail.com", "smtp.office365.com"])
 
 # Team analytics access and event recording are independent controls.
 TEAM_ACTIVITY_ENABLED = env.bool("TEAM_ACTIVITY_ENABLED", default=True)

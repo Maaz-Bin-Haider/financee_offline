@@ -26,7 +26,7 @@ class ActivityMiddleware(MiddlewareMixin):
             from spotlight.views import scope
             response['X-Activity-Scope']=scope(request)
             response['Cache-Control']='private, no-store'
-        if not settings.TEAM_ACTIVITY_RECORDING_ENABLED or not getattr(request, 'tenant_is_active',False): return response
+        if not settings.TEAM_ACTIVITY_RECORDING_ENABLED or not getattr(request, 'installation_ready',False): return response
         if response.status_code != 200 or not response.get('Content-Type','').startswith('application/json'): return response
         try:
             data = json.loads(response.content)

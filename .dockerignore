@@ -1,0 +1,8 @@
+.git
+.runtime
+__pycache__
+*.pyc
+.env
+Backups
+media
+staticfiles

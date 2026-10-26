@@ -67,7 +67,6 @@
   <link rel="stylesheet" href="{% static 'css/alerts.css' %}">
 
   <!-- Subscription renewal banner + suspended page -->
-  <link rel="stylesheet" href="{% static 'css/subscription.css' %}">
 
   {% if spotlight_config %}<link rel="stylesheet" href="{% static 'css/spotlight.css' %}">{% endif %}
   {% block SeperateCssFile %}{% endblock SeperateCssFile %}
@@ -221,17 +220,14 @@
             {% if team_activity_available %}
             <a href="{% url 'activity:page' %}" class="{% if request.resolver_match.app_name == 'activity' %}active{% endif %}"><i class="fa-solid fa-chart-simple"></i> Team Activity</a>
             {% endif %}
-            {% if features.report_email.enabled and features.sales_reports.enabled and features.sales_reports.subs.sale_wise and perms.auth.send_reports and perms.auth.can_view_sale_wise_profit and report_email_enabled %}
-            <a href="{% url 'reportmailer:report_email' %}" class="{% if request.resolver_match.app_name == 'reportmailer' %}active{% endif %}"><i class="fa-solid fa-paper-plane"></i> Report Email</a>
-            {% endif %}
             </nav>
         </div>
 
         <!-- Footer -->
         <div class="sidebar-footer">
             <div class="user_name"><i class="fa-solid fa-user"></i>  <span id="username">-</span></div>
-            {% if request.tenant_company %}
-            <div class="user_name company_name"><i class="fa-solid fa-building"></i>  <span id="companyname">{{ request.tenant_company.name }}</span></div>
+            {% if request.general_settings %}
+            <div class="user_name company_name"><i class="fa-solid fa-building"></i>  <span id="companyname">{{ request.general_settings.name }}</span></div>
             {% endif %}
             <hr>
 
@@ -249,37 +245,6 @@
     <!-- Main Content -->
     <main class="main-content">
       <i class="fa-solid fa-bars menu-toggle" id="menuToggle"></i>
-
-      {% if subscription_notice %}
-      <div id="subscriptionBanner" class="subscription-banner {{ subscription_notice.state }}"
-           data-banner-key="subscription-banner-{{ subscription_notice.state }}-{{ subscription_notice.paid_until|date:'Y-m-d' }}"
-           hidden>
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        <span>
-          {% if subscription_notice.state == 'grace' %}
-            Your subscription expired on {{ subscription_notice.paid_until|date:"d M Y" }}.
-            Access will be suspended on {{ subscription_notice.blocked_on|date:"d M Y" }} — please arrange the renewal payment.
-          {% else %}
-            Your subscription expires on {{ subscription_notice.paid_until|date:"d M Y" }}
-            ({{ subscription_notice.days_left }} day{{ subscription_notice.days_left|pluralize }} left).
-            Please arrange the renewal payment to avoid interruption.
-          {% endif %}
-        </span>
-        <button type="button" class="subscription-banner-close" aria-label="Dismiss">&times;</button>
-      </div>
-      <script>
-        (function () {
-          const banner = document.getElementById("subscriptionBanner");
-          if (!banner) return;
-          const key = banner.dataset.bannerKey;
-          if (!sessionStorage.getItem(key)) banner.hidden = false;
-          banner.querySelector(".subscription-banner-close").addEventListener("click", () => {
-            sessionStorage.setItem(key, "1");
-            banner.hidden = true;
-          });
-        })();
-      </script>
-      {% endif %}
 
       {% block body %}
       {% endblock body %}

@@ -2,12 +2,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from financee.security import rate_limit, safe_json_error, user_has_active_company
+from financee.security import rate_limit, safe_json_error, user_has_local_access
 
 @rate_limit("login", limit=10, window=60, methods={"POST"})
 def login_view(request):
     if request.user.is_authenticated:
-        if not user_has_active_company(request.user) and request.user.is_staff:
+        if not user_has_local_access(request.user) and request.user.is_staff:
             return redirect('/admin/')
         return redirect('home:home')
     if request.method == 'POST':
@@ -26,7 +26,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 redirect_url = "/admin/" if (
-                    not user_has_active_company(user) and user.is_staff
+                    not user_has_local_access(user) and user.is_staff
                 ) else "/home/"
                 return JsonResponse({
                     'status': 'success',

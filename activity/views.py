@@ -95,7 +95,7 @@ def _refusal(request):
 def _user(request, user_id):
     with connection.cursor() as cursor:
         cursor.execute('SELECT * FROM (' + queries.USERS + ') people WHERE id=%(user)s',
-                       {'company': request.tenant_company.pk, 'user': user_id})
+                       {'company': request.general_settings.pk, 'user': user_id})
         row=cursor.fetchone()
     return {'id':row[0], 'username':row[1], 'active':row[2]} if row else None
 
@@ -110,7 +110,7 @@ def team_activity_page(request):
         return redirect("home:home")
     tz = settings.ACTIVITY_TIMEZONE
     with connection.cursor() as cursor:
-        cursor.execute(queries.USERS, {'company':request.tenant_company.pk})
+        cursor.execute(queries.USERS, {'company':request.general_settings.pk})
         users = [{"id": r[0], "username": r[1], "active": r[2]} for r in cursor.fetchall()]
         cursor.execute(queries.FIRST_YEAR, {"tz": tz})
         first = cursor.fetchone()[0]
@@ -121,7 +121,7 @@ def team_activity_page(request):
     start_user = busiest[0] if busiest else (users[0]["id"] if users else None)
     return render(request, "activity_templates/team_activity.html", {
         "activity_page": {"timezone": settings.ACTIVITY_TIMEZONE, "scope": scope(request),
-            "company": request.tenant_company.name, "company_id": request.tenant_company.pk,
+            "company": request.general_settings.name, "company_id": request.general_settings.pk,
             "users": users, "years": years, "today": today.isoformat(),
             "user": start_user, "thresholds": list(figures.THRESHOLDS),
             "urls": {"year": reverse("activity:user_year"), "day": reverse("activity:user_day"),
@@ -228,7 +228,7 @@ def team(request):
     this_monday = today - datetime.timedelta(days=today.weekday())
     weeks_from = this_monday - datetime.timedelta(weeks=11)
     tz = settings.ACTIVITY_TIMEZONE
-    params = {"company": request.tenant_company.pk, "tz": tz, "from7": (today - datetime.timedelta(days=6)).isoformat(),
+    params = {"company": request.general_settings.pk, "tz": tz, "from7": (today - datetime.timedelta(days=6)).isoformat(),
               "from30": (today - datetime.timedelta(days=29)).isoformat(),
               "weeks_from": weeks_from.isoformat()}
     with connection.cursor() as cursor:

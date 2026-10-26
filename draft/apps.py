@@ -22,14 +22,7 @@ DRAFT_PERMISSIONS = (
 
 
 def seed_draft_permissions(sender, using="default", **kwargs):
-    """Create the draft permissions after every migrate (idempotent).
-
-    Seeded here rather than by a new authentication migration: the Phase 4
-    migration audit and the checkpoint-4B transition gate recognise only the
-    two squashed initial migrations, so a new migration row would make the
-    read-only history audit fail closed. The container entrypoint runs
-    ``migrate`` on every start, so this runs on every deployment.
-    """
+    """Seed retained draft action permissions after local migrations."""
     from django.contrib.auth.models import Permission
     from django.contrib.contenttypes.models import ContentType
 

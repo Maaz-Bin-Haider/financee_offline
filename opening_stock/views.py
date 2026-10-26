@@ -33,7 +33,7 @@ def opening_stock_page(request):
             "can_delete":  request.user.has_perm(DELETE_PERM),
             "can_reclass": request.user.has_perm(RECLASS_PERM),
             "base_currency": getattr(
-                getattr(request, "tenant_company", None), "base_currency", None
+                getattr(request, "general_settings", None), "base_currency", None
             ),
         },
     )

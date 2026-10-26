@@ -1,0 +1,1350 @@
+{
+  "source_sha": "96fd8b9dc4105870bc76cbb2b443bf5c36da2d66",
+  "template_sha256": "1b5a8b6e0c7dd86596f6a5a5325f2c87e0cd81f94bf1365003429835f1c1c325",
+  "functions": {
+    "activity_events_append_only()": {
+      "body_sha256": "a444319c8ffe5e48879a59e0914acf0e7fb661f7d70484392ee35876dcc14b76",
+      "result": "trigger",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "add_item_from_json(item_data jsonb)": {
+      "body_sha256": "bd0446685619a0619f309b92a832078cc4237282322446a67eb8ec94d40bc1ba",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "add_owner_equity_txn(p_data jsonb)": {
+      "body_sha256": "707ffda1c8bc986e5a8b0f3509a2b47d18bec6b350ba8ea8bfcd4e43adde4b43",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "add_party_from_json(party_data jsonb)": {
+      "body_sha256": "6ac0ea37defc698470fde240ad5a3e435ae8260617bbf24120bd7fa3488bdd8a",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "assert_draft_customer(p_party_id bigint)": {
+      "body_sha256": "64cc331ab6a2011d27782401704393ea04519439f47f6dd54f07998134578100",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "assert_purchase_invoice_deletable(p_invoice_id bigint)": {
+      "body_sha256": "57031b20f81b7eddb5908fee77d473508853a3aab3f40a23838a769586347781",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "assert_sale_invoice_has_no_returns(p_invoice_id bigint)": {
+      "body_sha256": "00394275a35220cb320b18dd9f4c10d212163b6060872844a12f4f4632d4d997",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "cancel_draft(p_draft_id bigint, p_cancelled_by integer)": {
+      "body_sha256": "1ec8c33e8dc579339ca5e402bfe72e2aed81b5fb320ae5a99c4ae0900e4d1777",
+      "result": "integer",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "close_draft_if_settled(p_draft_id bigint, p_actor integer)": {
+      "body_sha256": "7e74eb98371fcc1bee100e5ec916ecd9fa7aec490123452d78b7994c404206be",
+      "result": "text",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "close_period_from_json(p_data jsonb)": {
+      "body_sha256": "517b3565806e403f55a33732a5485b9bcd03742a6c0c09b13948a34b13741949",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "convert_draft_tranche(p_draft_id bigint, p_items jsonb, p_invoice_date date, p_created_by integer)": {
+      "body_sha256": "9bc2214b085d8584a9b99be194a500cf4641e9ab8fd9f4d90f967583011d4dfb",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "create_draft(p_party_id bigint, p_draft_date date, p_items jsonb, p_created_by integer)": {
+      "body_sha256": "aab7fa1a85c76a4f72a59aca681ceac5baf746645ff8e51b8e2311262210e93c",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "create_draft_return(p_party_name text, p_serials jsonb, p_return_date date, p_created_by integer)": {
+      "body_sha256": "2227e82cc25dfd39cbe26684d29d1685097253aa347e925a714132296a25f6e9",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "create_opening_stock(data jsonb)": {
+      "body_sha256": "59813aeecd6de9cb56215925a577b0198ecf790f9ddcaa1b9e7a165a38a30c23",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "create_purchase(p_party_id bigint, p_invoice_date date, p_items jsonb)": {
+      "body_sha256": "8463c3d97d6905384e3c7b3837e506d72e9a55be827e1950e794692251a90cb4",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "create_purchase(p_party_id bigint, p_invoice_date date, p_items jsonb, p_created_by integer)": {
+      "body_sha256": "65f87eb014c89128e4fa954191eaa9c60e17f82705a8dcf4204a28b2da430f45",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "create_purchase_return(p_party_name text, p_serials jsonb)": {
+      "body_sha256": "9642e7bee1a073ed918d73eaae1cb5dc1929abd819fe72c4949b4232a5db1f55",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "create_purchase_return(p_party_name text, p_serials jsonb, p_created_by integer)": {
+      "body_sha256": "0a6ea1e5bb8c2fc30e51d84a35dfe21928806007e3e2f4feb6fe3304d782d835",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "create_sale(p_party_id bigint, p_invoice_date date, p_items jsonb)": {
+      "body_sha256": "b6b74f6038180d86e2082106183f4d0bc23a42218e285bae8d6bb61c0b49fa12",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "create_sale(p_party_id bigint, p_invoice_date date, p_items jsonb, p_created_by integer)": {
+      "body_sha256": "3484f804684345806e274070935da5e8d5ebd9a60e5d6a5581557133f5ea4029",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "create_sale_return(p_party_name text, p_serials jsonb)": {
+      "body_sha256": "05de2483129f7bd318e75c3140244e16eb0415242762ca16274d0d719ce3dec0",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "create_sale_return(p_party_name text, p_serials jsonb, p_created_by integer)": {
+      "body_sha256": "e327a5bf1d2377cdfe4d62f9075dffa46f1c141b3581429ef3885bd7773c455f",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "customer_profitability_json(p_from date, p_to date)": {
+      "body_sha256": "65230977af5dc7a8720fe46d4632ecd15a03d1e87e62e7f949c1f6de36d85108",
+      "result": "jsonb",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "delete_contra(p_id bigint)": {
+      "body_sha256": "03e1f44b7fb4437ca3338545aa9322fd70a480c4d072af93d8aaa84b21a5badb",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "delete_draft(p_draft_id bigint)": {
+      "body_sha256": "f0c5ed857ab2f5ff0f0f5519d36078bded98c8bf672904a7dddeac883694ea59",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "delete_draft_return(p_draft_return_id bigint)": {
+      "body_sha256": "c39f22dbf15c39264f3725f919016d1cae4511a424c8a7e0d0f54fea19200300",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "delete_opening_stock(p_id bigint)": {
+      "body_sha256": "69db20f0d29c53c67e6b1198a0e8ec1df4f3eee7a99e0eac9d14c3dd7b37366a",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "delete_owner_equity_txn(p_txn_id bigint)": {
+      "body_sha256": "23289bdddbb4d315bce7bbcd3abd5fe7da24d0c04323c67043f6ae35e3fd62b1",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "delete_payment(p_payment_id bigint)": {
+      "body_sha256": "37e8aadf2545a9222394e150e0a56a86fa6146abd4b9bf15c84ce6d13e9fac0d",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "delete_purchase(p_invoice_id bigint)": {
+      "body_sha256": "afb71a440e7dc6ebd47c9315b8316aaf84de7a661336df9be7b625863428ab5f",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "delete_purchase_return(p_return_id bigint)": {
+      "body_sha256": "fc25de865ad3600af3548a4a1812ff350ac504894f4286ef53cad647b3e3973a",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "delete_receipt(p_receipt_id bigint)": {
+      "body_sha256": "e06378be3fc5ed058d2ed9d888abc93c5b15cc0cc8f4d69c91deba46603c82e4",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "delete_sale(p_invoice_id bigint)": {
+      "body_sha256": "fe64e769f4597fb03aa0c7ee7a202881c6da51fb8a834cff1411f5a12c8e09b3",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "delete_sale_return(p_return_id bigint)": {
+      "body_sha256": "522d41bf6b8428808e0bdc3cf49ad75a1fdf15f624f013980708ca769d2b779e",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "detailed_ledger(p_party_name text, p_start_date date, p_end_date date)": {
+      "body_sha256": "7c7bc804d249fca9d1ba75bc3a1ed0f43bdfd95efb8620e7f13c9dc8360cc678",
+      "result": "TABLE(entry_date date, journal_id bigint, description text, party_name text, account_type text, debit numeric, credit numeric, running_balance numeric, created_by text)",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "detailed_ledger2(p_party_name text, p_start_date date, p_end_date date)": {
+      "body_sha256": "3da42a90e2ce6433220b8ae351710f6251f93fb9850ffcc913e8e4c339d6330d",
+      "result": "TABLE(entry_date date, journal_id bigint, description text, party_name text, account_type text, debit numeric, credit numeric, running_balance numeric, invoice_details jsonb, created_by text)",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "draft_pending_report(p_from date, p_to date, p_age_warning_days integer)": {
+      "body_sha256": "377d0da8c00511d03aae8f179d75eafc3c89efcb2c4eb0bb8d7ddd19844ce5d1",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_draft_reservations(p_limit integer, p_age_warning_days integer)": {
+      "body_sha256": "cbde1bee18a7da51fef04edfbca4d60f46e5c159507faaac678ce09537a104d8",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_expense_kpi()": {
+      "body_sha256": "de58568423c154792ec13c95932207b12cb99c9bf8e6bf5a15d50cb4948a213c",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_fast_moving_items(p_days integer, p_limit integer)": {
+      "body_sha256": "28b7c2cc851d2add37637eec809bdee2b3b6a4097bdcd15bc61e92fb38253759",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_low_stock_items(p_threshold integer)": {
+      "body_sha256": "75a5d32edd6dde99be4b75885f89da5810e98faf1148f7e9ef717ec47cea514d",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_receivables_aging()": {
+      "body_sha256": "73add71f05b509820650cb7626dd8e8f4f8da647e87e9d63561d210cff2a2f75",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_recent_transactions(p_limit integer)": {
+      "body_sha256": "8f9f0d0bf471f0b6294d72c364541eef8dd91fd257c0aeb8a8d8510142498de0",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_sales_last7days()": {
+      "body_sha256": "19bee1c08d92bd784248f14c95d7027b7e3d3c1277a3dd8a59a3919e1b13bf17",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_sales_range(p_from date, p_to date)": {
+      "body_sha256": "3e421f7293bac4551287ea1d6f5d710fbbb1441dc29064e8edf85b709310c408",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_sales_today_kpi()": {
+      "body_sha256": "7f7a6f8d25311970837d08d21bbee0dd733729c83841362dbc19ff18afe50106",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_smart_alerts()": {
+      "body_sha256": "196d4c729eed28331a3d8a996b943ddbe68b9774ae1d5a41093803d3da5f2553",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_stale_stock(p_days integer)": {
+      "body_sha256": "3b0ca51082b3837738193e492763917e9fd4655c4a099c9146416828e0f1b691",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_stock_kpi()": {
+      "body_sha256": "7ccfe92ea3ad443229b5bde4f71d16da52ffa09daf6e3d6684c07dd1ac25238b",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_top_customers(p_limit integer, p_from date, p_to date)": {
+      "body_sha256": "8be5e83940f0acbf90223b320edae2d87b57cf3984ea5214f1f4ee9fdb359522",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_top_expense_categories(p_limit integer, p_from date, p_to date)": {
+      "body_sha256": "54a42ba1f73a651ab08f5883a775f7563e5cccf7b344c61181ebe5ee92b7286a",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_top_expense_descriptions(p_limit integer, p_from date, p_to date)": {
+      "body_sha256": "642ff523ecd40ca9b0915cbd7578aee3a415761f710c0233f5a75d6225b33b88",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "fn_dash_top_vendors(p_limit integer, p_from date, p_to date)": {
+      "body_sha256": "8af48aa63505b784a427707adeecce9c0aa4873b53e7709220a1f74dc5230cd2",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_accounts_payable_json_excluding(p_exclude_names text[])": {
+      "body_sha256": "65dc24389bc48866a95363a0349418a42503ccbe9f1836c3a3d3bb5e9cae4570",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_accounts_receivable_json_excluding(p_exclude_names text[])": {
+      "body_sha256": "47053e6e18bd2779b05b585ae0030351bb809bed6d524cd18b083b9e7e767082",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_cash_ledger_with_party(p_start_date date, p_end_date date)": {
+      "body_sha256": "f018b35bd3b13266dc274f1328455c1c12b065451c8632d8d885c97fa9f02644",
+      "result": "TABLE(entry_date date, journal_id bigint, party_name character varying, description text, debit numeric, credit numeric, balance numeric, created_by text)",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_cash_party_id(p_kind text)": {
+      "body_sha256": "c0752cfea48e2c43402bdce4efa636a7a4b71177eaa89c407b05084a02c70f4d",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_contra_details(p_id bigint)": {
+      "body_sha256": "923de5a0585c5cf33ceed6590a40b798d3c3dce69a582103c4a04ac065e27827",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_contras_by_date_json(p_data jsonb)": {
+      "body_sha256": "48429dcdbdfbda57e1286b24d7fffda563fe6aa92a4a74927a2ebf3db02ad57c",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_current_draft(p_draft_id bigint)": {
+      "body_sha256": "412a06ca3be0fbf64e0f7b88966b37c4210a16f13309b47eb261e55356cc05dd",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_current_draft_return(p_draft_return_id bigint)": {
+      "body_sha256": "e3ac005cfd5d86a0e6b023fb9c332bc0205b6ecccc174fd095ec1a7148b545dd",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_current_purchase(p_invoice_id bigint)": {
+      "body_sha256": "2437f60950c67a8fb41089d24929d6c40a5515af1a82bca92f12680ffda2b393",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_current_purchase_return(p_return_id bigint)": {
+      "body_sha256": "4312d444985b43c54ecec0bd1ac76efdfc398a5963295a90bc280283afa5684b",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_current_sale(p_invoice_id bigint)": {
+      "body_sha256": "0f51497abd33d85398ff02a5565ed1813895f289d6b25898b451f1512a00e1ac",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_current_sales_return(p_return_id bigint)": {
+      "body_sha256": "e43e0443f49111e1c6e951798430fa82e93458150b9ee335d18b3a01bf8fc5b0",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_draft_return_summary(p_start_date date, p_end_date date)": {
+      "body_sha256": "d02fa42971b38b1448214fdf603df59bdd872702650830e1864a1f391ab6e160",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_draft_summary(p_start_date date, p_end_date date)": {
+      "body_sha256": "4909a7da0d3aeccfb0e347ee553d0c34fefa1fa4596d787617b0143532be5850",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_expense_party_balances_json()": {
+      "body_sha256": "07f27fe2ba7fae918438d9b22bc4655bfc17e72ece7a0f6a3a7be6b9c98f8264",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_item_by_name(p_item_name text)": {
+      "body_sha256": "fe4a416b5e8783f1c4b95ceb452ae797332c72f14460c164b873793dd09c483f",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_item_names_like(search_term text)": {
+      "body_sha256": "3be7d1236f6f13b6588ed4289ec895b7798ff22c81233c34c5d37309826750a1",
+      "result": "TABLE(item_name text)",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_item_stock_by_name(p_item_name character varying)": {
+      "body_sha256": "544a015b03f5047a8e1c9a5ae9af6cfa49887b70cad0e2b444fc4fcafbeb628a",
+      "result": "TABLE(item_id_out text, item_name_out character varying, serial_number_out character varying, serial_comment_out text, quantity_out text)",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_items_json()": {
+      "body_sha256": "a2cab389cf44dda1ab6cb23d7b5296cfcd08ae1ad3b2a3d5beb15c0413d353ce",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_20_contras_json(p_data jsonb)": {
+      "body_sha256": "5f630ae8be6047ac13e077f66a3d374cfc09f6a49fc86c2a1c86e78b5910204f",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_20_payments_json(p_data jsonb)": {
+      "body_sha256": "190e233bdbc92def037beb6a025aead084941c20ae263a192b4711099d0d9654",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_20_receipts_json(p_data jsonb)": {
+      "body_sha256": "a2095ad472da53c573a8089d91791bd75ce49c494250a4780b675a9ac5393f35",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_contra()": {
+      "body_sha256": "8e42ddddf5f1d0b08789ed26e533f1c7ec69fe7e49565c7a178e44f81bc5ef24",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_draft_id()": {
+      "body_sha256": "6160c10b6258ce1fecf1b3592610f01226b6bbdf913f67f0dcbd539b8bced8a7",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_draft_return_id()": {
+      "body_sha256": "cb0af22c4fd00eda82bb805a1dffc64eb696facda8fb342f2080ca9437643423",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_payment()": {
+      "body_sha256": "8ab10ee33e0c19af96de46453b4e93c3b41538008254d8f7d837b0c18bddb38a",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_purchase()": {
+      "body_sha256": "674be6f8f11730543a69527527865268a75c643e8972269513dddfc5be06c68b",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_purchase_id()": {
+      "body_sha256": "503b6be5c125b7252a1cfacbbccd72298635b70c2be52ebe16db4cf5e947e9a6",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_purchase_return()": {
+      "body_sha256": "62b8715f72f695d2e32bab8674714bf842e3ae96c2df57311bcc5a42cfc81a2c",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_purchase_return_id()": {
+      "body_sha256": "851d938d23458e2e962af86d60730d833c6b6c6d4224d637a52e408038c3b269",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_receipt()": {
+      "body_sha256": "7159657399f220ea83fd4cceb2c9db65d5caa5537c8e9acc1fc6cf40514feb49",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_sale()": {
+      "body_sha256": "7964de6536779a3072518ea1cec4baed3635df61ec6707f9764569e479f99c70",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_sale_id()": {
+      "body_sha256": "519c49fd805f3df7ef74feb0e9a15c17cd0a7f5428c453d0e7ba1bf83e49eca0",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_sales_return()": {
+      "body_sha256": "5b50fa6306ae324bc6d7f4d9ef362a881b3bd5d97a6a0c0803b2feb1d7fdb447",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_last_sales_return_id()": {
+      "body_sha256": "85649afbc6dca18d0a0395c321e899593c2b6e1cbb4e519587692d55a05ece94",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_next_contra(p_id bigint)": {
+      "body_sha256": "fd3b5837acbc001634924fb1c95e6f7da48c24d1bd950408912cd058545ea199",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_next_draft(p_draft_id bigint)": {
+      "body_sha256": "948001032bb7f09879bc2c2b7a4dfe519193242231704be5d869983cafe62704",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_next_draft_return(p_draft_return_id bigint)": {
+      "body_sha256": "d5439fceb037dd895a983ad2830d13f359f4a34a04ff6ccf37f330747e603399",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_next_payment(p_payment_id bigint)": {
+      "body_sha256": "0d1c7b954b4ce2a90628a584bbf72988036caf95bc931a95a479eb1a8c24241c",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_next_purchase(p_invoice_id bigint)": {
+      "body_sha256": "51e5f6b15df82fdcedee4e475e3c45be1d534c4755ddc58a43dbfd1fa7cf2012",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_next_purchase_return(p_return_id bigint)": {
+      "body_sha256": "33667f81e6f946dae52b0807c354e3d20cc8386eebbe29dc640ac5bdbeb2103a",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_next_receipt(p_receipt_id bigint)": {
+      "body_sha256": "d280d079aa210f4c1ae4da02472856f25a315feebd4eeac3bee2765280791523",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_next_sale(p_invoice_id bigint)": {
+      "body_sha256": "5a054b59ecf79c34f573bc12207511f2688071bd4e7ad03dcb9a2ac725d4f985",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_next_sales_return(p_return_id bigint)": {
+      "body_sha256": "70a6592eb85d4684914de4aa1976c30065311c8e623a6bd8b44c5e5332c5f553",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_opening_balance_status_json()": {
+      "body_sha256": "e5f75bc203ec93a876573103a27dc6ecaaa10b39205f6e9374a374d709561a97",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_opening_cash_json()": {
+      "body_sha256": "629999989aa499a15e93c5b721ea2521c52bb6af67f6dba5f4d676bddd8ecef8",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_opening_stock_load_details(p_id bigint)": {
+      "body_sha256": "007e837d369bf8eaca5f0e183f7197d03822e044bfb117729a6596fc093cb956",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_opening_stock_loads_json()": {
+      "body_sha256": "9232080835f5dedba7add5a89b332b9fb1bcf2c947707dc418e042fefb3bf24b",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_opening_stock_vendor_id()": {
+      "body_sha256": "7c53c0bdaff4d23941d34837b4ff0c7b6f0cf6127cc4944d7af4c5d31b123126",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_owner_equity_json(p_limit integer)": {
+      "body_sha256": "5db2f3131131419b1970797d6cd5aa73682931332c13b155cbdb9a635dbd6814",
+      "result": "jsonb",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_parties_json()": {
+      "body_sha256": "c3bd04cd52ba0373e098c7d287cff979e9e96e72d0358e76d3fb8a83c83f992c",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_party_balance_by_name(p_name text)": {
+      "body_sha256": "4576fcdf03ecdff352459ff49bab4dcf78a19392756af351ea5208a0d27dcac7",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_party_balances_json()": {
+      "body_sha256": "6a58e1c02d7dd23ad7aec7016aa46237b9f5a8955065ce01963f3e38cf766416",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_party_balances_json_excluding(p_exclude_names text[])": {
+      "body_sha256": "176bdcf8364a622c779ee83cb5138f99383409202929cf82b02e70aa48154587",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_party_by_name(p_name text)": {
+      "body_sha256": "e2e7325caa358dfa476d91ef7c93d029309bac9edb177ab69fb9372feb8eee29",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_payment_details(p_payment_id bigint)": {
+      "body_sha256": "8de9d99a2ca1b315dabf3bd70d0d979015fb93701d5a09f0da9412da8eb263d7",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_payments_by_date_json(p_data jsonb)": {
+      "body_sha256": "faf8e614e1cc70190a635fb4d4fc49043d4796a013969ca2dd749b7757e77239",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_period_closes_json()": {
+      "body_sha256": "7e8a73f2d633c675f2865c5ea9194813ede56daa50031423d978f62c61692103",
+      "result": "jsonb",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_previous_contra(p_id bigint)": {
+      "body_sha256": "e0c9a08ae8facbdd4e076b83e1b976d56dc30cea8bf3dc5dfabd39bbb967c596",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_previous_draft(p_draft_id bigint)": {
+      "body_sha256": "7225bd369c7de2498b4b1413c6c10dc5c1172d8fc8c78891e6e23d7c80fe8373",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_previous_draft_return(p_draft_return_id bigint)": {
+      "body_sha256": "7d064ea6841685c61c64428e86f450dab9a845949ff3fd9d5c9eaba8a7041077",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_previous_payment(p_payment_id bigint)": {
+      "body_sha256": "1770b12019628b9bb9e51884e1ba0063115fcf1221f4e16709d1b02684e54d23",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_previous_purchase(p_invoice_id bigint)": {
+      "body_sha256": "a6d4a34e54dd81c2f4e83d9d001cb929d9f43ac118b4a6eb333931f4c4b4f663",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_previous_purchase_return(p_return_id bigint)": {
+      "body_sha256": "722810eb84005351c137e0aa7b305e99268ebb2eabcabdba57f0c212c1cb22dc",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_previous_receipt(p_receipt_id bigint)": {
+      "body_sha256": "9610775f37d2d984ff8184a6bf3967ba2c57ed966fd98a724c3fa315d1437a64",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_previous_sale(p_invoice_id bigint)": {
+      "body_sha256": "4681cd8ed535cbdc64786b41645d09939f86b4797a406881ccd350342eb2df8f",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_previous_sales_return(p_return_id bigint)": {
+      "body_sha256": "f5bbcf35e7931ef651f6b86097b3e1081b370a93e646aced7424a124b01959d7",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_purchase_return_summary(p_start_date date, p_end_date date)": {
+      "body_sha256": "9ef4ce757132b0f028da248af4a24a9a8a15deddca8976f842db026ca767a305",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_purchase_summary(p_start_date date, p_end_date date)": {
+      "body_sha256": "c1a7b31d89b7ff61567162045f66192c3a3a8f8c4ebe42101991279a0581c5e3",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_receipt_details(p_receipt_id bigint)": {
+      "body_sha256": "561b2bfaf40ea6b6adfc44a0b67411b525d03d9f29353c7f55e8c13908bb24af",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_receipts_by_date_json(p_data jsonb)": {
+      "body_sha256": "961085de974ce5468b610369fb2a7814598d437b7d6a1cbf8eabce37d9d132aa",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_sales_return_summary(p_start_date date, p_end_date date)": {
+      "body_sha256": "1cb34eb7ac4ff4ed6fc7696c8ecd5e4182e36ae940d711deed4e8fa7efe21ce7",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_sales_summary(p_start_date date, p_end_date date)": {
+      "body_sha256": "df993cd9a3a0b4333015330fbca3707732d48001833eec7bcc0fbe48631670c5",
+      "result": "json",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_serial_ledger(p_serial text)": {
+      "body_sha256": "9a006bf384205ab5b17317e1c059e5a6c86f4a53c238cf124c2624b337718fdb",
+      "result": "TABLE(serial_number text, serial_comment text, item_name text, txn_date date, particulars text, reference text, qty_in integer, qty_out integer, balance integer, party_name text, purchase_price numeric, sale_price numeric, profit numeric)",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_serial_ledger_purchase(p_serial text)": {
+      "body_sha256": "814d78ba1b183394e4e94e5fc59321b90848c36b87f7fffc6d816687ea0da8a6",
+      "result": "TABLE(serial_number text, serial_comment text, item_name text, txn_date date, particulars text, reference text, qty_in integer, qty_out integer, balance integer, party_name text, purchase_price numeric)",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_serial_ledger_sales(p_serial text)": {
+      "body_sha256": "be5e2d55ce31a0d9d0c7524e232c5b02befe72228839221ad0b0a6596a8607c1",
+      "result": "TABLE(serial_number text, serial_comment text, item_name text, txn_date date, particulars text, reference text, qty_in integer, qty_out integer, balance integer, party_name text, sale_price numeric)",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_serial_number_details(serial text)": {
+      "body_sha256": "38c36fb7580ca2fec2d3fe879512ac56d15b923994bea924ab887eaf31ce3737",
+      "result": "TABLE(serial_number character varying, item_name character varying, brand character varying, category character varying, purchase_invoice_id bigint, vendor_name character varying, purchase_date date, purchase_price numeric, in_stock boolean, sales_invoice_id bigint, customer_name character varying, sale_date date, sold_price numeric, current_status character varying, is_reserved boolean, reserved_for character varying, reserved_draft_id bigint)",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "get_trial_balance_json()": {
+      "body_sha256": "dd998c1de07712dc5d6d2da3690884f25f3faf2e4f0d7ff1ac82872fa9e1d903",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "invoice_register_json(p_from date, p_to date)": {
+      "body_sha256": "6deb19b1aa71469ebc314be05cfe01296979bee66dfe1fe405d2d7fef3ca01cd",
+      "result": "jsonb",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "item_transaction_history(p_item_name text, p_from_date date, p_to_date date)": {
+      "body_sha256": "eae37ade47a18a61492989aa73a936103841ec80abc146d3c4cf9b1baba99293",
+      "result": "TABLE(item_name text, serial_number text, serial_comment text, transaction_date date, transaction_type text, counterparty text, price numeric)",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "make_contra(p_data jsonb)": {
+      "body_sha256": "983d383a349cbc5aaee3b1b990049043924c5ddc4180832b86d465f095ed73b1",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "make_payment(p_data jsonb)": {
+      "body_sha256": "0e3b0eb6baf7221769b9b3ebed7f7d55fcfe29a4bcaaa01c4ded14056651005d",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "make_receipt(p_data jsonb)": {
+      "body_sha256": "a0237394f5d0fadfe106422e0bbc3ad58c7a5d2ddb65acd7a486c14c8e144b61",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "monthly_company_position(p_as_of_date date)": {
+      "body_sha256": "6ac24355b5147981d370866ca24d15946dc18b123c5e0c0704620ac3fdbeaeca",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "monthly_income_statement(p_from_date date, p_to_date date)": {
+      "body_sha256": "4ba726816e00c3b2629566989ab4d62cd47f510396e7a97cb506c9ddf2cf52dc",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "monthly_income_statement(p_from_date date, p_to_date date, p_sales_revenue numeric, p_cogs numeric)": {
+      "body_sha256": "c651f987e5ced87c23fd82d141a925ecec77501f927f5a159ff627763970df19",
+      "result": "json",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "preview_period_close(p_year integer, p_month integer)": {
+      "body_sha256": "9b268766750e11e1d7cf6056d29851a1555d4d8380cfb52b0a2765f9c4fa20dc",
+      "result": "jsonb",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "product_profitability_json(p_from date, p_to date)": {
+      "body_sha256": "8cf5fa270e87eb3343b48c118cbbac072606ebd9c8ea52c5be89769c0c1b5e4d",
+      "result": "jsonb",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "raise_serial_not_returnable(p_serial text)": {
+      "body_sha256": "5d3d602eed2ab4b306d51363979ede13e6a72f6afe855a5313d89b54c8448c2f",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "rebuild_purchase_journal(p_invoice_id bigint)": {
+      "body_sha256": "8c44ba5f3b79fcdddaf9b401d2ef7b68ea393bf95bc32a72d8377ae34d31dd17",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "rebuild_purchase_return_journal(p_return_id bigint)": {
+      "body_sha256": "058fb01afc73aa0916fe971482823b18a32b0a42f23d539d7241f73729599b1f",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "rebuild_sales_journal(p_invoice_id bigint)": {
+      "body_sha256": "4becbf8327182b7576bf205d4fa24ca054f922f1427688a3918b39dc597c94e2",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "rebuild_sales_return_journal(p_return_id bigint)": {
+      "body_sha256": "e4f298dcc7bdec9b11526ce7bd962a5355c8696c8ddc4b78003f3205914a5f66",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "reclassify_opening_balance_to_capital(data jsonb)": {
+      "body_sha256": "d461f5d8603fee14d4caab17facf5bb18cb1e77aac7d6b48c2d1213f2429dd0b",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "release_draft_units(p_draft_id bigint, p_serials jsonb, p_released_by integer)": {
+      "body_sha256": "6aadf4e29f92d69b17c4bfcd34754a81fb3b5808b2b9252bb807b83154c4139f",
+      "result": "integer",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "reverse_period_close(p_year integer, p_month integer)": {
+      "body_sha256": "35b316c6ceb4ef38eda6ce1571ab6ed9c3459b25ced44eb6e807ab33a2e879f6",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "sale_return_core(p_party_name text, p_serials jsonb, p_created_by integer, p_return_date date, p_allow_draft boolean)": {
+      "body_sha256": "f9305a1abbd8c2a05cc99711efac6791e2e72e08130425584e2afdff62c788c1",
+      "result": "bigint",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "sale_wise_profit(p_from_date date, p_to_date date)": {
+      "body_sha256": "92410d20068753ecdf2e1670f7265a60c55efb6f95f1a4329ed253e8dfbd1fbe",
+      "result": "TABLE(sale_date date, item_name text, serial_number text, serial_comment text, sale_price numeric, purchase_price numeric, profit_loss numeric, profit_loss_percent numeric, vendor_name text)",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "sale_wise_profit_json(p_from date, p_to date)": {
+      "body_sha256": "8f6e7c68a87661f65154f2bc69989d95eb926987f8e60ec9d19c2c9cec15dc83",
+      "result": "jsonb",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "sales_by_customer_json(p_from date, p_to date)": {
+      "body_sha256": "f057bab01773998de03e914df56aafce54dba6ee9fd217591350126eef1bb8dc",
+      "result": "jsonb",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "sales_by_product_json(p_from date, p_to date)": {
+      "body_sha256": "54397b4f27e9a2300a1f4114bc54602a3f76ca06acd6af1b84c86451b74d1efa",
+      "result": "jsonb",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "sales_summary_json(p_from date, p_to date)": {
+      "body_sha256": "214329fa09d80c4af0f099711be7e281dfcec6bdcafa10bd30aa1196b35b3275",
+      "result": "jsonb",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "sales_trend_json(p_from date, p_to date, p_granularity text)": {
+      "body_sha256": "6e689ea4fc0d1eb50fb21944018c9c065cbfb9eec52798db19c65cc29cc13cc9",
+      "result": "jsonb",
+      "volatility": "s",
+      "strict": false,
+      "security_definer": false
+    },
+    "serial_exists_in_draft_return(p_serial text)": {
+      "body_sha256": "b750af6120466c64c953d6b540e186f63f5321bd90fc7b25164d97458b06034e",
+      "result": "boolean",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "serial_exists_in_purchase_return(p_purchase_return_id bigint, p_serial_number text)": {
+      "body_sha256": "98d214f913cdbbf24fe058f97a7c2d3a4ecf9329d5ef15336cfb579c4336e885",
+      "result": "boolean",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "serial_exists_in_sales_return(p_sales_return_id bigint, p_serial_number text)": {
+      "body_sha256": "fb908e3b2e3f3c671c4afa1f3134351a11bb9302f1d433597e894db4d7fb257b",
+      "result": "boolean",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "set_opening_cash_from_json(data jsonb)": {
+      "body_sha256": "6f6bc347b46490a2a99945dab1e49bd5887544a8582a752cc9191447c89f710f",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "stock_summary()": {
+      "body_sha256": "5c052a77fa8133742b69eb12fe09855084531037ddd0720298c1505ab7559883",
+      "result": "TABLE(item_id bigint, item_name character varying, category character varying, brand character varying, quantity_in_stock bigint, reserved_on_drafts bigint)",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "trg_contra_journal()": {
+      "body_sha256": "e1bc0b27416afd48f24e59bc64880a2bb5914aaaa7a334bb4cb4edf01f050f24",
+      "result": "trigger",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "trg_fn_protect_reserved_units()": {
+      "body_sha256": "26c8263ee691bae3f37fa1eeab2b01819c3ed9d8bd42e174af6c7bbc7667fba4",
+      "result": "trigger",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "trg_fn_reserve_only_stocked_units()": {
+      "body_sha256": "4ec4e3131b5fdbc653a79db6ebbb79e7f5cbf3b8762d5f4c7f7977886a4b02e5",
+      "result": "trigger",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "trg_fn_soldunits_fix_ghost_stock()": {
+      "body_sha256": "19ed70d2f275d840bdc4e6cfaccd5e03ffb71fcc909910d98c708784ca7f7e1c",
+      "result": "trigger",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "trg_party_opening_balance()": {
+      "body_sha256": "a7212dcb838e77896deeab578ebc0285ae50e53bb5a53c76b6afa3e5979320c1",
+      "result": "trigger",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "trg_payment_journal()": {
+      "body_sha256": "ac7400d94aeafea4324f65c3487016dde9942e76150af763bdae7f661e996cbd",
+      "result": "trigger",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "trg_receipt_journal()": {
+      "body_sha256": "025cee106b6a299b01c0d59b0476e1da3af124ca7a23a1c8701191a3a9b99550",
+      "result": "trigger",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_contra(p_id bigint, p_data jsonb)": {
+      "body_sha256": "7bc8d72596f9e43458e68cdb36ccf6919e7f03cc31257adc8bea956e87be2983",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_draft(p_draft_id bigint, p_items jsonb, p_party_id bigint, p_draft_date date, p_created_by integer)": {
+      "body_sha256": "ed50aa62dd11e896bdc225e77fc4e254bf22c4e35d7e56e1bdee6ca08f2a63bc",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_draft_return(p_draft_return_id bigint, p_serials jsonb, p_return_date date, p_created_by integer)": {
+      "body_sha256": "762c01240befdf16e977ab37f400f24ff768f55e4d21b991953e939bbc6b8d01",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_item_from_json(item_data jsonb)": {
+      "body_sha256": "1e2400eaf32b91016440d89765dd87002632e9a7402f32c9fbf3bb41e3e4b852",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_party_from_json(p_id bigint, party_data jsonb)": {
+      "body_sha256": "3082cf02be4531486833fa3a8cabc0c36cb1af1c8c038b4cb0a5ab185c4ed6eb",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_payment(p_payment_id bigint, p_data jsonb)": {
+      "body_sha256": "d6c02c6fb81b7d51bec2ba0c34b2cf13dc0d3d2b9692a6cc3e1281b7a8d3f26c",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_purchase_invoice(p_invoice_id bigint, p_items jsonb, p_party_name text, p_invoice_date date)": {
+      "body_sha256": "79c1b65b879acafc94e1672e3f42c17afd9633d10cd9f9f4e33b3a10bb7f529e",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_purchase_invoice(p_invoice_id bigint, p_items jsonb, p_party_name text, p_invoice_date date, p_created_by integer)": {
+      "body_sha256": "ee6f9bafa367c1f29d59e2692349c7f60f77c7432989172b2fc7d626605078e4",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_purchase_items(p_invoice_id bigint, p_items jsonb)": {
+      "body_sha256": "05e44f8bf0ece2095fb00609167b469788c08fe9abd54d27e955c8090e07be20",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_purchase_items(p_invoice_id bigint, p_items jsonb, p_party_name text)": {
+      "body_sha256": "5f31b801e7a5fda4dd90efc5d985b1be3c6de3039bc3fd39f44a34fdff02cbe5",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_purchase_return(p_return_id bigint, p_serials jsonb)": {
+      "body_sha256": "5b258cd2e531e1b6ca1c305c0be6f8b1bcad6b9a0b7cea0a793a7d316fb452e0",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_purchase_return(p_return_id bigint, p_serials jsonb, p_created_by integer)": {
+      "body_sha256": "d605bbef6f7a3984a3e3305f8fdf1074b96118966fe8a33c8677b9d8249e5de3",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_receipt(p_receipt_id bigint, p_data jsonb)": {
+      "body_sha256": "de11251fa42b73362293a28f07dee00c5d8c780ce0ea07bd6f57389e45c89dd4",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_sale_invoice(p_invoice_id bigint, p_items jsonb, p_party_name text, p_invoice_date date)": {
+      "body_sha256": "65c967715720c5263a616a32040fdabba025e9a1529b24584feb12c4a1b55d08",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_sale_invoice(p_invoice_id bigint, p_items jsonb, p_party_name text, p_invoice_date date, p_created_by integer)": {
+      "body_sha256": "d10679160fbf56a96af90a7d4272d87746ea04144edd23d2382d1f33f0f067dc",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_sale_return(p_return_id bigint, p_serials jsonb)": {
+      "body_sha256": "5c60079fa24554b88c6b596659fd3ed464dd35820649c297eee50449baf9a410",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "update_sale_return(p_return_id bigint, p_serials jsonb, p_created_by integer)": {
+      "body_sha256": "e352d50fc3b6d2d9caab49fd8837d04a9111998277e4a96660c721732ece8c20",
+      "result": "void",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "validate_purchase_delete(p_invoice_id bigint)": {
+      "body_sha256": "1e05b8f101e99de12a3f9d869a0e3a0b1cf199ce30fc1e15047f8c912e66a1fc",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "validate_purchase_update(p_invoice_id bigint, p_items jsonb)": {
+      "body_sha256": "df9987f1c839794c03cdad1c9ba1665eb54d4e877c8a6c4c928379a49cf84afb",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "validate_purchase_update2(p_invoice_id bigint, p_items jsonb)": {
+      "body_sha256": "b8d7eaab061c63e1fa15d2b9aced480fae568adb2735a6c8da06a0f7cb866159",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "validate_sales_delete(p_invoice_id bigint)": {
+      "body_sha256": "da3a06a5b04b8d543f1594d2636bb57fc831fbe43e95830582a20f0242da7424",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    },
+    "validate_sales_update(p_invoice_id bigint, p_items jsonb)": {
+      "body_sha256": "7b0320d5b13c9ab1e66c6b9d74ebd984ad9502a180eae3c3c34a1983940f1ba2",
+      "result": "jsonb",
+      "volatility": "v",
+      "strict": false,
+      "security_definer": false
+    }
+  },
+  "removed_email_functions": [
+    "add_report_recipient_from_json(p_payload jsonb)",
+    "delete_report_recipient(p_recipient_id bigint)",
+    "rearm_report_email_day(p_day date, p_actor text)",
+    "report_email_claim(p_day date, p_trigger text, p_actor text)",
+    "report_email_due(p_day date)",
+    "report_email_finish(p_id bigint, p_data jsonb)",
+    "report_email_log_list(p_limit integer, p_offset integer)",
+    "report_email_recipients_list()",
+    "report_email_recover()",
+    "report_email_settings_get()",
+    "save_report_email_settings_from_json(p_payload jsonb)",
+    "update_report_recipient_from_json(p_payload jsonb)"
+  ]
+}

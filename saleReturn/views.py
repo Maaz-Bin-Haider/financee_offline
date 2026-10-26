@@ -730,7 +730,7 @@ def _sale_return_payload_matches_current(return_id, data, return_date):
 
 @login_required
 def createSaleReturn(request):
-    from tenancy.capabilities import serial_inventory_view
+    from local.capabilities import serial_inventory_view
     return serial_inventory_view(request, _serial_create_sale_return)
 
 
@@ -972,7 +972,7 @@ def sale_return_lookup(request,serial:str):
 
 @login_required  
 def get_sale_return(request):
-    from tenancy.capabilities import serial_inventory_view
+    from local.capabilities import serial_inventory_view
     return serial_inventory_view(request, _serial_get_sale_return)
 
 
@@ -1077,7 +1077,7 @@ def _serial_get_sale_return(request):
 
 @login_required
 def get_sale_return_summary(request):
-    from tenancy.capabilities import serial_inventory_view
+    from local.capabilities import serial_inventory_view
     return serial_inventory_view(request, _serial_get_sale_return_summary)
 
 

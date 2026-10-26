@@ -5,7 +5,7 @@ nothing else: no stock, no journal, no balance. Converting a tranche of it
 raises a real sale invoice.
 
 Every write goes through a stored procedure in the tenant schema
-(tenancy/sql/add_draft_invoices.sql), like the rest of this system. The
+(local/sql/0001_business.sql), like the rest of this system. The
 procedures raise curated P0001 messages that ``user_db_error`` passes straight
 to the browser; any other database error becomes a generic fallback so
 internal detail never leaks.
@@ -120,7 +120,7 @@ def _date_range(data):
 
 
 def _page_context(request):
-    company = getattr(request, "tenant_company", None)
+    company = getattr(request, "general_settings", None)
     return {
         "currency": getattr(company, "base_currency_id", None) or "PKR",
         "age_warning_days": draft_age_warning_days(),

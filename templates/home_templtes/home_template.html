@@ -14,7 +14,7 @@
 {% block body %}
 {% if features.dashboard.enabled %}
 {% comment %}
-Every widget below sits behind its own dashboard switch (tenancy/features.py,
+Every widget below sits behind its own dashboard switch (local/features.py,
 admin → company → Features). home_script.js skips loading a switched-off
 widget, and its data endpoint refuses anyway. With the whole dashboard off the
 page is a plain welcome page (the else branch at the bottom): /home/ itself is
@@ -737,7 +737,7 @@ never blocked, because every denial redirects here.
         <div class="dash-title-icon"><i class="fa-solid fa-house"></i></div>
         <div>
           <h1 class="dash-title-text">Welcome</h1>
-          <p class="dash-subtitle">{{ request.tenant_company.name }}</p>
+          <p class="dash-subtitle">{{ request.general_settings.name }}</p>
         </div>
       </div>
     </div>

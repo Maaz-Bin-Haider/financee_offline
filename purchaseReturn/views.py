@@ -735,7 +735,7 @@ def _purchase_return_payload_matches_current(return_id, data, return_date):
 
 @login_required
 def createPurchaseReturn(request):
-    from tenancy.capabilities import serial_inventory_view
+    from local.capabilities import serial_inventory_view
     return serial_inventory_view(request, _serial_create_purchase_return)
 
 
@@ -967,7 +967,7 @@ def purchase_return_lookup(request,serial:str):
     
 @login_required
 def get_purchase_return(request):
-    from tenancy.capabilities import serial_inventory_view
+    from local.capabilities import serial_inventory_view
     return serial_inventory_view(request, _serial_get_purchase_return)
 
 
@@ -1072,7 +1072,7 @@ def _serial_get_purchase_return(request):
 
 @login_required
 def get_purchase_return_summary(request):
-    from tenancy.capabilities import serial_inventory_view
+    from local.capabilities import serial_inventory_view
     return serial_inventory_view(request, _serial_get_purchase_return_summary)
 
 

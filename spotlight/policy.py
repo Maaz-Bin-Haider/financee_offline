@@ -1,7 +1,7 @@
 """Spotlight capabilities mirror the target screen, never a broader search grant."""
 from dataclasses import dataclass
 from django.conf import settings
-from tenancy.features import feature_for_path
+from local.features import feature_for_path
 
 
 @dataclass(frozen=True)
@@ -14,7 +14,7 @@ class Target:
     words: str = ''
 
     def allowed(self, request):
-        company = getattr(request, 'tenant_company', None)
+        company = getattr(request, 'general_settings', None)
         feature = self.feature or feature_for_path(self.path)
         if not company or (feature and not company.feature_enabled(feature)):
             return False
@@ -24,8 +24,6 @@ class Target:
             if not settings.DRAFT_SALES_ENABLED or request.user.groups.filter(name='view_only_users').exists():
                 return False
         if self.path.startswith('/activity/') and not settings.TEAM_ACTIVITY_ENABLED:
-            return False
-        if self.path.startswith('/report-email/') and not settings.REPORT_EMAIL_ENABLED:
             return False
         return all(request.user.has_perm('auth.' + perm) for perm in self.perms)
 
@@ -57,8 +55,6 @@ PAGES = {
     'owner_equity': Target('Owner Equity', '/owner-equity/', ('can_manage_owner_equity',)),
     'month_close': Target('Month-End Close', '/month-close/', ('can_close_period',)),
     'team_activity': Target('Team Activity','/activity/',('view_team_activity',),feature='team_activity',words='team contributions work history'),
-    'email': Target('Report Email', '/report-email/', ('send_reports', 'can_view_sale_wise_profit'),
-                    feature='report_email', words='mail schedule recipients'),
 }
 # Actual report paths, target permissions, and the existing form selector key.
 for key, label, route, perm, tab, group in (

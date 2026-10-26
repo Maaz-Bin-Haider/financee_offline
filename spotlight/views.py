@@ -1,4 +1,4 @@
-"""Request-scoped, read-only Spotlight API. Membership alone selects the schema."""
+"""Request-scoped, read-only Spotlight API. One local database; capabilities remain authoritative."""
 import json
 import re
 from functools import wraps
@@ -12,17 +12,14 @@ from . import policy, queries
 
 
 def scope(request):
-    company = getattr(request, 'tenant_company', None)
+    company = getattr(request, 'general_settings', None)
     identity = f'{request.user.pk}:{getattr(company, "pk", "")}:{request.session.session_key}'
     return salted_hmac('spotlight.session', identity).hexdigest()
 
 
 def enabled(request):
-    company = getattr(request, 'tenant_company', None)
-    return bool(request.user.is_authenticated and request.user.is_active and company
-                and getattr(request, 'tenant_is_active', False) and company.is_active
-                and company.feature_enabled('spotlight')
-                and company.subscription_state() not in ('blocked', 'suspended'))
+    return bool(request.user.is_authenticated and request.user.is_active
+                and getattr(request, 'installation_ready', False))
 
 
 def guarded(view):

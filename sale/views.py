@@ -64,7 +64,7 @@ def _sale_payload_matches_current(sale_id, data, sale_date):
 
 @login_required
 def sales(request):
-    from tenancy.capabilities import serial_inventory_view
+    from local.capabilities import serial_inventory_view
     return serial_inventory_view(request, _serial_sales)
 
 
@@ -464,7 +464,7 @@ def _serial_sales(request):
 
 @login_required
 def get_sale(request):
-    from tenancy.capabilities import serial_inventory_view
+    from local.capabilities import serial_inventory_view
     return serial_inventory_view(request, _serial_get_sale)
 
 
@@ -796,7 +796,7 @@ def sale_bulk_serial_lookup(request):
 
 @login_required
 def get_sale_summary(request):
-    from tenancy.capabilities import serial_inventory_view
+    from local.capabilities import serial_inventory_view
     return serial_inventory_view(request, _serial_get_sale_summary)
 
 

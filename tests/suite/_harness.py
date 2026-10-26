@@ -38,8 +38,8 @@ except ImportError:  # pragma: no cover
 
 
 DSN = {
-    "dbname": os.environ.get("DB_NAME", "financee"),
-    "user": os.environ.get("DB_USER", "postgres"),
+    "dbname": os.environ["DB_NAME"],
+    "user": os.environ["DB_USER"],
     "password": os.environ.get("DB_PASSWORD", ""),
     "host": os.environ.get("DB_HOST", "localhost"),
     "port": os.environ.get("DB_PORT", "5432"),
@@ -86,7 +86,7 @@ class Tester:
         if self.conn.get_transaction_status() != extensions.TRANSACTION_STATUS_IDLE:
             self._rollback()
         c = self.conn.cursor()
-        c.execute(f'SET search_path TO "{self.schema}", public')
+        if self.schema != 'public': raise RuntimeError('Only public is supported.')
         return c
 
     def q(self, sql, params=None):
@@ -359,24 +359,14 @@ class Tester:
 # ------------------------------------------------------------------------- #
 #  Tenant discovery + runners
 # ------------------------------------------------------------------------- #
-def discover_tenants(conn):
-    cur = conn.cursor()
-    try:
-        # One representative membership per schema (a tenant may have many users).
-        cur.execute(
-            """
-            SELECT c.schema_name, MIN(m.user_id)
-            FROM public.tenancy_company c
-            JOIN public.tenancy_membership m ON m.company_id = c.id
-            WHERE c.is_active = true
-              AND c.schema_name IS NOT NULL
-            GROUP BY c.id, c.schema_name
-            ORDER BY c.id
-            """
-        )
-        return cur.fetchall()
-    finally:
-        cur.close()
+def discover_business(conn):
+    if DSN['dbname'] != 'financee_offline_test':
+        raise RuntimeError('Business suite requires the isolated disposable financee_offline_test database.')
+    with conn.cursor() as cur:
+        cur.execute('SELECT id FROM public.auth_user WHERE is_active AND is_superuser ORDER BY id LIMIT 1')
+        row = cur.fetchone()
+    if not row: raise RuntimeError('Set up a disposable test owner first.')
+    return [('public', row[0])]
 
 
 def _print_and_exit(results):
@@ -421,7 +411,7 @@ def standalone(run_fn, group):
     """Entry point for running a single domain module directly."""
     conn = psycopg2.connect(**DSN)
     conn.autocommit = True
-    tenants = discover_tenants(conn)
+    tenants = discover_business(conn)
     if not tenants:
         print("No active tenant memberships found.")
         return 2
