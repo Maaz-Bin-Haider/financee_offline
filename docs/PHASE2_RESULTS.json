@@ -1,0 +1,37 @@
+{
+  "build": "0.2.0-phase2",
+  "schema": 2,
+  "core_commit": "c5e5aeca6cd78be98442f6364337c40b468f9028",
+  "image": "sha256:1d730046686324be95151e1e77f7149d0dd2365de3de22e464976cb2133624e1",
+  "architecture": "linux/arm64",
+  "review_url": "http://127.0.0.1:18766/admin/local/generalsettings/1/change/",
+  "verification": {
+    "core_tests": 32,
+    "business_assertions": 328,
+    "business_modules": 11,
+    "sql_source_functions_unchanged": 190,
+    "local_integrity_guards": 3,
+    "concurrency_cases": 3,
+    "currency_js_checks": 17,
+    "company_export_checks": 18,
+    "existing_frontend_checks": 41,
+    "pdf_samples": 4,
+    "pdf_sample_pages": 20,
+    "visual_qa": "first page of all four currency samples and last AED page; company/code verified by extraction on all pages",
+    "django_check": "pass",
+    "migration_drift": "none",
+    "review_data_counts_and_profile": "preserved"
+  },
+  "developer_rescue": {
+    "archive": "/Users/swisstech/Development/Financee_Offline/.runtime/review/Backups/DEV_before_Phase2_20261026T113332Z.zip",
+    "sha256": "edd509fca887b1f4a9e37a5a75e0b658425a26688f6ceb1d4734b61fdaebf3c2",
+    "kind": "developer-pre-phase2-rescue"
+  },
+  "release_limits": [
+    "full cold disconnected asset audit pending Phase 3",
+    "customer backup/restore pending Phase 4",
+    "native launchers/installers/signing/platform matrix pending",
+    "manual installer upgrade certification pending Phase 8",
+    "currency catalogue glyphs covered; universal writing-system coverage not certified"
+  ]
+}

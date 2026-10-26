@@ -1,68 +1,55 @@
 # Financee Offline context
 
-2026-10-26, Asia/Karachi. Authorized work: the owner approved continuing through Phase 2 after reviewing
-Phase 1 and the AED correction. Stop at the Phase 2 manual-review gate. Later phases need their own review gates. Never infer push,
-remote creation or publication permission from local review approval.
+2026-10-26, Asia/Karachi. Owner authorized continuation through Phase 2 after
+Phase 1 review and the AED correction. **Phase 2 is complete; stop for owner review.**
+Later phases retain their individual review gates. No push/publication authorized.
 
-Repository: /Users/swisstech/Development/Financee_Offline, independent Git history,
-branch codex/single-company-core. Both existing applications are read-only.
-Source application snapshot: 96fd8b9dc4105870bc76cbb2b443bf5c36da2d66, confirmed
-workflow 40122187390; clean source HEAD 0ea97a2253f0ed12213a24832393e223eed71e21
-is documentation only. See SOURCE_PROVENANCE.md and SOURCE_FILES_SHA256.json.
-Approved request and full plan are preserved verbatim in this repository.
+Independent repo /Users/swisstech/Development/Financee_Offline, branch
+codex/single-company-core. Both source systems remain read-only and unchanged.
+Confirmed application baseline 96fd8b9dc4105870bc76cbb2b443bf5c36da2d66, workflow
+40122187390; source HEAD 0ea97a2253f0ed12213a24832393e223eed71e21 is documentation only.
+Provenance and original imported hashes remain in SOURCE_PROVENANCE.md and
+SOURCE_FILES_SHA256.json. Approved requirements/plan are preserved locally.
 
-Implemented: one public dataset with Django auth/local settings, singleton profile
-and owner onboarding, fresh local migrations/schema v1, retained business SQL,
-module/action/report permissions, local activity and attachment storage. No
-Company/Membership models, tenant provisioning/switching, subscriptions, Report
-Email, SMTP scheduler, production workflows or operational source tools remain.
-No universal password, sample transactions or imported customer data are seeded.
-Core settings/currency guards are present because onboarding requires them; the
-complete currency/identity presentation work remains Phase 2.
+Current review build **0.2.0-phase2**, schema **2**, core commit c5e5aeca6cd78be98442f6364337c40b468f9028.
+Image sha256:1d730046686324be95151e1e77f7149d0dd2365de3de22e464976cb2133624e1 (Linux ARM64).
+Review http://127.0.0.1:18766/; owner General Settings at
+/admin/local/generalsettings/1/change/. Existing company, AED, timezone, users,
+financial/media counts and login preserved; all 24 local modules enabled.
+No universal password or sample business data is installed.
 
-Stable review project financee_offline_review: loopback 18766, own database/static
-volumes and independent ignored .runtime/review customer folder/configuration.
-Automated tests use financee_offline_test only, plus temporary test DBs within it.
-DB/cache have no host ports and no app container mounts Docker's socket.
-No source credentials, application images or live databases were used.
+Architecture: one public PostgreSQL business dataset beside Django auth and a
+singleton local General Settings profile. No tenant registry/membership/routing,
+provisioning, subscription/SMTP/report email, activation or cloud operations.
+Local permissions remain authoritative. Module availability is stored locally;
+dark mode and append-only attribution are retained. Attachments remain private.
 
-Local-core verification: 20/20 tests; frontend checks: 41/41.
-Evidence: ported business suite 328/328 assertions across 11 modules; independent
-Decimal journal/revenue/COGS/serial-return invariants; all retained screen templates;
-local auth, singleton, currency lock, activity append-only, private attachment and
-session capability checks. Confirmed source contract: 190 unchanged SQL functions,
-12 removed email functions, 2 added profile guards. Final image checks and exact
-handoff build are recorded in docs/PHASE1_REVIEW.md.
+Phase 2 adds owner-only identity/contact/currency/timezone/module editing, database
+module-key validation, base-currency/posting serialization, company/currency-aware
+PDF/CSV/print presentation and bundled currency-symbol fonts. Original arithmetic
+and all 190 source SQL definitions remain unchanged. SQL/Python/browser business
+dates use the chosen timezone. Offset-preserving PostgreSQL timestamp decoding
+prevents audit instant shifts across timezone and DST changes.
 
-Remaining gates: Phase 2 full identity/currency labels; Phase 3 all local assets/
-fonts and cold disconnected checks; Phase 4 ZIP backups/candidate restore; Phase 5
-native GUI launcher prototype; Phases 6/7 real Windows10/11 and ARM64 Mac installers,
-prerequisite consent and signing; Phase 8 safe upgrade/recovery; Phase 9 release CI
-and explicitly owner-authorized artifacts. No full-offline, backup, installer,
-notarization, x64 or upgrade success is claimed. See ADR-002 for current official
-platform constraints and the unverified maintained Engine-in-WSL Windows10 path.
+Verification: 32 core tests, 328 business assertions, 3 real currency/posting race
+cases, 17 currency JS checks, 18 export checks and 41 earlier frontend checks pass.
+Four real PDF/CSV currency samples; company/code checked on all 20 PDF pages,
+representative pages rendered/visually inspected. No migration drift/system errors.
+See docs/PHASE2_REVIEW.md and docs/PHASE2_RESULTS.json for exact evidence and limits.
+Earlier Phase 1/currency handoff documents are historical snapshots.
 
-## AED dashboard correction (owner review follow-up)
+Owned stable project financee_offline_review, loopback 18766; customer folder
+.runtime/review, database volume financee_offline_review_database. Test resources
+financee_offline_test are disposable and separate. DB/cache have no host ports;
+no app container mounts Docker's socket. Runtime credentials remain independent
+and ignored. Developer pre-Phase2 rescue ZIP retained under .runtime/review/Backups;
+it is not the Phase 4 customer backup implementation or a restore certification.
 
-Owner reported PKR on the dashboard after choosing AED. Read-only inspection of
-the offline review profile confirmed AED with no override; browser reproduced
-PKR on cards/aging/expenses. The inherited dashboard JS used a fixed PKR formatter
-and chart axis; SQL smart-alert prose also contained fixed PKR labels.
-
-A safely serialized currency context and shared browser formatter now use the
-saved code or optional local display override. Dashboard cards, tables, charts,
-PDF data, Spotlight, transaction chips/history/document PDF labels and draft
-labels consume it. The dashboard identifies both currency code and symbol.
-Known generated alert prefixes are localized at the response boundary, preserving
-amount text and customer names. All SQL definitions and financial math remain
-unchanged, and no review data/currency/credentials were edited.
-
-Patch build: 0.1.1-phase1, schema version remains 1. Targeted regressions: 23 local
-core tests (including 40 page/currency combinations) and 17 JS currency checks
-covering actual dashboard cards, chart axis/tooltips and PDF data. Existing 41
-frontend checks also pass. Unicode PDF font certification and other later phase
-gates remain pending; this patch does not complete the whole Phase 2/3 scope.
-
-Currency patch deployed and browser verified: core commit a7c104d5beb9da99d44e5502f64437d7455ae0d9,
-image sha256:d7678230f8ddabbb54b934aad67960b22ba5f6628bcd4c56736726447c8081f7. Existing AED, users and business/media counts preserved.
-See docs/CURRENCY_REVIEW_FIX.md for the cause, scope and actual verification.
+Remaining gates: Phase 3 complete local assets/cold offline verification; Phase 4
+scheduled ZIP backups and candidate restore; Phase 5 native launcher; Phases 6/7
+real Windows10/11 x64 and signed/notarized Apple Silicon installers; Phase 8 safe
+manual installer upgrades/recovery; Phase 9 release CI/distribution with explicit
+owner authorization. No Intel Mac/Windows ARM package in v1. Current fonts cover
+catalogue currency symbols, not every possible writing system. CSV is Excel-readable;
+no new native XLSX writer or Excel-app verification is claimed. Keep customer data,
+media, secrets, logs, ZIPs and installer payloads out of Git. Never operate sources.

@@ -1,6 +1,6 @@
 # Financee Offline
 
-Phase 1 local review build: **0.1.1-phase1**. Independent Django/PostgreSQL
+Phase 2 local review build: **0.2.0-phase2**. Independent Django/PostgreSQL
 single-device edition imported from confirmed application release `96fd8b9`.
 Both reference systems remain read-only. No Git remote or publication exists.
 
@@ -15,10 +15,12 @@ Implemented: public-only business database, singleton profile, first-owner setup
 local auth/permissions, retained serial financial SQL, local activity/Spotlight/
 attachments, dark mode and the source purchase layout. Tenant registry, tenant
 schema provisioning, subscriptions/SMTP/report email and cloud operations removed.
+Phase 2 adds owner-only company/contact/currency/timezone settings, local module
+controls, timezone-safe business dates and company-aware Unicode PDF/CSV/print exports.
 
 This is not yet a customer installer or a certified offline release. CDN assets
 remain for Phase 3; backup/restore, launchers, platform installers and upgrades are
-later gated phases. See [phase handoff](docs/PHASE1_REVIEW.md),
+later gated phases. See [phase handoff](docs/PHASE2_REVIEW.md),
 [product requirements](OFFLINE_PRODUCT_SPEC.md), [approved plan](IMPLEMENTATION_PLAN.md),
 [source provenance](SOURCE_PROVENANCE.md) and [architecture](docs/ADR-001-single-company.md).
 

@@ -1,6 +1,6 @@
-# Phase 1 developer review
+# Phase 2 developer review
 
-This is a local Docker review build, not a desktop installation release.
+Build 0.2.0-phase2, schema 2. This is a local Docker review build, not a desktop installation release.
 Open http://127.0.0.1:18766/setup/ on this machine. Choose company, currency,
 optional display symbol, timezone, owner username and a strong password.
 There is no shipped administrator password. Setup cannot replace existing accounts.
@@ -20,3 +20,7 @@ Backups are not implemented at this gate. Do not use the review build as your on
 copy of business records. Customer setup, Documents folder selection, desktop
 shortcut, prerequisite consent/reboot, repair and data-preserving uninstall are
 pending Phases 5–7. No Windows or DMG installer exists at Phase 1.
+
+Phase 2 settings and exports are ready for review; see docs/PHASE2_REVIEW.md.
+A developer rescue point exists under the ignored review Backups folder; the
+customer backup/restore controls and scheduler are still pending Phase 4.
