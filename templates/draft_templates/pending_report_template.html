@@ -84,7 +84,6 @@ before window.jspdf exists, so it has no jsPDF to attach to and
 doc.autoTable would never be defined.
 {% endcomment %}
 <script>
-  window.FINANCEE_CURRENCY = "{{ currency|default:'PKR'|escapejs }}";
   window.DRAFT_AGE_WARNING_DAYS = Number("{{ age_warning_days|default:30|escapejs }}") || 30;
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>

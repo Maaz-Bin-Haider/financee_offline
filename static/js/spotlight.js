@@ -73,7 +73,7 @@
     input.setAttribute('aria-activedescendant', rows[active].element.id);
     rows[active].element.scrollIntoView({block:'nearest'});
   }
-  function money(value) { return config.currency + ' ' + Number(value).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function money(value) { return window.FinanceeMoney.format(value); }
   function render() {
     clearResults();
     for (const group of groups) {

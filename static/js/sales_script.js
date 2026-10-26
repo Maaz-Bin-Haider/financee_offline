@@ -1934,7 +1934,7 @@ function downloadInvoicePDF() {
   doc.setTextColor(30, 58, 95);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
-  doc.text(`Total Qty: ${totalQty}   ·   Total Items: ${items.length}   ·   Invoice Amount: PKR ${amount}`, PL, y + 1);
+  doc.text(`Total Qty: ${totalQty}   ·   Total Items: ${items.length}   ·   Invoice Amount: ${window.FinanceeMoney.label} ${amount}`, PL, y + 1);
 
   y += 12;
 
@@ -1972,8 +1972,8 @@ function downloadInvoicePDF() {
     doc.text(item.name, PL + 10, y + 3.5);
     doc.setFont("helvetica", "normal");
     doc.text(String(item.qty), PL + 80, y + 3.5);
-    doc.text(`PKR ${item.price.toFixed(2)}`, PL + 100, y + 3.5);
-    doc.text(`PKR ${item.subtotal.toFixed(2)}`, PR, y + 3.5, { align: "right" });
+    doc.text(`${window.FinanceeMoney.label} ${item.price.toFixed(2)}`, PL + 100, y + 3.5);
+    doc.text(`${window.FinanceeMoney.label} ${item.subtotal.toFixed(2)}`, PR, y + 3.5, { align: "right" });
 
     // Serials in small gray text
     if (item.serials.length) {
@@ -2002,7 +2002,7 @@ function downloadInvoicePDF() {
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10);
-  doc.text(`TOTAL AMOUNT:  PKR ${amount}`, PR, y + 7, { align: "right" });
+  doc.text(`TOTAL AMOUNT:  ${window.FinanceeMoney.label} ${amount}`, PR, y + 7, { align: "right" });
 
   // ── Footer ──
   doc.setFontSize(7.5);
@@ -2044,7 +2044,7 @@ async function fetchSaleSummary(from = null, to = null) {
             <td>${sale.invoice_date}</td>
             <td>${escapeHtml(sale.customer)}</td>
             <td style="text-align:right;font-family:'DM Mono',monospace;">
-              PKR ${parseFloat(sale.total_amount).toFixed(2)}
+              ${escapeHtml(window.FinanceeMoney.label)} ${parseFloat(sale.total_amount).toFixed(2)}
             </td>
           </tr>`;
       });

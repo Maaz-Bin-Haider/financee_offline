@@ -173,7 +173,7 @@ is not recognised and renders its prose onto the page.
           leaves the browser no legal break point, so it splits the digits.
           {% endcomment %}
           <div class="total-chip">
-            <span class="total-chip-label">Indicative Value ({{ currency|default:"PKR" }})</span>
+            <span class="total-chip-label">Indicative Value ({{ currency_label }})</span>
             <span class="total-chip-value amount-value" id="indicativeValue">0.00</span>
           </div>
         </div>
@@ -203,7 +203,6 @@ The company's base currency for every money label the scripts build (history,
 PDFs), read by draft_script.js and draft_reports.js.
 {% endcomment %}
 <script>
-  window.FINANCEE_CURRENCY = "{{ currency|default:'PKR'|escapejs }}";
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 {% comment %}

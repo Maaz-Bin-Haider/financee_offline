@@ -101,8 +101,7 @@ function todayISO() {
 }
 
 function currencyCode() {
-  const code = String(window.FINANCEE_CURRENCY || "").trim();
-  return code || "PKR";
+  return window.FinanceeMoney.label;
 }
 
 /* The company's DRAFT_AGE_WARNING_DAYS, rendered by the template; the

@@ -224,3 +224,53 @@ class LocalCoreTests(TestCase):
         for name,expected in contract['functions'].items():
             with self.subTest(function=name):self.assertEqual(actual.pop(name,None),expected)
         self.assertEqual(set(actual),{'local_profile_guard()','local_profile_no_truncate()'})
+
+    def test_saved_currency_reaches_dashboard_and_transaction_pages(self):
+        import re
+        self.client.force_login(self.owner)
+        paths=['/home/','/purchase/purchasing/','/sale/sales/','/saleReturn/create-sale-return/',
+               '/purchaseReturn/create-purchase-return/','/opening-stock/','/draft/',
+               '/draft/convert/screen/','/draft/return/screen/','/draft/pending/screen/']
+        for code,override in [('AED',''),('USD',''),('EUR','€'),('AED','Dhs')]:
+            GeneralSettings.objects.filter(pk=1).update(base_currency_id=code,symbol_override=override)
+            for path in paths:
+                with self.subTest(code=code,override=override,path=path):
+                    response=self.client.get(path)
+                    self.assertEqual(response.status_code,200)
+                    html=response.content.decode()
+                    config=json.loads(re.search(r'<script id="financee-currency" type="application/json">(.*?)</script>',html,re.S)[1])
+                    self.assertEqual(config['code'],code)
+                    self.assertEqual(config['label'],override or code)
+                    self.assertNotIn('PKR',html)
+                    self.assertLess(html.index('financee-currency'),html.index('js/currency.'))
+        self.assertEqual(scalar('SELECT count(*) FROM journalentries'),0)
+
+    def test_alert_labels_use_selected_currency_without_changing_amounts(self):
+        from unittest.mock import patch
+        from local.currency import present_dashboard_alerts
+        GeneralSettings.objects.filter(pk=1).update(base_currency_id='AED',symbol_override='')
+        profile=GeneralSettings.objects.select_related('base_currency').get()
+        alerts=[{'title':'Stale Receivable: PKR Traders','message':'Balance PKR 123456.7890 — last activity 60 days ago.'},
+                {'title':'Negative Cash Balance','message':'Cash balance is PKR -25.1250. Immediate action required.'},
+                {'title':'Risky Customer','message':'High receivable PKR 50000.0001 with no payment received in the last 45 days.'},
+                {'title':'No Sales Today','message':'No sales invoices have been recorded for today yet.'}]
+        shown=present_dashboard_alerts(alerts,profile)
+        self.assertEqual(shown[0]['title'],'Stale Receivable: PKR Traders')
+        self.assertEqual(shown[0]['message'],'Balance AED 123456.7890 — last activity 60 days ago.')
+        self.assertEqual(shown[1]['message'],'Cash balance is AED -25.1250. Immediate action required.')
+        self.assertIn('AED 50000.0001',shown[2]['message'])
+        self.assertEqual(shown[3],alerts[3])
+        self.assertIn('PKR 123456.7890',alerts[0]['message'])
+        self.client.force_login(self.owner)
+        with patch('home.views._run_pg_function',return_value=alerts):
+            response=self.client.get('/home/api/dash/alerts/')
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(response.json()['data'],shown)
+
+    def test_symbol_override_is_serialized_as_data_and_html_escaped(self):
+        GeneralSettings.objects.filter(pk=1).update(base_currency_id='AED',symbol_override='</script>')
+        self.client.force_login(self.owner)
+        response=self.client.get('/home/')
+        html=response.content.decode()
+        self.assertIn('\\u003C/script\\u003E',html)
+        self.assertNotIn('· </script>',html)

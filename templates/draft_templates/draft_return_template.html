@@ -159,7 +159,7 @@ cacheable and reviewable, and the rows use the shared tokens throughout.
             <span class="total-chip-value" id="totalSerials">0</span>
           </div>
           <div class="total-chip">
-            <span class="total-chip-label">Return Amount ({{ currency|default:"PKR" }})</span>
+            <span class="total-chip-label">Return Amount ({{ currency_label }})</span>
             <span class="total-chip-value amount-value" id="totalReturnAmount">0.00</span>
           </div>
         </div>
@@ -185,7 +185,6 @@ that order and in the body: the autotable copy in base.html's head runs before
 window.jspdf exists and attaches to nothing.
 {% endcomment %}
 <script>
-  window.FINANCEE_CURRENCY = "{{ currency|default:'PKR'|escapejs }}";
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>

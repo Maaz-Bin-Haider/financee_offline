@@ -43,6 +43,9 @@
     };
   </script>
 
+  {{ currency_config|json_script:"financee-currency" }}
+  <script src="{% static 'js/currency.js' %}"></script>
+
   {% if activity_config %}
   {{ activity_config|json_script:"activity-config" }}
   <script src="{% static 'js/activity_ping.js' %}"></script>

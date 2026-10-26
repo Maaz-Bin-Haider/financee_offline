@@ -713,8 +713,9 @@ def api_dash_smart_alerts(request):
     """Smart alert signals: negative cash, no sales, stale receivables, risky customers."""
     if not request.user.has_perm("auth.view_dash_smart_alerts"):
         return _json_denied()
+    from local.currency import present_dashboard_alerts
     data = _run_pg_function("SELECT fn_dash_smart_alerts();")
-    return _json_ok(data or [])
+    return _json_ok(present_dashboard_alerts(data or [], request.general_settings))
 
 
 # ---------------------------------------------------------------------------

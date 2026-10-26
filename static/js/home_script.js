@@ -33,8 +33,8 @@ const API = {
   items:               "/home/api/items/",
 };
 
-const PKR = new Intl.NumberFormat("en-AE", { style:"currency", currency:"PKR", currencyDisplay:"code", minimumFractionDigits:2, maximumFractionDigits:2 });
-const fmt  = n => PKR.format(parseFloat(n) || 0);
+const fmt = n => window.FinanceeMoney.format(n);
+const moneyHtml = n => esc(fmt(n));
 const fmtN = n => (parseFloat(n) || 0).toLocaleString("en-AE");
 const esc  = s => String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 const $    = id => document.getElementById(id);
@@ -239,11 +239,11 @@ async function loadSalesChart(preset, customFrom, customTo) {
       interaction:{mode:"index",intersect:false},
       plugins:{
         legend:{position:"top",labels:{boxWidth:12,font:{size:11}}},
-        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${PKR.format(c.parsed.y)}`}},
+        tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${fmt(c.parsed.y)}`}},
       },
       scales:{
         x:{grid:{display:false},ticks:{font:{size:11}}},
-        y:{grid:{color:"#f1f5f9"},ticks:{callback:v=>"PKR "+(v>=1000?(v/1000).toFixed(0)+"k":v),font:{size:10}}},
+        y:{grid:{color:"#f1f5f9"},ticks:{callback:v=>window.FinanceeMoney.axis(v),font:{size:10}}},
       },
     },
   });
@@ -377,17 +377,17 @@ async function loadCashLedger() {
     <div class="modal-kpi kpi-inflow">
       <div class="modal-kpi-icon"><i class="fa-solid fa-arrow-down"></i></div>
       <div class="modal-kpi-label">Total Inflow</div>
-      <div class="modal-kpi-val td-pos">${fmt(totalDebit)}</div>
+      <div class="modal-kpi-val td-pos">${moneyHtml(totalDebit)}</div>
     </div>
     <div class="modal-kpi kpi-outflow">
       <div class="modal-kpi-icon"><i class="fa-solid fa-arrow-up"></i></div>
       <div class="modal-kpi-label">Total Outflow</div>
-      <div class="modal-kpi-val td-neg">${fmt(totalCredit)}</div>
+      <div class="modal-kpi-val td-neg">${moneyHtml(totalCredit)}</div>
     </div>
     <div class="modal-kpi ${closing<0?"kpi-outflow":"kpi-balance"}">
       <div class="modal-kpi-icon"><i class="fa-solid fa-coins"></i></div>
       <div class="modal-kpi-label">Closing Balance</div>
-      <div class="modal-kpi-val ${closing<0?"td-neg":"td-pos"}">${fmt(closing)}</div>
+      <div class="modal-kpi-val ${closing<0?"td-neg":"td-pos"}">${moneyHtml(closing)}</div>
     </div>`;
 
   tbody.innerHTML = data.map(r => {
@@ -397,9 +397,9 @@ async function loadCashLedger() {
       <td class="td-muted">${r.journal_id||"—"}</td>
       <td class="td-name">${esc(r.party_name||"—")}</td>
       <td>${esc(r.description||"")}</td>
-      <td class="td-pos">${r.debit?fmt(r.debit):""}</td>
-      <td class="td-neg">${r.credit?fmt(r.credit):""}</td>
-      <td class="${bal<0?"td-neg":"td-pos"} td-amount">${fmt(bal)}</td>
+      <td class="td-pos">${r.debit?moneyHtml(r.debit):""}</td>
+      <td class="td-neg">${r.credit?moneyHtml(r.credit):""}</td>
+      <td class="${bal<0?"td-neg":"td-pos"} td-amount">${moneyHtml(bal)}</td>
     </tr>`;
   }).join("");
 }
@@ -455,7 +455,7 @@ async function loadLowStock(threshold=5) {
         <strong style="color:${r.units_in_stock===0?"var(--ink-red)":r.units_in_stock<3?"var(--ink-amber)":"var(--ink-green)"}">${r.units_in_stock}</strong>
         <div class="stock-bar-track"><div class="stock-bar-fill ${cls(r.units_in_stock)}" style="width:${pct(r.units_in_stock)}%"></div></div>
       </td>
-      <td class="td-amount">${fmt(r.sale_price)}</td>
+      <td class="td-amount">${moneyHtml(r.sale_price)}</td>
     </tr>`).join("");
 }
 $("low-stock-threshold")?.addEventListener("change", function(){ loadLowStock(parseInt(this.value)||5); });
@@ -475,7 +475,7 @@ async function loadFastMoving(days=30) {
       <td class="td-name">${esc(r.item_name)}</td>
       <td class="td-muted">${esc(r.category)}</td>
       <td><strong>${fmtN(r.units_sold)}</strong></td>
-      <td class="td-amount">${fmt(r.revenue)}</td>
+      <td class="td-amount">${moneyHtml(r.revenue)}</td>
     </tr>`).join("");
 }
 document.addEventListener("click", async e => {
@@ -527,7 +527,7 @@ async function loadTopCustomers(p={}) {
       <td class="td-name">${esc(r.party_name)}</td>
       <td class="td-muted">${r.invoice_count}</td>
       <td class="td-muted">${r.last_purchase}</td>
-      <td class="td-amount">${fmt(r.total_purchases)}</td>
+      <td class="td-amount">${moneyHtml(r.total_purchases)}</td>
     </tr>`).join("");
 }
 async function loadTopVendors(p={}) {
@@ -542,7 +542,7 @@ async function loadTopVendors(p={}) {
       <td class="td-name">${esc(r.party_name)}</td>
       <td class="td-muted">${r.invoice_count}</td>
       <td class="td-muted">${r.last_purchase}</td>
-      <td class="td-amount">${fmt(r.total_purchased)}</td>
+      <td class="td-amount">${moneyHtml(r.total_purchased)}</td>
     </tr>`).join("");
 }
 document.addEventListener("click", async e => {
@@ -581,7 +581,7 @@ function renderAgingTable(bucket) {
   tbody.innerHTML = rows.map(r=>`
     <tr>
       <td class="td-name">${esc(r.party_name)}</td>
-      <td class="td-amount">${fmt(r.balance)}</td>
+      <td class="td-amount">${moneyHtml(r.balance)}</td>
       <td class="td-muted">${r.last_txn}</td>
       <td><span class="days-badge ${cls}">${r.days_overdue} days</span></td>
     </tr>`).join("");
@@ -617,7 +617,7 @@ function renderTxns(list) {
         <div class="txn-title">${esc(r.party_name)}</div>
         <div class="txn-meta">${r.txn_date} &nbsp;·&nbsp;<span class="txn-type-badge ${badgeMap[r.type]}">${r.type}</span></div>
       </div>
-      <div class="txn-amount">${fmt(r.amount)}</div>
+      <div class="txn-amount">${moneyHtml(r.amount)}</div>
     </div>`).join("")}</div>`;
 }
 $("txn-search")?.addEventListener("input", function() {
@@ -652,7 +652,7 @@ async function loadExpenseCategories(p={}) {
   const max = Math.max(...data.map(d=>parseFloat(d.total)));
   cont.innerHTML = `<div class="expense-cat-list">${data.map(d=>`
     <div class="expense-cat-item">
-      <div class="expense-cat-label"><strong>${esc(d.category)}</strong><span>${fmt(d.total)}</span></div>
+      <div class="expense-cat-label"><strong>${esc(d.category)}</strong><span>${moneyHtml(d.total)}</span></div>
       <div class="expense-bar-track"><div class="expense-bar-fill" style="width:${((parseFloat(d.total)/max)*100).toFixed(1)}%"></div></div>
     </div>`).join("")}</div>`;
 }
@@ -667,7 +667,7 @@ async function loadExpenseDescriptions(p={}) {
       <td>${rankBadge(i+1)}</td>
       <td class="td-name">${esc(r.description)}</td>
       <td class="td-muted">${esc(r.category)}</td>
-      <td class="td-amount">${fmt(r.total)}</td>
+      <td class="td-amount">${moneyHtml(r.total)}</td>
       <td class="td-muted">${r.count}×</td>
     </tr>`).join("");
 }
@@ -718,9 +718,9 @@ function renderPartyBalance(list) {
     return `<tr>
       <td class="td-name">${esc(name)}</td>
       <td class="td-muted">${esc(ptype)}</td>
-      <td class="${debit?"td-pos":""}">${debit ? fmt(debit) : "—"}</td>
-      <td class="${credit?"td-neg":""}">${credit ? fmt(credit) : "—"}</td>
-      <td class="${net<0?"td-neg":"td-pos"} td-amount">${fmt(Math.abs(net))} ${net<0?"(Cr)":"(Dr)"}</td>
+      <td class="${debit?"td-pos":""}">${debit ? moneyHtml(debit) : "—"}</td>
+      <td class="${credit?"td-neg":""}">${credit ? moneyHtml(credit) : "—"}</td>
+      <td class="${net<0?"td-neg":"td-pos"} td-amount">${moneyHtml(Math.abs(net))} ${net<0?"(Cr)":"(Dr)"}</td>
     </tr>`;
   }).join("");
 }
@@ -769,7 +769,7 @@ function renderReceivable(list) {
   tbody.innerHTML = list.map(r=>`
     <tr>
       <td class="td-name">${esc(r.party_name||r.name||"")}</td>
-      <td class="td-pos td-amount">${fmt(Math.abs(parseFloat(r.balance??r.receivable??0)))}</td>
+      <td class="td-pos td-amount">${moneyHtml(Math.abs(parseFloat(r.balance??r.receivable??0)))}</td>
     </tr>`).join("");
 }
 $("rec-search")?.addEventListener("input", function() {
@@ -801,7 +801,7 @@ function renderPayable(list) {
   tbody.innerHTML = list.map(r=>`
     <tr>
       <td class="td-name">${esc(r.party_name||r.name||"")}</td>
-      <td class="td-neg td-amount">${fmt(Math.abs(parseFloat(r.balance??r.payable??0)))}</td>
+      <td class="td-neg td-amount">${moneyHtml(Math.abs(parseFloat(r.balance??r.payable??0)))}</td>
     </tr>`).join("");
 }
 $("pay-search")?.addEventListener("input", function() {
@@ -833,7 +833,7 @@ function renderExpenseParty(list) {
     const bal = parseFloat(r.balance??0);
     return `<tr>
       <td class="td-name">${esc(r.party_name||r.name||"")}</td>
-      <td class="${bal<0?"td-neg":"td-pos"} td-amount">${fmt(Math.abs(bal))} ${bal<0?"(Cr)":"(Dr)"}</td>
+      <td class="${bal<0?"td-neg":"td-pos"} td-amount">${moneyHtml(Math.abs(bal))} ${bal<0?"(Cr)":"(Dr)"}</td>
     </tr>`;
   }).join("");
 }
@@ -868,7 +868,7 @@ function renderItems(list) {
       <td class="td-name">${esc(r.item_name||r.name||"")}</td>
       <td class="td-muted">${esc(r.category||"N/A")}</td>
       <td class="td-muted">${esc(r.brand||"—")}</td>
-      <td class="td-amount">${fmt(r.sale_price||0)}</td>
+      <td class="td-amount">${moneyHtml(r.sale_price||0)}</td>
       <td>${fmtN(r.units_in_stock||r.stock||0)}</td>
     </tr>`).join("");
 }

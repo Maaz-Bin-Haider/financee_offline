@@ -122,7 +122,7 @@ def _date_range(data):
 def _page_context(request):
     company = getattr(request, "general_settings", None)
     return {
-        "currency": getattr(company, "base_currency_id", None) or "PKR",
+        "currency": getattr(company, "base_currency_id", ""),
         "age_warning_days": draft_age_warning_days(),
     }
 

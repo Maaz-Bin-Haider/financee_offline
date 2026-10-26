@@ -41,3 +41,24 @@ prerequisite consent and signing; Phase 8 safe upgrade/recovery; Phase 9 release
 and explicitly owner-authorized artifacts. No full-offline, backup, installer,
 notarization, x64 or upgrade success is claimed. See ADR-002 for current official
 platform constraints and the unverified maintained Engine-in-WSL Windows10 path.
+
+## AED dashboard correction (owner review follow-up)
+
+Owner reported PKR on the dashboard after choosing AED. Read-only inspection of
+the offline review profile confirmed AED with no override; browser reproduced
+PKR on cards/aging/expenses. The inherited dashboard JS used a fixed PKR formatter
+and chart axis; SQL smart-alert prose also contained fixed PKR labels.
+
+A safely serialized currency context and shared browser formatter now use the
+saved code or optional local display override. Dashboard cards, tables, charts,
+PDF data, Spotlight, transaction chips/history/document PDF labels and draft
+labels consume it. The dashboard identifies both currency code and symbol.
+Known generated alert prefixes are localized at the response boundary, preserving
+amount text and customer names. All SQL definitions and financial math remain
+unchanged, and no review data/currency/credentials were edited.
+
+Patch build: 0.1.1-phase1, schema version remains 1. Targeted regressions: 23 local
+core tests (including 40 page/currency combinations) and 17 JS currency checks
+covering actual dashboard cards, chart axis/tooltips and PDF data. Existing 41
+frontend checks also pass. Unicode PDF font certification and other later phase
+gates remain pending; this patch does not complete the whole Phase 2/3 scope.

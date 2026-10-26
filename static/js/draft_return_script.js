@@ -101,8 +101,7 @@ function todayISO() {
 }
 
 function currencyCode() {
-  const code = String(window.FINANCEE_CURRENCY || "").trim();
-  return code || "PKR";
+  return window.FinanceeMoney.label;
 }
 
 /* ?open=<number>: read once, then taken out of the address bar, so a refresh

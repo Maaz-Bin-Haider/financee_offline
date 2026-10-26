@@ -132,7 +132,7 @@
           <span class="total-chip-value" id="remainingUnits">0</span>
         </div>
         <div class="total-chip">
-          <span class="total-chip-label">Invoice Amount ({{ currency|default:"PKR" }})</span>
+          <span class="total-chip-label">Invoice Amount ({{ currency_label }})</span>
           <span class="total-chip-value amount-value" id="trancheTotal">0.00</span>
         </div>
       </div>
@@ -152,7 +152,6 @@ The company's base currency (money labels) and DRAFT_AGE_WARNING_DAYS (the
 "old draft" highlight in the draft picker), read by draft_convert.js.
 {% endcomment %}
 <script>
-  window.FINANCEE_CURRENCY = "{{ currency|default:'PKR'|escapejs }}";
   window.DRAFT_AGE_WARNING_DAYS = Number("{{ age_warning_days|default:30|escapejs }}") || 30;
 </script>
 <script src="{% static 'js/draft_convert.js' %}"></script>

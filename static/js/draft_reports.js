@@ -5,7 +5,7 @@
  * 80e8f8a). The one change is the currency: the source printed a fixed
  * currency code in every money label; here each label reads the company's
  * base currency from window.FINANCEE_CURRENCY (rendered by the draft page
- * templates), falling back to "PKR" when a page does not set it. The age
+ * templates), using the shared local display label. The age
  * threshold in the ageing note likewise falls back to DRAFT_AGE_WARNING_DAYS.
  *
  * Dual-mode: pure helpers first, browser global last, so Node can require()
@@ -31,9 +31,7 @@
   /* Read at call time, not at load time, so the order of the page's own
      <script> tags cannot freeze the fallback into a label. */
   function currency() {
-    var code = root && root.FINANCEE_CURRENCY;
-    code = code == null ? "" : String(code).trim();
-    return code || "PKR";
+    return root && root.FinanceeMoney ? root.FinanceeMoney.label : String(root && root.FINANCEE_CURRENCY || "");
   }
 
   function moneyLabel(label) {
