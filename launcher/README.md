@@ -18,14 +18,14 @@ product + installation-specific health. All compose mutations are project scoped
 normal launch never builds/pulls images or uses global stop/down/prune. Missing
 owned volumes, unrelated ports and different image versions are refused before
 mutation. Explicit update/release recovery is Phase 8. A healthy matching build
-is reused. Per-installation host locks serialize operations; a separate GUI lock
+is reused. Health uses fixed loopback HTTP without proxies, cookies, TLS certificate discovery or redirects. Per-installation host locks serialize operations; a separate GUI lock
 forwards second-launch requests to the existing window. Work runs off the GUI
 thread, and closing a busy window waits for completion.
 
 Backup, inspect and digest-confirmed restore call the shared Phase 4 engine in
 the owned runtime. Restore retains the rescue/previous data, checks candidate
 health, commits only after success and rolls back on restart failure. A missing
-or invalid ZIP never replaces the active dataset. The local device owner is the
+or invalid ZIP never replaces the active dataset. The desktop confirmation requires typing RESTORE exactly, is single use, and starts disabled; cancel leaves the active generation untouched. Native menus expose the same actions for accessibility. The local device owner is the
 maintenance authority; these operations are not remotely exposed through Django.
 
 `integration.py` creates an explicit desktop shortcut and opt-in OS sign-in
@@ -51,3 +51,5 @@ Host guard tests use fake runtime responses and private temporary OS-hook paths.
 `tests/test_launcher_integration.py` guards the disposable `financee_offline_test`
 installation, restores real backups there, returns its original pointer, and
 creates/stops a separate empty owned test installation. It never restores review.
+
+For packaging CI, the frozen executable accepts `--diagnostic-output PATH --customer FOLDER` and writes program-verification/platform/local-health evidence without creating a window or starting Docker. This is developer verification, not a customer setup requirement. Close the previous native process before replacing its bundle during development.

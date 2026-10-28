@@ -6,15 +6,17 @@ from .installation import Installation
 from .storage import LauncherError,read,atomic,lock
 from .system import System,docker_path
 from . import integration
+from .confirmation import RestoreConsent
 
 class Window:
     def __init__(self,root,program):
         self.root=root;self.program=Path(program);self.bootstrap=read(self.program/'bootstrap.json',{})
-        self.events=queue.Queue();self.executor=concurrent.futures.ThreadPoolExecutor(max_workers=1);self.controller=None;self.busy=False;self.window_lock=contextlib.ExitStack()
+        self.events=queue.Queue();self.executor=concurrent.futures.ThreadPoolExecutor(max_workers=1);self.controller=None;self.busy=False;self.cancel_confirmation=None;self.window_lock=contextlib.ExitStack()
         title='Financee Offline'+(' — Development Review' if self.bootstrap.get('development') else '')
         root.title(title);height=max(680,min(740,root.winfo_screenheight()-100))
         left=max(20,(root.winfo_screenwidth()-780)//2);top=max(25,(root.winfo_screenheight()-height-50)//2)
         root.geometry(f'780x{height}+{left}+{top}');root.minsize(740,680);root.protocol('WM_DELETE_WINDOW',self.close)
+        if sys.platform=='darwin':root.createcommand('tk::mac::Quit',self.close)
         style=ttk.Style(root);style.configure('Title.TLabel',font=('Helvetica',22,'bold'));style.configure('Heading.TLabel',font=('Helvetica',12,'bold'))
         frame=ttk.Frame(root,padding=22);frame.pack(fill='both',expand=True)
         ttk.Label(frame,text='Financee Offline',style='Title.TLabel').pack(anchor='w')
@@ -37,7 +39,7 @@ class Window:
         self.backup_text=tk.StringVar(value='No installation selected.');ttk.Label(frame,textvariable=self.backup_text,wraplength=680).pack(anchor='w',pady=12)
         self.activity=tk.Text(frame,height=6,wrap='word',state='disabled',font=('Helvetica',11));self.activity.pack(fill='both',expand=True)
         ttk.Label(frame,text='Closing this window or your browser keeps Financee running. Stop Financee affects only this installation.',wraplength=680).pack(anchor='w',pady=(12,0))
-        if self.bootstrap.get('development'):ttk.Label(frame,text='Local development build • not notarized • installers/platform certification are separate review stages.',wraplength=680).pack(anchor='w',pady=(6,0))
+        if self.bootstrap.get('development'):ttk.Label(frame,text='Development '+read(self.program/'release.json',{}).get('version','')+' • not notarized • installers/platform certification are separate review stages.',wraplength=680).pack(anchor='w',pady=(6,0))
         self.make_menu(actions)
         preference=self.bootstrap.get('preferences_path')
         if preference:self.preferences=Path(preference)
@@ -51,7 +53,7 @@ class Window:
         if self.controller and self.bootstrap.get('auto_start',True):root.after(300,self.start)
     def make_menu(self,actions):
         # Native menus expose the same maintenance actions to assistive tools.
-        menu=tk.Menu(self.root);self.root.configure(menu=menu)
+        menu=tk.Menu(self.root);self.menubar=menu;self.root.configure(menu=menu)
         file_menu=tk.Menu(menu,tearoff=False);menu.add_cascade(label='File',menu=file_menu)
         file_menu.add_command(label='Open Existing Financee Folder…',command=self.existing)
         file_menu.add_command(label='Create New Empty Installation…',command=self.new)
@@ -134,10 +136,41 @@ class Window:
     def restore(self):
         path=filedialog.askopenfilename(title='Choose a Financee recovery ZIP',initialdir=str(self.controller.installation.backup_folder),filetypes=[('Financee ZIP','*.zip')])
         if not path:return
-        def inspected(info):
-            message=f"Company: {info['company']}\nRecovery point: {info['created_utc']}\nVersion: {info['app_version']}\nSHA-256: {info['archive_sha256']}\n\nReplace the active business with this recovery point?\nA healthy current business gets a rescue ZIP; previous data is retained. You will sign in again."
-            if messagebox.askyesno('Confirm Restore Backup',message,icon='warning',default='no',parent=self.root):self.task(lambda:self.controller.restore(path,info['archive_sha256']),lambda value:messagebox.showinfo('Recovery completed','Recovery and startup checks passed. Open Financee and sign in again.',parent=self.root))
-        self.task(lambda:self.controller.inspect_backup(path),inspected)
+        self.task(lambda:self.controller.inspect_backup(path),lambda info:self.confirm_restore(path,info))
+    def confirm_restore(self,path,info):
+        # A typed, single-use gate cannot be accepted by a default alert response.
+        consent=RestoreConsent(info['archive_sha256']);self.busy=True;self.menu_state(False)
+        for b in self.buttons:b.state(['disabled'])
+        self.signin_button.state(['disabled']);self.status.set('Restore is waiting for your explicit confirmation.')
+        dialog=tk.Toplevel(self.root);dialog.title('Confirm Restore Backup');dialog.transient(self.root);dialog.resizable(False,False)
+        frame=ttk.Frame(dialog,padding=22);frame.pack(fill='both',expand=True)
+        ttk.Label(frame,text='Confirm Restore Backup',style='Heading.TLabel').pack(anchor='w')
+        summary=f"Company: {info['company']}\nRecovery point: {info['created_utc']}\nVersion: {info['app_version']}\nSHA-256: {info['archive_sha256']}"
+        ttk.Label(frame,text=summary,wraplength=590).pack(anchor='w',pady=14)
+        ttk.Label(frame,text='This replaces the active business with the selected recovery point. A healthy current business gets a rescue ZIP; previous data is retained. You will sign in again.',wraplength=590).pack(anchor='w')
+        ttk.Label(frame,text='Type RESTORE exactly, then choose Restore Backup.').pack(anchor='w',pady=(16,5))
+        phrase=tk.StringVar();entry=ttk.Entry(frame,textvariable=phrase,width=42);entry.pack(fill='x')
+        buttons=ttk.Frame(frame);buttons.pack(fill='x',pady=(18,0))
+        recovery_menu=tk.Menu(self.menubar,tearoff=False);self.menubar.add_cascade(label='Recovery',menu=recovery_menu)
+        def finish():
+            self.cancel_confirmation=None;dialog.grab_release();dialog.destroy();self.menubar.delete('Recovery')
+            self.busy=False;self.menu_state(True)
+            for b in self.buttons:b.state(['!disabled'])
+            self.signin_button.state(['!disabled'])
+        def cancel():finish();self.status.set('Restore cancelled. The active business was not changed.')
+        def approve():
+            if phrase.get()!='RESTORE':return
+            digest=consent.confirm(phrase.get());finish()
+            self.task(lambda:self.controller.restore(path,digest),lambda value:self.status.set('Recovery verified. Open Financee and sign in again.'))
+        ttk.Button(buttons,text='Cancel',command=cancel).pack(side='right',padx=(8,0))
+        confirm=ttk.Button(buttons,text='Restore Backup',command=approve,state='disabled');confirm.pack(side='right')
+        recovery_menu.add_command(label='Cancel Restore',command=cancel)
+        recovery_menu.add_command(label='Restore Confirmed Backup',command=approve,state='disabled')
+        def changed(*args):
+            enabled=phrase.get()=='RESTORE';confirm.state(['!disabled'] if enabled else ['disabled']);recovery_menu.entryconfigure(1,state='normal' if enabled else 'disabled')
+        phrase.trace_add('write',changed);self.cancel_confirmation=cancel
+        dialog.protocol('WM_DELETE_WINDOW',cancel);dialog.bind('<Escape>',lambda event:cancel());dialog.bind('<Return>',lambda event:approve())
+        dialog.grab_set();dialog.after_idle(entry.focus_force)
     def refresh_status(self):self.task(lambda:self.controller.status(),lambda value:self.status.set(value))
     def refresh(self):
         if not self.controller:return
@@ -170,5 +203,6 @@ class Window:
         try:integration.signin(self.controller.installation,self.at_signin.get())
         except Exception as exc:self.at_signin.set(not self.at_signin.get());self.show_error(exc)
     def close(self):
+        if self.cancel_confirmation:self.cancel_confirmation();return
         if self.busy:messagebox.showinfo('Operation still running','Please wait for the current operation to finish before closing this window.',parent=self.root);return
         self.window_lock.close();self.executor.shutdown(wait=False);self.root.destroy()

@@ -2,7 +2,7 @@
 No source checkout, Python/Node CLI, registry login, Docker socket in web, or
 normal-start network downloads. Installer payload preparation is separate.
 """
-import contextlib,hashlib,json,os,socket,time,urllib.error,urllib.request
+import contextlib,hashlib,http.client,json,os,socket,time
 from pathlib import Path
 from .storage import LauncherError,read,atomic,lock
 from .installation import Installation
@@ -12,6 +12,7 @@ SERVICES={'db','redis','web','nginx','backup'}
 class Controller:
     def __init__(self,installation,program,system=None,progress=None):
         self.installation=installation;self.program=Path(program);self.system=system or System();self.progress=progress or (lambda text:None)
+        self.last_health_error=None
         self.release=read(self.program/'release.json')
         if not self.release or self.release.get('product')!='Financee_Offline' or self.release.get('format')!=1:raise LauncherError('Financee program files are incomplete. Use setup repair; customer data was not initialized.')
         for name,expected in self.release['files'].items():
@@ -68,21 +69,25 @@ class Controller:
                 bindings=value.get('HostConfig',{}).get('PortBindings',{}).get('80/tcp',[])
                 if bindings!=[{'HostIp':'127.0.0.1','HostPort':str(self.installation.port)}]:raise LauncherError('The Financee web port ownership is inconsistent. No containers were changed.')
     def health(self):
-        # Never send local session cookies or follow redirects to another service.
-        class NoRedirect(urllib.request.HTTPRedirectHandler):
-            def redirect_request(self,*args):return None
+        # This protocol is fixed loopback HTTP: no proxies, TLS CA discovery,
+        # cookies, DNS, URL overrides or redirect-following in the frozen app.
+        self.last_health_error=None
         try:
-            with urllib.request.build_opener(NoRedirect).open(self.installation.url+'/health/',timeout=2) as r:
-                if r.status!=200:return None
-                value=json.loads(r.read(65536))
+            with contextlib.closing(http.client.HTTPConnection('127.0.0.1',self.installation.port,timeout=2)) as conn:
+                conn.request('GET','/health/');response=conn.getresponse()
+                if response.status!=200:
+                    self.last_health_error='Local HTTP status '+str(response.status);return None
+                value=json.loads(response.read(65536))
                 return value if isinstance(value,dict) else None
-        except (OSError,ValueError):return None
+        except (OSError,ValueError,http.client.HTTPException) as exc:
+            self.last_health_error=type(exc).__name__+': '+str(exc)
+            return None
     def port_busy(self):
         with socket.socket() as sock:return sock.connect_ex(('127.0.0.1',self.installation.port))==0
     def check_port(self):
         health=self.health()
         if health and health.get('product')=='Financee_Offline' and health.get('installation_id')==self.installation.data['id']:return health
-        if self.port_busy():raise LauncherError(f'Local port {self.installation.port} is occupied by another or unverified service. Nothing was stopped or opened. Close that service or repair the recorded port.')
+        if self.port_busy():raise LauncherError(f'Local port {self.installation.port} is occupied by another or unverified service. Nothing was stopped or opened. Close that service or repair the recorded port.'+(' Health check: '+self.last_health_error if self.last_health_error else ''))
         return None
     def volume_exists(self):
         try:self.command('volume','inspect',self.installation.volume);return True

@@ -7,6 +7,7 @@ from launcher.installation import Installation,env_values
 from launcher.storage import LauncherError,atomic,lock
 from launcher.system import System,platform_key
 from launcher import integration
+from launcher.confirmation import RestoreConsent
 
 class FakeSystem:
     def __init__(self):
@@ -63,6 +64,14 @@ class LauncherTests(unittest.TestCase):
     def test_spaces_unicode_dollar_and_quote_paths_round_trip(self):
         other=Installation.create(self.root/"Company's AED $cash — Dubai",18782,'test')
         self.assertEqual(env_values(other.root/'Config/compose.env')['CUSTOMER_DIR'],str(other.root));self.assertEqual(Installation(other.root).project,other.project)
+    def test_restore_consent_requires_exact_typed_phrase(self):
+        consent=RestoreConsent('sha256')
+        for text in ('','yes','restore','RESTORE '):
+            with self.assertRaisesRegex(LauncherError,'Type RESTORE'):consent.confirm(text)
+        self.assertFalse(consent.used);self.assertEqual(consent.confirm('RESTORE'),'sha256')
+    def test_restore_consent_is_single_use(self):
+        consent=RestoreConsent('sha256');consent.confirm('RESTORE')
+        with self.assertRaisesRegex(LauncherError,'already used'):consent.confirm('RESTORE')
     def test_tampered_program_refused(self):
         (self.program/'compose.yml').write_text('changed')
         with self.assertRaisesRegex(LauncherError,'verification'):Controller(self.install,self.program,self.system)
@@ -102,6 +111,18 @@ class LauncherTests(unittest.TestCase):
         self.system.off=True;self.assertIn('unavailable',self.c.status());self.assertEqual(self.system.started,0);self.assertFalse(self.mutations())
     def test_status_reports_running_without_mutations(self):
         self.c.health=self.health;self.assertIn('running',self.c.status());self.assertFalse(self.mutations())
+    def test_health_uses_fixed_loopback_http_without_proxy_or_redirects(self):
+        with patch('launcher.controller.http.client.HTTPConnection') as make:
+            conn=make.return_value;response=conn.getresponse.return_value;response.status=200;response.read.return_value=json.dumps(self.health()).encode()
+            value=Controller.health(self.c)
+            self.assertEqual(value['installation_id'],self.install.data['id']);make.assert_called_once_with('127.0.0.1',18781,timeout=2);conn.request.assert_called_once_with('GET','/health/');response.read.assert_called_once_with(65536);conn.close.assert_called_once()
+    def test_health_redirect_is_refused(self):
+        with patch('launcher.controller.http.client.HTTPConnection') as make:
+            make.return_value.getresponse.return_value.status=302
+            self.assertIsNone(Controller.health(self.c));self.assertIn('302',self.c.last_health_error)
+    def test_health_errors_are_visible_for_diagnostics(self):
+        with patch('launcher.controller.http.client.HTTPConnection',side_effect=OSError('local unavailable')):
+            self.assertIsNone(Controller.health(self.c));self.assertIn('local unavailable',self.c.last_health_error)
     def test_setup_incomplete_opens_setup(self):
         value=self.health();value['setup_complete']=False;self.c.health=lambda:value;self.c.start();self.assertTrue(self.system.urls[0].endswith('/setup/'))
     def test_different_running_version_never_implicitly_upgrades(self):
