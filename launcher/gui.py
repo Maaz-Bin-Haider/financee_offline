@@ -12,7 +12,9 @@ class Window:
         self.root=root;self.program=Path(program);self.bootstrap=read(self.program/'bootstrap.json',{})
         self.events=queue.Queue();self.executor=concurrent.futures.ThreadPoolExecutor(max_workers=1);self.controller=None;self.busy=False;self.window_lock=contextlib.ExitStack()
         title='Financee Offline'+(' — Development Review' if self.bootstrap.get('development') else '')
-        root.title(title);root.geometry('780x740');root.minsize(740,680);root.protocol('WM_DELETE_WINDOW',self.close)
+        root.title(title);height=max(680,min(740,root.winfo_screenheight()-100))
+        left=max(20,(root.winfo_screenwidth()-780)//2);top=max(25,(root.winfo_screenheight()-height-50)//2)
+        root.geometry(f'780x{height}+{left}+{top}');root.minsize(740,680);root.protocol('WM_DELETE_WINDOW',self.close)
         style=ttk.Style(root);style.configure('Title.TLabel',font=('Helvetica',22,'bold'));style.configure('Heading.TLabel',font=('Helvetica',12,'bold'))
         frame=ttk.Frame(root,padding=22);frame.pack(fill='both',expand=True)
         ttk.Label(frame,text='Financee Offline',style='Title.TLabel').pack(anchor='w')
@@ -36,6 +38,7 @@ class Window:
         self.activity=tk.Text(frame,height=6,wrap='word',state='disabled',font=('Helvetica',11));self.activity.pack(fill='both',expand=True)
         ttk.Label(frame,text='Closing this window or your browser keeps Financee running. Stop Financee affects only this installation.',wraplength=680).pack(anchor='w',pady=(12,0))
         if self.bootstrap.get('development'):ttk.Label(frame,text='Local development build • not notarized • installers/platform certification are separate review stages.',wraplength=680).pack(anchor='w',pady=(6,0))
+        self.make_menu(actions)
         preference=self.bootstrap.get('preferences_path')
         if preference:self.preferences=Path(preference)
         elif sys.platform=='darwin':self.preferences=Path.home()/'Library/Application Support/Financee Offline/installation.json'
@@ -46,6 +49,19 @@ class Window:
             except Exception as exc:self.show_error(exc)
         root.after(100,self.poll)
         if self.controller and self.bootstrap.get('auto_start',True):root.after(300,self.start)
+    def make_menu(self,actions):
+        # Native menus expose the same maintenance actions to assistive tools.
+        menu=tk.Menu(self.root);self.root.configure(menu=menu)
+        file_menu=tk.Menu(menu,tearoff=False);menu.add_cascade(label='File',menu=file_menu)
+        file_menu.add_command(label='Open Existing Financee Folder…',command=self.existing)
+        file_menu.add_command(label='Create New Empty Installation…',command=self.new)
+        file_menu.add_separator();file_menu.add_command(label='Close Maintenance Window',command=self.close)
+        self.action_menu=tk.Menu(menu,tearoff=False);menu.add_cascade(label='Financee',menu=self.action_menu)
+        for label,command in actions:self.action_menu.add_command(label=label,command=command,state='disabled')
+        self.file_menu=file_menu
+    def menu_state(self,enabled):
+        for i in range(9):self.action_menu.entryconfigure(i,state='normal' if enabled else 'disabled')
+        for i in (0,1):self.file_menu.entryconfigure(i,state='normal' if self.controller is None and not self.busy else 'disabled')
     def append(self,text):
         self.activity.configure(state='normal');self.activity.insert('end',text+'\n');self.activity.see('end');self.activity.configure(state='disabled')
     def attach(self,installation):
@@ -55,7 +71,7 @@ class Window:
         installation.data['development']=bool(self.bootstrap.get('development'));installation.save()
         self.controller=Controller(installation,self.program,progress=lambda text:self.events.put(('progress',text)))
         atomic(self.preferences,{'format':1,'customer_directory':str(installation.root)})
-        self.location.set(str(installation.root));self.wizard.pack_forget();self.controls.pack(fill='x',after=self.bar);self.signin_button.pack(anchor='w',after=self.controls,pady=(8,0));self.at_signin.set(installation.data.get('start_at_signin',False));self.refresh()
+        self.location.set(str(installation.root));self.wizard.pack_forget();self.controls.pack(fill='x',after=self.bar);self.signin_button.pack(anchor='w',after=self.controls,pady=(8,0));self.at_signin.set(installation.data.get('start_at_signin',False));self.menu_state(True);self.refresh()
     def context(self):
         system=System();docker=docker_path()
         for name in ('desktop-linux','default') if sys.platform=='darwin' else ('default','desktop-linux'):
@@ -84,7 +100,7 @@ class Window:
         except Exception as exc:self.show_error(exc)
     def task(self,fn,done=None):
         if self.busy:return
-        self.busy=True;self.bar.start(12)
+        self.busy=True;self.menu_state(False);self.bar.start(12)
         for button in self.buttons:button.state(['disabled'])
         self.signin_button.state(['disabled'])
         def run():
@@ -97,7 +113,7 @@ class Window:
                 kind,value=self.events.get_nowait()
                 if kind=='progress':self.status.set(value);self.append(value)
                 else:
-                    self.busy=False;self.bar.stop()
+                    self.busy=False;self.menu_state(True);self.bar.stop()
                     for b in self.buttons:b.state(['!disabled'])
                     self.signin_button.state(['!disabled'])
                     if kind=='error':self.show_error(value)
