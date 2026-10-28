@@ -95,11 +95,18 @@
     "comparison_head": "ea1f0194f2e4d2b0ec6e120086b29276c4d99365",
     "unchanged_and_clean": true
   },
-  "publication": "No remote, push, release or upload",
+  "publication": "No installer/image/app release or customer-data upload. Source push subsequently authorized by owner.",
   "cleanup": {
     "stable_test_stack_stopped_data_retained": true,
     "temporary_test_containers_networks_removed_volumes_retained": true,
     "review_five_services_running": true,
     "desktop_shortcut_verified": true
+  },
+  "source_control": {
+    "remote": "https://github.com/Maaz-Bin-Haider/financee_offline.git",
+    "branch": "codex/single-company-core",
+    "phase5_handoff_commit": "03a22c3f9755e9c805fe222c5795ee1985b7d3e3",
+    "source_push_authorized_date": "2026-10-28",
+    "generated_artifacts_customer_data_and_credentials_excluded": true
   }
 }

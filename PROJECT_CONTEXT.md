@@ -3,7 +3,12 @@
 2026-10-28, Asia/Karachi. Owner authorized Phase 5. **The local Apple Silicon
 Phase 5 implementation is ready for owner review; stop before Phase 6.** Full
 hardware acceptance remains pending for Windows, actual shared-runtime Docker-off
-and OS reboot/sign-in. No push/publication authorized.
+and OS reboot/sign-in. The owner authorized committing and pushing the current
+source state to https://github.com/Maaz-Bin-Haider/financee_offline.git on
+2026-10-28. Remote `origin`, branch `codex/single-company-core`, tracks the same
+remote branch. The Phase 5 handoff commit is 03a22c3f9755e9c805fe222c5795ee1985b7d3e3.
+Generated apps/images, customer data, credentials, media, backups and logs remain
+excluded. Installer releases/distribution still require separate owner authorization.
 
 Independent repo /Users/swisstech/Development/Financee_Offline, branch
 codex/single-company-core. Both source systems remain read-only and unchanged.

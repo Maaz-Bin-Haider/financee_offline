@@ -89,7 +89,9 @@ bundle checksum, review ZIP checksum and recorded results.
 - Review before/after fingerprints match for 35 business/configuration tables, user flags and
   permissions, profile and media. Session/activity timing is excluded from these comparison
   snapshots. Full backup validation separately fingerprints every public table and sequence.
-- Both source repositories remain clean at their original HEADs. No remote/push/publication.
+- Both source repositories remain clean at their original HEADs. At the original Phase 5
+  handoff no remote/push/publication existed. The owner subsequently authorized a source
+  push to the new GitHub repository; see PROJECT_CONTEXT.md. Installer publication remains gated.
 
 The native HTTP check uses direct fixed loopback HTTP, without proxy lookup,
 redirects, cookies or unnecessary HTTPS certificate discovery. This fixed a

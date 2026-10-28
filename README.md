@@ -2,7 +2,9 @@
 
 Local desktop review build **0.5.0-phase5**, schema 2. This independent
 single-device Django/PostgreSQL edition retains the confirmed financial engine.
-Both reference systems remain read-only. No remote or public release exists.
+Both reference systems remain read-only. Source is stored in
+[financee_offline](https://github.com/Maaz-Bin-Haider/financee_offline) on
+`codex/single-company-core`. No installer release has been published.
 
 On this Apple Silicon review Mac, double-click **Financee Offline Development**
 on the desktop. It opens the maintenance app and the existing review business at
