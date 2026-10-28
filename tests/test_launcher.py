@@ -133,6 +133,13 @@ class LauncherTests(unittest.TestCase):
         self.system.containers=[self.container(Image='sha256:old')]
         with self.assertRaisesRegex(LauncherError,'another runtime image'):self.c.start(False)
         self.assertFalse(self.mutations())
+    def test_mac_desktop_mount_alias_matches_only_confirmed_runtime(self):
+        source='/host_mnt'+str(self.install.root);self.assertFalse(self.c.customer_mount_matches(source))
+        self.c.desktop_runtime=True;self.assertTrue(self.c.customer_mount_matches(source))
+        self.assertFalse(self.c.customer_mount_matches('/host_mnt/another-customer'))
+    def test_mac_alias_is_not_applied_to_windows_or_other_runtime(self):
+        self.c.desktop_runtime=True;self.c.platform_name='windows-amd64'
+        self.assertFalse(self.c.customer_mount_matches('/host_mnt'+str(self.install.root)))
     def test_foreign_customer_mount_refused(self):
         self.system.containers=[self.container(Mounts=[{'Destination':'/customer','Source':'/foreign'}])]
         with self.assertRaisesRegex(LauncherError,'another customer'):self.c.stop()

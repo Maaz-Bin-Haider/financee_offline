@@ -12,7 +12,7 @@ SERVICES={'db','redis','web','nginx','backup'}
 class Controller:
     def __init__(self,installation,program,system=None,progress=None):
         self.installation=installation;self.program=Path(program);self.system=system or System();self.progress=progress or (lambda text:None)
-        self.last_health_error=None
+        self.last_health_error=None;self.desktop_runtime=False;self.platform_name=platform_key()[0]
         self.release=read(self.program/'release.json')
         if not self.release or self.release.get('product')!='Financee_Offline' or self.release.get('format')!=1:raise LauncherError('Financee program files are incomplete. Use setup repair; customer data was not initialized.')
         for name,expected in self.release['files'].items():
@@ -43,6 +43,7 @@ class Controller:
                 try:info=json.loads(self.command('info','--format','{{json .}}',timeout=3));break
                 except (LauncherError,OSError,TimeoutError):time.sleep(1)
             else:raise LauncherError('Docker is not ready. Complete its startup prompts, then retry. Financee did not change or stop other projects.')
+        self.desktop_runtime=info.get('OperatingSystem')=='Docker Desktop'
         _,arch=platform_key()
         actual={'aarch64':'arm64','x86_64':'amd64'}.get(info.get('Architecture'),info.get('Architecture'))
         if info.get('OSType')!='linux' or actual!=arch:raise LauncherError('The local runtime must use Linux containers for this computer’s architecture. Financee will not switch or replace your runtime automatically.')
@@ -53,6 +54,14 @@ class Controller:
             try:value=json.loads(self.command('image','inspect',item['reference']))[0]
             except LauncherError:raise LauncherError('A required Financee runtime image is missing. Run setup repair/import the tested local payload. Normal startup never downloads images.')
             if value['Id']!=item['id'] or value['Architecture']!=self.release['architecture'] or value['Os']!='linux':raise LauncherError('A cached Financee image differs from the tested payload. Use setup repair before starting.')
+    def customer_mount_matches(self,source):
+        actual=Path(source).resolve()
+        if actual==self.installation.root:return True
+        # Docker Desktop may expose a macOS bind through its VM alias. Never
+        # apply this translation to another daemon or an arbitrary local path.
+        if self.desktop_runtime and self.platform_name=='macos-arm64' and source.startswith('/host_mnt/'):
+            return Path(source[len('/host_mnt'):]).resolve()==self.installation.root
+        return False
     def ownership(self):
         ids=self.command('ps','-aq','--filter','label=com.docker.compose.project='+self.installation.project).split()
         if not ids:return
@@ -63,7 +72,7 @@ class Controller:
             expected=self.release['service_images'][service]
             if value.get('Image')!=expected:raise LauncherError('This installation uses another runtime image version. Use the explicit update or repair workflow; the launcher will not upgrade it automatically.')
             mounts=value.get('Mounts',[])
-            if service in ('web','backup') and not any(m.get('Destination')=='/customer' and Path(m.get('Source','')).resolve()==self.installation.root for m in mounts):raise LauncherError('This project belongs to another customer folder. No containers were changed.')
+            if service in ('web','backup') and not any(m.get('Destination')=='/customer' and self.customer_mount_matches(m.get('Source','')) for m in mounts):raise LauncherError('This project belongs to another customer folder. No containers were changed.')
             if service=='db' and not any(m.get('Name')==self.installation.volume and m.get('Destination')=='/var/lib/postgresql/data' for m in mounts):raise LauncherError('This project uses a different database volume. No containers were changed.')
             if service=='nginx':
                 bindings=value.get('HostConfig',{}).get('PortBindings',{}).get('80/tcp',[])
@@ -134,7 +143,8 @@ class Controller:
     def status(self):
         # Read-only: Refresh must not start Docker or change any container.
         self.context_local()
-        try:self.command('info','--format','{{json .}}',timeout=8)
+        try:
+            info=json.loads(self.command('info','--format','{{json .}}',timeout=8));self.desktop_runtime=info.get('OperatingSystem')=='Docker Desktop'
         except LauncherError:return 'Docker is unavailable. Use Start / Open Financee when you are ready.'
         self.ownership();self.verify_storage();healthy=self.check_port()
         if not healthy:return 'Financee is stopped. Data and backups are retained.'
