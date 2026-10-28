@@ -142,7 +142,7 @@ class Window:
         consent=RestoreConsent(info['archive_sha256']);self.busy=True;self.menu_state(False)
         for b in self.buttons:b.state(['disabled'])
         self.signin_button.state(['disabled']);self.status.set('Restore is waiting for your explicit confirmation.')
-        dialog=tk.Toplevel(self.root);dialog.title('Confirm Restore Backup');dialog.transient(self.root);dialog.resizable(False,False)
+        dialog=tk.Toplevel(self.root);dialog.title('Confirm Restore Backup');dialog.transient(self.root);dialog.resizable(False,False);dialog.configure(menu=self.menubar)
         frame=ttk.Frame(dialog,padding=22);frame.pack(fill='both',expand=True)
         ttk.Label(frame,text='Confirm Restore Backup',style='Heading.TLabel').pack(anchor='w')
         summary=f"Company: {info['company']}\nRecovery point: {info['created_utc']}\nVersion: {info['app_version']}\nSHA-256: {info['archive_sha256']}"
