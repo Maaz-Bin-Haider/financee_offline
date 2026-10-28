@@ -35,5 +35,5 @@ def health(request):
         cur.execute('SELECT version FROM offline_schema_version WHERE id=true')
         row = cur.fetchone()
     from django.conf import settings
-    return JsonResponse({'generation':getattr(settings,'OFFLINE_GENERATION','development'),'product':'Financee_Offline','build':'0.4.0-phase4','schema':row[0] if row else None,
+    return JsonResponse({'installation_id':getattr(settings,'OFFLINE_INSTALLATION_ID',None),'generation':getattr(settings,'OFFLINE_GENERATION','development'),'product':'Financee_Offline','build':'0.5.0-phase5','schema':row[0] if row else None,
                          'setup_complete':GeneralSettings.objects.exists()})

@@ -19,7 +19,7 @@ services:
     command: ["redis-server", "--maxmemory", "64mb", "--maxmemory-policy", "allkeys-lru"]
   web:
     stop_grace_period: 75s
-    image: financee-offline:0.4.0-phase4
+    image: financee-offline:0.5.0-phase5
     pull_policy: never
     build:
       context: ..

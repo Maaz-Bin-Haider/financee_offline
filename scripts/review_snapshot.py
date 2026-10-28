@@ -8,7 +8,7 @@ import django;django.setup()
 from django.conf import settings
 from django.db import connection
 assert settings.DATABASES['default']['NAME']=='financee_offline_review','Owned review database required'
-assert sys.argv[1] in ('phase3_before','phase3_after','phase4_before','phase4_after')
+assert sys.argv[1] in ('phase3_before','phase3_after','phase4_before','phase4_after','phase5_before','phase5_after')
 with connection.cursor() as c:
  c.execute("SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename NOT LIKE 'django_%' AND tablename NOT IN ('auth_user','activity_events') ORDER BY tablename")
  tables=[row[0] for row in c.fetchall()]

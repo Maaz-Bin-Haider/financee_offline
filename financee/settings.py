@@ -268,3 +268,5 @@ if OFFLINE_CUSTOMER_ROOT:
     PRIVATE_MEDIA_ROOT = MEDIA_ROOT / 'private'
 
     OFFLINE_GENERATION = _active_generation['generation']
+
+    OFFLINE_INSTALLATION_ID = _active_generation['instance_id']
