@@ -187,8 +187,10 @@ class Engine:
         if config.pending(self.root):return False
         active=config.active(self.root)
         with contextlib.closing(database.connect(active['database'])) as c:
-            tz=database.scalar(c,'SELECT timezone FROM local_generalsettings WHERE id=1')
-        if not tz:return False
+            tz=database.scalar(c,'SELECT (SELECT timezone FROM local_generalsettings WHERE id=1)')
+        if not tz:
+            if self.status().get('state')!='waiting_for_setup':self.update(state='waiting_for_setup',message='Complete company setup before the first daily backup.',last_error=None)
+            return False
         day=(now or datetime.now(timezone.utc)).astimezone(ZoneInfo(tz)).date().isoformat()
         last=self.status().get('last_success') or {}
         file=self.folder/last.get('filename','')

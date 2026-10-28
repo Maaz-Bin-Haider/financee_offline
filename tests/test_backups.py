@@ -216,6 +216,24 @@ with lock(Path(sys.argv[1]),exclusive=False):
             with lock(self.e.control/'maintenance/intent.lock',exclusive=False):pass
         finally:child.kill();child.wait();child.stdout.close()
 
+    def test_18_empty_company_waits_then_becomes_due_after_setup(self):
+        from psycopg2 import sql
+        name='financee_offline_empty_test_'+uuid.uuid4().hex[:10]
+        with contextlib.closing(database.connect('postgres',autocommit=True)) as admin:
+            with admin.cursor() as cur:cur.execute(sql.SQL('CREATE DATABASE {}').format(sql.Identifier(name)))
+            try:
+                with contextlib.closing(database.connect(name,autocommit=True)) as blank:
+                    with blank.cursor() as cur:cur.execute('CREATE TABLE local_generalsettings(id integer PRIMARY KEY,timezone text NOT NULL)')
+                    with tempfile.TemporaryDirectory(dir=self.root) as folder:
+                        root=Path(folder);(root/'Config').mkdir();backups=root/'Backups';backups.mkdir()
+                        atomic(root/'Config/active.json',dict(self.original,database=name,generation='initial',instance_id=uuid.uuid4().hex))
+                        engine=Engine(root,backups);engine.update(state='error',last_error='earlier startup error')
+                        self.assertFalse(engine.due());self.assertEqual(engine.status()['state'],'waiting_for_setup');self.assertIsNone(engine.status()['last_error'])
+                        with blank.cursor() as cur:cur.execute("INSERT INTO local_generalsettings VALUES(1,'Asia/Karachi')")
+                        self.assertTrue(engine.due())
+            finally:
+                with admin.cursor() as cur:cur.execute(sql.SQL('DROP DATABASE {} WITH (FORCE)').format(sql.Identifier(name)))
+
 if __name__=='__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE','financee.settings')
     import django;django.setup();unittest.main(verbosity=2)
