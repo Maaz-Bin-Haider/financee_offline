@@ -148,6 +148,10 @@ class LauncherTests(unittest.TestCase):
         self.system.containers=[self.container('unrecognized')]
         with self.assertRaisesRegex(LauncherError,'unexpected'):self.c.stop()
         self.assertFalse(self.mutations())
+    def test_stop_never_starts_an_unavailable_runtime(self):
+        self.system.off=True
+        with self.assertRaisesRegex(LauncherError,'No stop command'):self.c.stop()
+        self.assertEqual(self.system.started,0);self.assertFalse(self.mutations())
     def test_stop_is_project_scoped_without_volume_removal(self):
         self.c.stop();calls=self.mutations();self.assertEqual(len(calls),1);self.assertIn(self.install.project,calls[0]);self.assertEqual(calls[0][-1],'stop');self.assertNotIn('down',calls[0]);self.assertNotIn('-v',calls[0])
     def test_duplicate_operation_rejected(self):

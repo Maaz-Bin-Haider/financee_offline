@@ -152,7 +152,11 @@ class Controller:
         return 'Financee is running — '+('ready to open.' if healthy.get('setup_complete') else 'company setup is needed.')
     def stop(self):
         with lock(self.installation.root/'Config/controller.lock'):
-            self.ensure_runtime();self.ownership();self.step('Stopping only Financee. Docker and other projects remain running.');self.compose('stop');self.step('Financee stopped. Your data and backups are retained.')
+            self.context_local()
+            try:info=json.loads(self.command('info','--format','{{json .}}',timeout=8))
+            except LauncherError:raise LauncherError('Docker is unavailable. No stop command was sent, and Financee did not start Docker. Check the local runtime if Financee still appears to be running.')
+            self.desktop_runtime=info.get('OperatingSystem')=='Docker Desktop'
+            self.ownership();self.step('Stopping only Financee. Docker and other projects remain running.');self.compose('stop');self.step('Financee stopped. Your data and backups are retained.')
     def backup(self):
         with lock(self.installation.root/'Config/controller.lock'):
             value=self._start()
