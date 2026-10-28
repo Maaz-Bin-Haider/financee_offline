@@ -1,30 +1,33 @@
 # Financee Offline
 
-Phase 2 local review build: **0.2.0-phase2**. Independent Django/PostgreSQL
-single-device edition imported from confirmed application release `96fd8b9`.
-Both reference systems remain read-only. No Git remote or publication exists.
+Local desktop review build **0.5.0-phase5**, schema 2. This independent
+single-device Django/PostgreSQL edition retains the confirmed financial engine.
+Both reference systems remain read-only. No remote or public release exists.
 
-Open **http://127.0.0.1:18766/home/** for an existing company. On a fresh
-installation, start at **http://127.0.0.1:18766/setup/**. Create your
-company and owner username/password. No default login exists. Each fresh installation
-starts empty, apart from currencies, permissions, COA and cash sentinels.
-After setup, use `/authentication/login/`; manage users/groups and General Settings
-through Admin. Keep review data disposable until backups are implemented.
+On this Apple Silicon review Mac, double-click **Financee Offline Development**
+on the desktop. It opens the maintenance app and the existing review business at
+http://127.0.0.1:18766/home/. Use the original owner login; AED and existing data
+are preserved. Normal app use requires no terminal, checkout, Python, Git or Node.
+The tested Docker images/runtime are already present on this development machine.
 
-Implemented: public-only business database, singleton profile, first-owner setup,
-local auth/permissions, retained serial financial SQL, local activity/Spotlight/
-attachments, dark mode and the source purchase layout. Tenant registry, tenant
-schema provisioning, subscriptions/SMTP/report email and cloud operations removed.
-Phase 2 adds owner-only company/contact/currency/timezone settings, local module
-controls, timezone-safe business dates and company-aware Unicode PDF/CSV/print exports.
+A fresh installation chooses an empty customer folder and creates its own company
+and owner through setup. No default login or demonstration transactions exist.
+Reference currencies, permissions, chart of accounts and cash sentinels are seeded.
+The first backup waits until company setup is complete.
 
-This is not yet a customer installer or a certified offline release. CDN assets
-remain for Phase 3; backup/restore, launchers, platform installers and upgrades are
-later gated phases. See [phase handoff](docs/PHASE2_REVIEW.md),
-[product requirements](OFFLINE_PRODUCT_SPEC.md), [approved plan](IMPLEMENTATION_PLAN.md),
-[source provenance](SOURCE_PROVENANCE.md) and [architecture](docs/ADR-001-single-company.md).
+Implemented: one public business dataset/profile, local users and permissions,
+company/currency/timezone/module settings, local assets and Unicode exports,
+private attachments, activity/Spotlight, daily/catch-up verified ZIPs, candidate
+recovery and a packaged desktop maintenance window. Tenant/SaaS/email/cloud
+operations are removed. Original financial SQL and purchase layout are retained.
 
-Developer controls (run from this repository with Docker already available):
+See [current desktop review](docs/PHASE5_REVIEW.md) and
+[verification evidence](docs/PHASE5_RESULTS.json). **Stop for owner review before
+Phase 6.** Windows targets, reboot/Docker-off hardware tests, installers,
+notarization, upgrade/recovery packaging and publication remain gated work. The
+Mac artifact is locally ad-hoc signed and is not a notarized customer release.
+
+Developer controls require this repository and Docker; they are not customer steps:
 
 ```sh
 python3 runtime/dev.py init
@@ -34,20 +37,10 @@ python3 runtime/dev.py status
 python3 runtime/dev.py stop
 ```
 
-These preserve the database/media and operate only the selected Financee_Offline
-stack. Startup never pulls. Fresh machines must first obtain the exact dependency
-images pinned in runtime/compose.yml; installation/payload automation is pending.
+Use `--stack test` for disposable tests, never review. Normal starts do not pull
+images. All real data, runtime credentials, media, completed ZIPs, logs and generated
+app/image/installer payloads are ignored. Customer data and backups are separate
+from installed program files and retained when services stop.
 
-Disposable automated-test stack (never point tests at review data):
-
-```sh
-python3 runtime/dev.py --stack test init
-python3 runtime/dev.py --stack test up
-python3 runtime/dev.py --stack test test
-python3 runtime/dev.py --stack test business
-python3 runtime/dev.py --stack test check
-python3 runtime/dev.py --stack test stop
-```
-
-Real customer data, secrets, media, ZIPs and logs are ignored. Backups/ is only a
-source placeholder. Uninstall/reset automation has not been implemented.
+[Approved plan](IMPLEMENTATION_PLAN.md) · [Product spec](OFFLINE_PRODUCT_SPEC.md) ·
+[Project context](PROJECT_CONTEXT.md) · [Source provenance](SOURCE_PROVENANCE.md)

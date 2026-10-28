@@ -1,9 +1,9 @@
 # Financee Offline context
 
-2026-10-26, Asia/Karachi. Owner authorized Phase 4 and later resumed after a
-usage-limit interruption. **Phase 4 is complete; stop for owner review before
-Phase 5.**
-Later phases retain their individual review gates. No push/publication authorized.
+2026-10-28, Asia/Karachi. Owner authorized Phase 5. **The local Apple Silicon
+Phase 5 implementation is ready for owner review; stop before Phase 6.** Full
+hardware acceptance remains pending for Windows, actual shared-runtime Docker-off
+and OS reboot/sign-in. No push/publication authorized.
 
 Independent repo /Users/swisstech/Development/Financee_Offline, branch
 codex/single-company-core. Both source systems remain read-only and unchanged.
@@ -12,8 +12,14 @@ Confirmed application baseline 96fd8b9dc4105870bc76cbb2b443bf5c36da2d66, workflo
 Provenance and original imported hashes remain in SOURCE_PROVENANCE.md and
 SOURCE_FILES_SHA256.json. Approved requirements/plan are preserved locally.
 
-Current review build **0.4.0-phase4**, schema **2**, core commit 36e77f93bf024d1c85e8030a4f25f8985429ee68.
-Image sha256:49a9f3dc7e91ff12a07da8a8754b01706259019e857e9f277e087391edf5a75a (linux/arm64).
+Current review build **0.5.0-phase5**, schema **2**. Engine core commit
+f9b00f7163e18b218ab478e2d0471c74f65910d1; native launcher commit
+a78b9a72c8cc4d37c57f54eba4b003cbc54705a9. The engine image is
+sha256:40b14f234aaf0f41aa35341f47200ce1ba7a847997905ae0619bace283a6d94c
+(linux/arm64). Native bundle checksum and exact evidence are in docs/PHASE5_RESULTS.json.
+Desktop shortcut: /Users/swisstech/Desktop/Financee Offline Development.app →
+.runtime/phase5-launcher/Financee Offline Review.app. This local ad-hoc signed
+ARM64 app is not notarized or a customer installer.
 Review http://127.0.0.1:18766/home/; owner General Settings at
 /admin/local/generalsettings/1/change/, Local Backups at /admin/local-backups/.
 Existing company, AED, timezone, users, permissions, all business rows/media and
@@ -80,7 +86,28 @@ owner-UI review ZIPs validate; the latest observed review pause was 0.097 second
 on this small dataset. Review business/profile/user/media hashes remain equal.
 See docs/PHASE4_REVIEW.md and PHASE4_RESULTS.json for commands, limits and evidence.
 
-Remaining gates: Phase 5 native launcher; Phases 6/7
+Phase 5 adds a frozen Python/Tk desktop maintenance app, chosen-folder empty
+setup and existing-install adoption, independent identity/credentials, explicit
+local Docker context and cached-image checks, strict owned roots/volumes/loopback
+ports, installation health, nonblocking operations, locks/second-launch handling,
+start/open/status/stop, backup/folder/log controls, typed single-use restore consent,
+rescue/candidate verification/rollback, desktop shortcut and opt-in sign-in hooks.
+Stop never starts an unavailable Docker runtime. A verified Docker Desktop macOS
+/host_mnt alias is normalized while foreign mounts remain refused. New empty
+businesses wait quietly for setup before scheduling a backup.
+
+36 launcher guards, 38 core tests, 18 recovery cases, 328 business assertions and
+1530 HTTP checks pass. Real native first-run, backup, explicit restore and cancellation
+were exercised on disposable data; zero seeded owners/company/journal rows and a
+waiting backup worker were verified. Typing alone/cancellation preserve pointer
+and journal. A copied ARM64 app verifies real health with developer paths removed;
+program hashes, contained symlinks, native libraries and local signature validate.
+Review AED/profile/users/permissions/business/media fingerprints remain equal;
+no review restore occurred. Source Git HEAD/status remain unchanged. Actual global
+Docker-off/reboot and Windows target tests are not claimed. See docs/PHASE5_REVIEW.md
+and PHASE5_RESULTS.json. Generated apps/config/ZIPs/receipts remain ignored.
+
+Remaining gates: owner Phase 5 review; Phases 6/7
 real Windows10/11 x64 and signed/notarized Apple Silicon installers; Phase 8 safe
 manual installer upgrades/recovery; Phase 9 release CI/distribution with explicit
 owner authorization. No Intel Mac/Windows ARM package in v1. Current fonts cover

@@ -1,0 +1,105 @@
+{
+  "build": "0.5.0-phase5",
+  "schema": 2,
+  "backup_format": 1,
+  "date": "2026-10-28",
+  "timezone": "Asia/Karachi",
+  "status": "Local Apple Silicon implementation ready for owner review; remaining hardware acceptance pending",
+  "engine_core_commit": "f9b00f7163e18b218ab478e2d0471c74f65910d1",
+  "launcher_commit": "a78b9a72c8cc4d37c57f54eba4b003cbc54705a9",
+  "image_id": "sha256:40b14f234aaf0f41aa35341f47200ce1ba7a847997905ae0619bace283a6d94c",
+  "runtime_platform": "linux/arm64",
+  "native_test_host": "macOS 26.5.2 arm64",
+  "checks": {
+    "launcher_guard_tests": 36,
+    "django_core_tests": 38,
+    "backup_recovery_cases": 18,
+    "business_assertions": 328,
+    "http_checks": 1530,
+    "http_screens": 43,
+    "http_local_resources": 147,
+    "source_sql_definitions_unchanged": 190
+  },
+  "controller_lifecycle": {
+    "existing_healthy_reused": true,
+    "cold_stop_start": true,
+    "selected_backup_folder": true,
+    "manual_backup_and_inspect": true,
+    "digest_change_refused": true,
+    "candidate_restore_verified": true,
+    "rescue_and_previous_data_retained": true,
+    "restored_sessions_expired": true,
+    "runtime_credentials_preserved": true,
+    "original_test_pointer_restored": true,
+    "actual_port_collision_refused_before_volume_creation": true,
+    "new_empty_installation": true,
+    "spaces_unicode_dollar_path": true,
+    "temporary_networks_removed_data_volume_retained": true
+  },
+  "native_ui": {
+    "consent_waited": true,
+    "typing_phrase_alone_did_not_mutate": true,
+    "explicit_approval_committed": true,
+    "cancel_kept_active_and_journal": true,
+    "native_recovery_menu_disabled_before_phrase": true,
+    "native_create_new_flow": true,
+    "new_installation_has_no_users_company_or_transactions": true,
+    "empty_company_worker_waits_without_error": true,
+    "first_run_retry_preserved_installation_identity": true
+  },
+  "bundle": {
+    "bundle_tree_sha256": "94b85ad7e97e21a07157025c4f2e55f632c6a9eebb7139284ae4ec4fd5861ef0",
+    "mach_o_files": 5,
+    "architectures": [
+      "arm64"
+    ],
+    "relocatable_library_paths": true,
+    "symlinks_stay_in_bundle": true,
+    "program_files_verified": true,
+    "codesign": "ad-hoc signature verified; not notarized",
+    "copied_app_without_developer_path": true,
+    "frozen_health_verified": true,
+    "launcher_revision": "a78b9a72c8cc4d37c57f54eba4b003cbc54705a9",
+    "version": "0.5.0-phase5"
+  },
+  "review_preservation": {
+    "equal_before_after": true,
+    "business_configuration_tables": 35,
+    "user_permission_flags_preserved": true,
+    "media_preserved": true,
+    "currency": "AED",
+    "timezone": "Asia/Karachi",
+    "review_restore_performed": false
+  },
+  "review_backup": {
+    "filename": "Financee_Offline_Backup_2026-10-28_191409_09832bcc155a4498986fd9f2e64df501.zip",
+    "sha256": "01465671664eec815b226ba8188a8ef13adefc1597274ce32c07a93dff7123c9",
+    "bytes": 89083,
+    "pause_seconds": 0.206,
+    "verified": true
+  },
+  "artifacts": {
+    "review_app": "/Users/swisstech/Development/Financee_Offline/.runtime/phase5-launcher/Financee Offline Review.app",
+    "desktop_shortcut": "/Users/swisstech/Desktop/Financee Offline Development.app",
+    "unbound_first_run_app": "/Users/swisstech/Development/Financee_Offline/.runtime/phase5-launcher/Financee Offline First Run.app"
+  },
+  "pending": [
+    "Native Windows 10/11 x64 build and target-machine tests",
+    "Real shared-runtime Docker-off startup test (mocked only; global Docker was not stopped)",
+    "OS reboot/sign-in lifecycle on dedicated target machines",
+    "Signed/notarized distribution and installers",
+    "Owner review before Phase 6"
+  ],
+  "source_repositories": {
+    "production_head": "0ea97a2253f0ed12213a24832393e223eed71e21",
+    "comparison_head": "ea1f0194f2e4d2b0ec6e120086b29276c4d99365",
+    "unchanged_and_clean": true
+  },
+  "publication": "No remote, push, release or upload",
+  "cleanup": {
+    "stable_test_stack_stopped_data_retained": true,
+    "temporary_test_containers_networks_removed_volumes_retained": true,
+    "review_five_services_running": true,
+    "desktop_shortcut_verified": true
+  }
+}
