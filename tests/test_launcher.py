@@ -1,5 +1,5 @@
 """Host-only lifecycle guards. No Docker daemon, business data or OS hooks changed."""
-import hashlib,json,plistlib,socket,subprocess,tempfile,unittest
+import hashlib,json,plistlib,socket,subprocess,sys,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
 from launcher.controller import Controller
@@ -74,6 +74,15 @@ class LauncherTests(unittest.TestCase):
     def test_spaces_unicode_dollar_and_quote_paths_round_trip(self):
         other=Installation.create(self.root/"Company's AED $cash — Dubai",18782,'test')
         self.assertEqual(env_values(other.root/'Config/compose.env')['CUSTOMER_DIR'],str(other.root));self.assertEqual(Installation(other.root).project,other.project)
+    def test_unicode_customer_paths_use_utf8_env_files_on_every_host(self):
+        other=Installation.create(self.root/'شركة AED 汉字 —',18782,'test')
+        raw=(other.root/'Config/compose.env').read_bytes()
+        self.assertIn(str(other.root).encode('utf-8'),raw)
+        self.assertEqual(env_values(other.root/'Config/compose.env')['CUSTOMER_DIR'],str(other.root))
+    def test_runtime_utf8_output_is_decoded_independently_of_windows_codepage(self):
+        value='شركة AED 汉字 —'
+        code='import sys; sys.stdout.buffer.write('+repr(value.encode('utf-8'))+')'
+        self.assertEqual(System().execute([sys.executable,'-c',code]),value)
     def test_restore_consent_requires_exact_typed_phrase(self):
         consent=RestoreConsent('sha256')
         for text in ('','yes','restore','RESTORE '):

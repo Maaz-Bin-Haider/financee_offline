@@ -29,8 +29,8 @@ def windows_link(path,target):
 
 def windows_remove_link(path,target):
     env=dict(os.environ,FINANCEE_LINK=str(path))
-    code="$s=New-Object -ComObject WScript.Shell; $l=$s.CreateShortcut($env:FINANCEE_LINK); [Console]::WriteLine($l.TargetPath)"
-    result=subprocess.run(['powershell.exe','-NoProfile','-NonInteractive','-Command',code],env=env,check=True,capture_output=True,text=True,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+    code="[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false); $s=New-Object -ComObject WScript.Shell; $l=$s.CreateShortcut($env:FINANCEE_LINK); [Console]::WriteLine($l.TargetPath)"
+    result=subprocess.run(['powershell.exe','-NoProfile','-NonInteractive','-Command',code],env=env,check=True,capture_output=True,text=True,encoding='utf-8',creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
     normalize=lambda value:ntpath.normcase(ntpath.normpath(value))
     if normalize(result.stdout.strip())!=normalize(str(target)):
         raise LauncherError('The sign-in shortcut points to another program and was preserved.')

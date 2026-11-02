@@ -4,7 +4,7 @@ from .storage import LauncherError,read,atomic
 
 def env_values(path):
     values={}
-    for line in Path(path).read_text().splitlines():
+    for line in Path(path).read_text(encoding='utf-8').splitlines():
         if line and not line.startswith('#') and '=' in line:
             key,value=line.split('=',1)
             if value.startswith("'") and value.endswith("'"):value=value[1:-1].replace("\\'","'")
@@ -63,7 +63,7 @@ class Installation:
         for file,text in [('runtime.env',body),('compose.env',body+f'HTTP_PORT={port}\nCUSTOMER_DIR={quoted(root)}\nRUNTIME_ENV_FILE={quoted(root/"Config/runtime.env")}\n')]:
             path=root/'Config'/file
             fd=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
-            with os.fdopen(fd,'w') as f:f.write(text);f.flush();os.fsync(f.fileno())
+            with os.fdopen(fd,'w',encoding='utf-8',newline='\n') as f:f.write(text);f.flush();os.fsync(f.fileno())
         atomic(root/'Config/active.json',{'format':1,'instance_id':token,'generation':'initial','database':project,'media':'Data/media','database_volume':project+'_database'})
         atomic(root/'Config/launcher.json',{'format':1,'product':'Financee_Offline','id':token,'customer_directory':str(root),'project':project,'port':port,'docker_context':context,'initialized':False,'volume_seen':False,'start_at_signin':False})
         return cls(root)

@@ -1,5 +1,6 @@
 # Read-only diagnostics. No settings, services, distros or registry keys changed.
 $ErrorActionPreference = 'Stop'
+[Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
 $os = Get-CimInstance Win32_OperatingSystem
 $computer = Get-CimInstance Win32_ComputerSystem
 $cpu = @(Get-CimInstance Win32_Processor)[0]

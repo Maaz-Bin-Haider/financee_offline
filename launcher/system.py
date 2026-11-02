@@ -36,7 +36,7 @@ class System:
     def execute(self,args,env=None,timeout=60):
         flags={'creationflags':subprocess.CREATE_NO_WINDOW} if os.name=='nt' else {}
         try:
-            result=subprocess.run(list(map(str,args)),env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,timeout=timeout,**flags)
+            result=subprocess.run(list(map(str,args)),env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,encoding='utf-8',errors='replace',timeout=timeout,**flags)
         except subprocess.TimeoutExpired as exc:
             raise LauncherError('The local runtime did not respond in time. Check Docker and retry; no global shutdown was requested.') from exc
         except OSError as exc:

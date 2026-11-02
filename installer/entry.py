@@ -10,7 +10,10 @@ def main():
     program=Path(getattr(sys,'_MEIPASS',Path(__file__).resolve().parents[1]))/'program'
     base=Path(os.environ['LOCALAPPDATA'])/'Financee Offline'
     preferences=base/'installation.json'
-    parser=argparse.ArgumentParser();parser.add_argument('--prepare-uninstall',action='store_true');args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--prepare-uninstall',action='store_true');parser.add_argument('--bundle-check-output',type=Path);args=parser.parse_args()
+    if args.bundle_check_output:
+        from installer.bundle_check import check
+        check(program,args.bundle_check_output);return
     if args.prepare_uninstall:
         from installer.controller import prepare_uninstall
         prepare_uninstall(program,preferences,base/'uninstall-preserved.json');return
@@ -27,7 +30,7 @@ if __name__=='__main__':
     try:sys.exit(main() or 0)
     except Exception as exc:
         # Uninstall must fail closed; a frozen windowed process has no stderr UI.
-        if os.name=='nt':
+        if os.name=='nt' and '--bundle-check-output' not in sys.argv:
             import ctypes
             ctypes.windll.user32.MessageBoxW(None,str(exc),'Financee Setup needs attention',0x10)
         sys.exit(1)

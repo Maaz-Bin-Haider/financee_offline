@@ -43,7 +43,14 @@ def main():
     (program/'delivery.json').write_text(json.dumps(delivery,indent=2)+'\n')
     for name,entry in [('Financee Offline','launcher/entry.py'),('Financee Offline Setup','installer/entry.py')]:
         subprocess.run([sys.executable,'-m','PyInstaller','--noconfirm','--windowed','--onedir','--noupx','--name',name,'--paths',str(ROOT),'--add-data',str(program)+os.pathsep+'program','--distpath',str(out/'frozen'),'--workpath',str(out/'work'/name),'--specpath',str(out/'spec'),str(ROOT/entry)],cwd=ROOT,check=True)
+    checks=[]
+    for name in ('Financee Offline','Financee Offline Setup'):
+        output=out/(name.replace(' ','-')+'-bundle-check.json')
+        subprocess.run([str(out/'frozen'/name/(name+'.exe')),'--bundle-check-output',str(output)],check=True,timeout=60)
+        result=json.loads(output.read_text(encoding='utf-8'))
+        if not (result['frozen'] and result['platform']=='Windows' and result['native_architecture']=='amd64' and result['program_files_verified'] and result['payload_architecture']=='amd64' and result['tls_context_loaded']):raise SystemExit('Native frozen-bundle check failed: '+name)
+        checks.append(result)
     subprocess.run([str(a.iscc.resolve()),'/DStageDir='+str(out/'frozen'),'/DOutputDir='+str(out/'installer'),'/DProgramIdentity='+digest(program/'release.json'),str(ROOT/'installer/windows/financee.iss')],check=True)
-    receipt={'setup_version':'0.6.0-phase6','engine_version':release['version'],'architecture':'windows-amd64','source_revision':release['launcher_revision'],'development':True,'signed':False,'native_customer_acceptance':'pending','installers':[{ 'filename':str(f),'sha256':digest(f),'bytes':f.stat().st_size} for f in (out/'installer').glob('*.exe')]}
+    receipt={'setup_version':'0.6.0-phase6','engine_version':release['version'],'architecture':'windows-amd64','source_revision':release['launcher_revision'],'development':True,'signed':False,'native_customer_acceptance':'pending','bundle_checks':checks,'compiler':{'path':str(a.iscc),'version':subprocess.run([str(a.iscc.resolve()),'/?'],capture_output=True,text=True).stdout.splitlines()[:3]},'installers':[{ 'filename':str(f),'sha256':digest(f),'bytes':f.stat().st_size} for f in (out/'installer').glob('*.exe')]}
     (out/'build-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt,indent=2))
 if __name__=='__main__':main()

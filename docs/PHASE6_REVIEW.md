@@ -148,3 +148,16 @@ DMG/notarization (Phase 7) and data-changing upgrades (Phase 8) have not been st
   [program mutexes](https://jrsoftware.org/ishelp/topic_setup_appmutex.htm):
   retained upstream notices, native x64 restriction, program replacement guards.
   No compiler is redistributed by this repository.
+
+## Owner-directed build follow-up
+
+The owner confirmed no Windows test machine is currently available and authorized
+building now with testing later. `.github/workflows/windows-development-build.yml`
+is a manual-only build: an isolated Linux AMD64 payload job followed by a native
+Windows x64 freeze/Inno job. It cannot deploy, write repository contents or publish
+a release. Only program/image payloads and public build receipts are artifacts;
+customer data, runtime credentials and live backup ZIPs are excluded. Artifacts
+have seven-day retention and will also be downloaded locally. Both frozen programs
+must pass headless program hash, native architecture, Tcl and TLS-context checks.
+A Windows Server build runner does not prove Windows 10/11 customer acceptance.
+Final build results will supersede the prototype's earlier “not built” statement.

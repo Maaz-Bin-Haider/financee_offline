@@ -3,14 +3,14 @@ from pathlib import Path
 class LauncherError(RuntimeError):pass
 
 def read(path,default=None):
-    try:return json.loads(Path(path).read_text())
+    try:return json.loads(Path(path).read_text(encoding='utf-8'))
     except FileNotFoundError:return default
 
 def atomic(path,value):
     path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
     fd,name=tempfile.mkstemp(prefix='.'+path.name,dir=path.parent)
     try:
-        with os.fdopen(fd,'w') as f:json.dump(value,f,indent=2);f.write('\n');f.flush();os.fsync(f.fileno())
+        with os.fdopen(fd,'w',encoding='utf-8',newline='\n') as f:json.dump(value,f,indent=2);f.write('\n');f.flush();os.fsync(f.fileno())
         os.replace(name,path)
     finally:
         if os.path.exists(name):os.unlink(name)

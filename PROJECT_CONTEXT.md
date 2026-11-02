@@ -131,7 +131,11 @@ preserved those states, images/config/credentials/media. No stopped-review live
 business fingerprint was queried. Temporary test containers/networks were removed,
 volumes retained. See docs/PHASE6_REVIEW.md and PHASE6_RESULTS.json for exact local
 payload/source evidence and build instructions. Core source commit 6cb2bc8.
-No new publication/push is authorized by the phase instruction.
+The owner then confirmed that a Windows test machine is unavailable and instructed
+building now with device tests deferred. A manually dispatched hosted Linux AMD64
+payload + Windows x64 PyInstaller/Inno development build is being prepared. The
+build source/workflow will be pushed only to financee_offline; no public release,
+customer upload, production action or Phase 7 work is part of that build.
 
 Remaining gates: Phase 6 native Windows10/11 x64 implementation/acceptance and
 owner review; Phase 7 signed/notarized Apple Silicon installers; Phase 8 safe

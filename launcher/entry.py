@@ -8,6 +8,10 @@ def main():
         hold_program_mutex()
     program=Path(getattr(sys,'_MEIPASS',Path(__file__).resolve().parents[1]))/'program'
     if not program.is_dir():program=Path(__file__).resolve().parents[1]/'.runtime/phase5-program'
+    if '--bundle-check-output' in sys.argv:
+        p=argparse.ArgumentParser();p.add_argument('--bundle-check-output',type=Path,required=True);a=p.parse_args()
+        from installer.bundle_check import check
+        check(program,a.bundle_check_output);return
     # Packaging CI can check the frozen stdlib without launching a GUI or Docker.
     if '--diagnostic-output' in sys.argv:
         p=argparse.ArgumentParser();p.add_argument('--diagnostic-output',type=Path,required=True);p.add_argument('--customer',type=Path,required=True);a=p.parse_args()
