@@ -1,6 +1,7 @@
 # Financee Offline
 
-Local desktop review build **0.5.0-phase5**, schema 2. This independent
+Current development installer **0.8.0-phase8**, schema 2; the existing bound
+review business remains on **0.5.0-phase5**. This independent
 single-device Django/PostgreSQL edition retains the confirmed financial engine.
 Both reference systems remain read-only. Source is stored in
 [financee_offline](https://github.com/Maaz-Bin-Haider/financee_offline) on
@@ -70,3 +71,16 @@ Native self-copy, empty setup, handoff, cancellation and data-retaining removal
 checks pass on this Mac, along with 106 host and 38 core checks. It is ad-hoc
 signed; Developer ID/notarization and fresh-device/reboot acceptance remain pending.
 No production resources or review business data were changed. Stop before Phase 8.
+
+## Manual upgrades (Phase 8)
+
+Local Mac development DMG: `dist/Financee-Offline-Apple-Silicon-Development-b12e676.dmg`.
+Install the versioned 0.8 app beside the previous app and choose Setup → Upgrade
+Existing Business. The policy accepts schema-2 0.5/0.7 sources, preserves a paired
+rescue and previous data/runtime, verifies a separate candidate and refuses
+unreviewed migrations or downgrades. [Phase 8 tests and review steps](docs/PHASE8_REVIEW.md).
+
+120 host checks, 38 post-upgrade core tests, five forced host exits and real
+candidate/startup failure recovery pass on disposable data. The final native
+confirmation awaits Mac unlock; Windows/native reboot and signing/notarization
+acceptance remain pending. Stop before Phase 9. No installer was published.

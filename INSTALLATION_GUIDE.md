@@ -58,3 +58,24 @@ Automatic daily/catch-up ZIPs, Backup Now and launcher recovery controls exist;
 see [Phase 4 backup/recovery evidence](docs/PHASE4_REVIEW.md) and
 [Phase 5 maintenance controls](docs/PHASE5_REVIEW.md). Earlier phase guides are
 historical handoffs, not current installer release claims.
+
+## Manual update to 0.8 development
+
+Use `dist/Financee-Offline-Apple-Silicon-Development-b12e676.dmg` for the new
+versioned Mac app; keep the previous app. Close old maintenance, turn off its
+optional sign-in startup, then select Upgrade Existing Business in the new app’s
+Setup menu. Choose the existing business and previous app, verify the exact
+release and confirm the displayed folder/version change. Start with a disposable
+business for review. Enable optional startup in the new app only after success.
+
+The installer retains a protected rescue ZIP, previous program/images and old
+DB/media. It checks a separate candidate and exact startup health before commit.
+If interrupted, reopen the matching new installer, select the same business and
+choose Recover Interrupted Upgrade. Data-changing schema upgrades and image-only
+downgrades are refused by this release’s schema-2 policy.
+
+See [Phase 8 evidence](docs/PHASE8_REVIEW.md) for supported 0.5/0.7 source versions,
+checks and remaining gates. Final native Mac confirmation awaits manual unlock;
+Windows Phase 8 building/device tests and signed customer delivery remain pending.
+No universal test login is shipped. New-empty-business setup asks you to create
+your own company/currency/owner credentials.

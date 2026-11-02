@@ -1,0 +1,219 @@
+{
+  "phase": 8,
+  "date": "2026-11-02",
+  "status": "Same-schema manual upgrade and failure recovery verified on disposable data; final native confirmation waits for manual Mac unlock; stop before Phase 9",
+  "artifact_source_revision": "b12e676ee93e40a3dfab2f3dafa76287bce5773e",
+  "engine_revision": "8076287f6f2ba38f80eb647bc1465884f38542ea",
+  "engine_image_id": "sha256:a5fc7755ca707f57d218a327471d82d185e0538721c5cfd36b488dab9e005c81",
+  "version": "0.8.0-phase8",
+  "schema": 2,
+  "policy": {
+    "format": 1,
+    "product": "Financee_Offline",
+    "target_version": "0.8.0-phase8",
+    "from_versions": [
+      "0.5.0-phase5",
+      "0.7.0-phase7"
+    ],
+    "source_schema": 2,
+    "target_schema": 2,
+    "postgres_major": 16,
+    "migration_policy": "no-pending-django-migrations",
+    "preserve_business_fingerprints": true
+  },
+  "dmg": {
+    "path": "dist/Financee-Offline-Apple-Silicon-Development-b12e676.dmg",
+    "bytes": 498479775,
+    "sha256": "2561a5e5756cedb8638cf11872749f5b4aa724744f07cd0cfeb57d71c1012ab2",
+    "signing": "ad-hoc development; not Developer ID",
+    "notarized": false,
+    "uploaded": false,
+    "customer_profile_embedded": false
+  },
+  "runtime": {
+    "bytes": 494785024,
+    "sha256": "ef132737fabfbfc2f7c78536bdb6d51fa1fde4874234ddee5726692610674336",
+    "native_architecture": "arm64",
+    "images": 4
+  },
+  "host_checks": {
+    "upgrade": 14,
+    "existing": 106,
+    "total": 120,
+    "result": "pass"
+  },
+  "standalone_readonly_DMG": {
+    "source_revision": "b12e676ee93e40a3dfab2f3dafa76287bce5773e",
+    "copied_app_without_developer_environment": {
+      "bundle_tree_sha256": "4f65e4b9a0df6368c75ef0d22edcc51e656eeda0be0644beb6315c95ded0adc6",
+      "mach_o_files": 5,
+      "native_arm64_only": true,
+      "symlinks_stay_in_app": true,
+      "relocatable_library_paths": true,
+      "bundle_check": {
+        "format": 1,
+        "product": "Financee_Offline",
+        "frozen": true,
+        "platform": "Darwin",
+        "native_architecture": "arm64",
+        "python": "3.12.14",
+        "tcl": "9.0.4",
+        "program_files_verified": true,
+        "release_sha256": "49297e33c1dafd2e83579e013155b76a3bbf67ec1e3af4cd2115f299ab1064f4",
+        "payload_architecture": "arm64",
+        "tls_context_loaded": true,
+        "source_revision": "b12e676ee93e40a3dfab2f3dafa76287bce5773e",
+        "customer_installation_tested": false,
+        "docker_or_wsl_modified": false
+      },
+      "payload_check": {
+        "verified": true,
+        "sha256": "ef132737fabfbfc2f7c78536bdb6d51fa1fde4874234ddee5726692610674336",
+        "bytes": 494785024,
+        "architecture": "arm64",
+        "images": 4,
+        "docker_modified": false
+      }
+    },
+    "read_only_dmg_app_verified": {
+      "bundle_tree_sha256": "4f65e4b9a0df6368c75ef0d22edcc51e656eeda0be0644beb6315c95ded0adc6",
+      "mach_o_files": 5,
+      "native_arm64_only": true,
+      "symlinks_stay_in_app": true,
+      "relocatable_library_paths": true,
+      "bundle_check": {
+        "format": 1,
+        "product": "Financee_Offline",
+        "frozen": true,
+        "platform": "Darwin",
+        "native_architecture": "arm64",
+        "python": "3.12.14",
+        "tcl": "9.0.4",
+        "program_files_verified": true,
+        "release_sha256": "49297e33c1dafd2e83579e013155b76a3bbf67ec1e3af4cd2115f299ab1064f4",
+        "payload_architecture": "arm64",
+        "tls_context_loaded": true,
+        "source_revision": "b12e676ee93e40a3dfab2f3dafa76287bce5773e",
+        "customer_installation_tested": false,
+        "docker_or_wsl_modified": false
+      },
+      "payload_check": {
+        "verified": true,
+        "sha256": "ef132737fabfbfc2f7c78536bdb6d51fa1fde4874234ddee5726692610674336",
+        "bytes": 494785024,
+        "architecture": "arm64",
+        "images": 4,
+        "docker_modified": false
+      }
+    },
+    "dmg_sha256": "2561a5e5756cedb8638cf11872749f5b4aa724744f07cd0cfeb57d71c1012ab2",
+    "dmg_bytes": 498479775,
+    "codesign": "verified",
+    "customer_installation_tested": false,
+    "docker_modified": false,
+    "notarization": "not claimed by this verification"
+  },
+  "upgrade_from_0.5": {
+    "previous_version": "0.5.0-phase5",
+    "target_version": "0.8.0-phase8",
+    "schema": 2,
+    "synthetic_populated_business": true,
+    "interrupted_host_exit_checkpoints_recovered": [],
+    "real_candidate_and_startup_failure_recovery": [
+      "candidate_business_mutation",
+      "target_start_failure"
+    ],
+    "candidate_business_requests_gated_until_commit": false,
+    "all_business_auth_permissions_settings_history_rows_sequences_and_media_preserved": true,
+    "SQL_definitions_verified": 190,
+    "sessions_expired_after_success": true,
+    "runtime_credentials_preserved": true,
+    "previous_database_media_program_images_and_rescues_retained": true,
+    "committed_recovery_idempotent_no_downgrade": true,
+    "core_tests": 38,
+    "project": "financee_offline_09e55f71e786",
+    "review_resources_unchanged": true,
+    "artifact_source_revision": "b12e676ee93e40a3dfab2f3dafa76287bce5773e",
+    "program_staging_revision": "686552297670bb2d7751fc6a061c5daa8646127f",
+    "test_containers_and_networks_removed_data_volume_retained": true
+  },
+  "upgrade_from_0.7": {
+    "previous_version": "0.7.0-phase7",
+    "target_version": "0.8.0-phase8",
+    "schema": 2,
+    "synthetic_populated_business": true,
+    "interrupted_host_exit_checkpoints_recovered": [
+      "rescue_saved",
+      "candidate_prepared",
+      "target_bound",
+      "candidate_verified",
+      "awaiting_health"
+    ],
+    "real_candidate_and_startup_failure_recovery": [
+      "candidate_business_mutation",
+      "target_start_failure"
+    ],
+    "candidate_business_requests_gated_until_commit": true,
+    "all_business_auth_permissions_settings_history_rows_sequences_and_media_preserved": true,
+    "SQL_definitions_verified": 190,
+    "sessions_expired_after_success": true,
+    "runtime_credentials_preserved": true,
+    "previous_database_media_program_images_and_rescues_retained": true,
+    "committed_recovery_idempotent_no_downgrade": true,
+    "core_tests": 38,
+    "project": "financee_offline_7a201627c23e",
+    "review_resources_unchanged": true,
+    "artifact_source_revision": "b12e676ee93e40a3dfab2f3dafa76287bce5773e",
+    "program_staging_revision": "686552297670bb2d7751fc6a061c5daa8646127f",
+    "test_containers_and_networks_removed_data_volume_retained": true
+  },
+  "native_UI": {
+    "earlier_build": "0bfae68094af13fba0e9e4c8570bd06ea64e1e32",
+    "versioned_app_self_copy": true,
+    "upgrade_window_and_verified_summary": true,
+    "native_cancel_preserved_previous_release_and_credentials": true,
+    "final_b12e676_confirmation_and_upgrade_handoff": "pending manual Mac unlock",
+    "text_confirmation": "Removed the unnecessary second typed prompt; one native confirmation retains exact versions/folder and reviewed-input binding",
+    "credentials_entered_by_UI_automation": false,
+    "fixture_services_stopped_data_retained_while_waiting_for_unlock": true
+  },
+  "distribution": {
+    "gatekeeper_exit": 3,
+    "notarized": false,
+    "Developer_ID_signed": false,
+    "notary_helper_refused_before_upload": true,
+    "Apple_submission": false,
+    "security_bypass": false,
+    "public_release": false
+  },
+  "push": {
+    "authorized": true,
+    "Phase7_checkpoint_pushed": "9eb706f1492828b1f186cfdeb5a425a5b527cd02",
+    "Phase8": "tested handoff source authorized for push; final remote verification follows"
+  },
+  "limitations": [
+    "This policy accepts schema 2 only; future/schema-changing migrations require their own reviewed policy and checks",
+    "Final native GUI confirmation and handoff waits for manual Mac unlock",
+    "Windows Phase8 source is implemented; native Phase8 build/device tests remain pending",
+    "Developer ID/notarization and real fresh-device/offline OS reboot/sign-in acceptance remain pending",
+    "Windows10 maintained runtime strategy remains unfinished",
+    "No automatic downgrade after successful commit; use a separately confirmed paired recovery point and keep the previous release",
+    "Owner review before Phase9 distribution work"
+  ],
+  "source_repositories": {
+    "Financee_Multitenant_Production": {
+      "head": "0ea97a2253f0ed12213a24832393e223eed71e21",
+      "clean": true,
+      "operated_or_modified": false
+    },
+    "Accounting-Plus-Inventory-System": {
+      "head": "ea1f0194f2e4d2b0ec6e120086b29276c4d99365",
+      "clean": true,
+      "operated_or_modified": false
+    }
+  },
+  "review_preservation": {
+    "original_container_ids_states_image_ids_config_credentials_media_match_phase7_baseline": true,
+    "review_DB_not_queried_or_upgraded": true
+  }
+}

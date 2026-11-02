@@ -3,9 +3,9 @@
 2026-11-02: The owner instructed “move forward and push”, then “continue”.
 Phase 7 source/evidence was pushed to origin/codex/single-company-core at
 9eb706f1492828b1f186cfdeb5a425a5b527cd02. Phase 8 manual upgrade/failure recovery
-is now authorized and in progress. Stop at its review gate before Phase 9;
+is authorized and headless-verified. Stop at its review gate before Phase 9;
 no publication or live review upgrade is authorized. Current engine development
-version is 0.8.0-phase8, schema 2. Targeted native upgrade validation is pending.
+version is 0.8.0-phase8, schema 2. Final native upgrade confirmation/handoff is pending manual Mac unlock.
 The policy accepts only 0.5.0-phase5/0.7.0-phase7 schema-2 sources, rejects any
 pending migration/downgrade, and preserves all business rows/sequences/media
 apart from deliberately expired sessions. This is not arbitrary schema-change
@@ -214,3 +214,43 @@ Docker setup, offline OS reboot/sign-in and customer reinstall acceptance. Windo
 10 maintained runtime work/device acceptance remain pending. Stop before Phase 8.
 Exact receipts: docs/PHASE7_REVIEW.md and docs/PHASE7_RESULTS.json; ignored build
 receipts/screenshots in .runtime/phase7-final-build.
+
+Current Phase 8 handoff (2026-11-02): app source
+b12e676ee93e40a3dfab2f3dafa76287bce5773e, engine source 8076287, version
+0.8.0-phase8/schema 2. DMG dist/Financee-Offline-Apple-Silicon-Development-b12e676.dmg
+(498,479,775 bytes), SHA256
+2561a5e5756cedb8638cf11872749f5b4aa724744f07cd0cfeb57d71c1012ab2.
+120 host checks, both populated 0.5/0.7→0.8 upgrades, 38 core tests per source,
+190 SQL definitions, five abrupt host-exit checkpoints, candidate corruption and
+startup failure recovery pass. Business/auth/permission/settings/history rows,
+sequences/media and credentials survive; sessions expire after success. Previous
+programs/images/data/rescues retained; test containers/networks removed without -v.
+Final app/read-only DMG and clean engine checks pass. Native earlier 0bfae68 app
+self-copy, verified summary and cancel/no-mutation pass. The redundant typed
+upgrade dialog was removed; b12e676 has one native folder/version confirmation.
+Final native positive handoff awaits the pending manual Mac-unlock question.
+
+Resume native check ONLY on the marked fixture in .runtime/phase8-native-ui.json.
+The previous (typed-dialog) installed 0.8 app/state were preserved under
+.runtime/phase8-native-previous-confirmation; install the b12e676 source app from
+.runtime/phase8-delivery-build/frozen into ~/Applications first. Its namespace is
+Financee Offline Mac 0.8 Development; old 0.7 app/state and original bound review
+are separate and preserved. Choose Upgrade Existing Business, select the exact
+fixture customer from the receipt and default previous 0.7 app; verify, cancel
+and check unchanged, then confirm the native Yes/No and verify new maintenance/
+browser login. Do not create/change owner credentials in GUI. Compare receipt
+fingerprints and credentials, stop/retire only that private stack with volume
+retained, release locks and save CUA screenshots. The fixture services were stopped and its containers/networks removed while
+waiting for unlock; its volume and all data remain retained. Native Verify /
+Prepare Upgrade can restart only this initialized fixture. Never select
+.runtime/review.
+
+Native input issue was confined to Tk’s extra text dialog; the native first
+Yes/No prompt worked and cancellation was independently verified. Recovery proxy
+ownership and test Desktop mount detection were corrected, not weakened.
+Windows Phase 8 source has separate install identity/paths but native Phase 8
+build/testing remains pending. Same-schema policy only; no arbitrary future
+migrations. No signing identity/notarization, security bypass, Apple upload or
+public artifact release. Phase 7 push 9eb706f succeeded; Phase 8 source push is
+authorized and its final headless-tested handoff is being prepared. Stop before
+Phase 9; exact results in docs/PHASE8_RESULTS.json and docs/PHASE8_REVIEW.md.
