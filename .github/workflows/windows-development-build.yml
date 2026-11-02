@@ -42,6 +42,10 @@ jobs:
         run: |
           set -euo pipefail
           python runtime/dev.py init --stack test
+          # Native Linux bind permissions on this disposable CI fixture only.
+          # Keep runner ownership; grant the image's app group access, not world.
+          sudo chown -R "$(id -u):10001" .runtime/test
+          chmod -R g+rwX .runtime/test
           python runtime/dev.py up --stack test
           python runtime/dev.py check --stack test
           python runtime/dev.py test --stack test
