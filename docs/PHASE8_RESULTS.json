@@ -189,7 +189,13 @@
   "push": {
     "authorized": true,
     "Phase7_checkpoint_pushed": "9eb706f1492828b1f186cfdeb5a425a5b527cd02",
-    "Phase8": "tested handoff source authorized for push; final remote verification follows"
+    "Phase8": {
+      "verified_checkpoint": "113887c550a005314bdeec78513a13c0841b4877",
+      "remote": "origin",
+      "branch": "codex/single-company-core",
+      "remote_head_matched": true,
+      "installer_artifacts_uploaded": false
+    }
   },
   "limitations": [
     "This policy accepts schema 2 only; future/schema-changing migrations require their own reviewed policy and checks",

@@ -252,5 +252,7 @@ Windows Phase 8 source has separate install identity/paths but native Phase 8
 build/testing remains pending. Same-schema policy only; no arbitrary future
 migrations. No signing identity/notarization, security bypass, Apple upload or
 public artifact release. Phase 7 push 9eb706f succeeded; Phase 8 source push is
-authorized and its final headless-tested handoff is being prepared. Stop before
+authorized; checkpoint 113887c550a005314bdeec78513a13c0841b4877 was pushed
+and independently matched the GitHub branch HEAD. Generated installers/data
+remain local and ignored. Stop before
 Phase 9; exact results in docs/PHASE8_RESULTS.json and docs/PHASE8_REVIEW.md.

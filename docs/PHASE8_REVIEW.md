@@ -1,7 +1,9 @@
 # Phase 8 manual upgrades and failure recovery
 
 2026-11-02. The owner authorized “move forward and push”, then “continue”.
-Phase 7 source checkpoint `9eb706f` was pushed. Phase 8 now has a local,
+Phase 7 source checkpoint `9eb706f` and Phase 8 checkpoint `113887c` were pushed
+to `origin/codex/single-company-core`; remote HEAD was independently verified.
+Phase 8 now has a local,
 headless-verified manual-upgrade build. Stop for review before Phase 9.
 Final native confirmation/handoff testing is waiting for manual Mac unlock.
 No installer publication, Apple upload or upgrade of the review business occurred.
