@@ -5,7 +5,10 @@ root=Path(SPECPATH).parents[1]
 program=os.environ['FINANCEE_MAC_PROGRAM'];archive=os.environ['FINANCEE_MAC_ARCHIVE']
 name='Financee Offline Mac Development'
 identity=os.environ.get('FINANCEE_MAC_SIGN_IDENTITY') or None
-a=Analysis([str(root/'installer/macos_entry.py')],pathex=[str(root)],binaries=[],datas=[(program,'program'),(archive,'payload')],hiddenimports=[],hookspath=[],excludes=[],noarchive=False)
+datas=[(program,'program'),(archive,'payload')]
+aux=os.environ.get('FINANCEE_MAC_SSL_AUXILIARY')
+if aux:datas.append((aux,'.'))
+a=Analysis([str(root/'installer/macos_entry.py')],pathex=[str(root)],binaries=[],datas=datas,hiddenimports=[],hookspath=[],excludes=[],noarchive=False)
 pyz=PYZ(a.pure)
 exe=EXE(pyz,a.scripts,[],exclude_binaries=True,name=name,debug=False,bootloader_ignore_signals=False,strip=False,upx=False,console=False,target_arch='arm64',codesign_identity=identity,entitlements_file=None,argv_emulation=False)
 coll=COLLECT(exe,a.binaries,a.datas,strip=False,upx=False,name=name)

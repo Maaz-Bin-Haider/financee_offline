@@ -3,7 +3,7 @@ Docker Desktop redistribution, notarization submission or publication. Optional
 Developer ID signing requires an existing owner-provided identity; the default is
 ad-hoc development signing. Use the isolated pinned build interpreter.
 """
-import argparse,importlib.metadata,json,os,platform,shutil,subprocess,sys
+import argparse,importlib.metadata,json,os,platform,shutil,ssl,subprocess,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 from installer.payload import Payload,digest
@@ -40,10 +40,14 @@ def main():
     (program/'bootstrap.json').write_text(json.dumps(bootstrap,indent=2)+'\n',encoding='utf-8')
     release=payload.release;revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     release.update(setup_version='0.7.0-phase7',launcher_revision=revision,build_host='macos-arm64',python=platform.python_version(),pyinstaller=importlib.metadata.version('pyinstaller'),tcl='9.0.4',certifi=importlib.metadata.version('certifi'),https_ca_file='certs/cacert.pem',development=True)
+    auxiliary=Path(ssl.__file__).with_name('codex-rejected-cas.pem')
+    if auxiliary.is_file():
+        if b'PRIVATE KEY' in auxiliary.read_bytes():raise SystemExit('A private key cannot be a TLS policy resource.')
+        release['ssl_auxiliary']={'filename':auxiliary.name,'sha256':digest(auxiliary),'purpose':'required interpreter root-certificate rejection policy'}
     release['files']={str(f.relative_to(program)):digest(f) for f in sorted(program.rglob('*')) if f.is_file() and f.name not in ('release.json','delivery.json')}
     (program/'release.json').write_text(json.dumps(release,indent=2)+'\n',encoding='utf-8');delivery=payload.delivery;delivery['release_sha256']=digest(program/'release.json')
     (program/'delivery.json').write_text(json.dumps(delivery,indent=2)+'\n',encoding='utf-8')
-    env=dict(os.environ,FINANCEE_MAC_PROGRAM=str(program.resolve()),FINANCEE_MAC_ARCHIVE=str(a.archive.resolve()),FINANCEE_MAC_SIGN_IDENTITY=a.identity or '')
+    env=dict(os.environ,FINANCEE_MAC_PROGRAM=str(program.resolve()),FINANCEE_MAC_ARCHIVE=str(a.archive.resolve()),FINANCEE_MAC_SIGN_IDENTITY=a.identity or '',FINANCEE_MAC_SSL_AUXILIARY=str(auxiliary) if auxiliary.is_file() else '')
     subprocess.run([sys.executable,'-m','PyInstaller','--noconfirm','--distpath',str(a.output/'frozen'),'--workpath',str(a.output/'work'),str(ROOT/'installer/macos/financee.spec')],cwd=ROOT,env=env,check=True)
     app=a.output/'frozen'/(NAME+'.app');subprocess.run(['codesign','--verify','--deep','--strict',str(app)],check=True)
     stage=a.output/'dmg-contents';stage.mkdir();shutil.copytree(app,stage/app.name,symlinks=True);(stage/'Applications').symlink_to('/Applications',target_is_directory=True)
