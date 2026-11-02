@@ -1,11 +1,13 @@
 # Financee Offline context
 
-2026-11-02, Asia/Karachi. The owner instructed “move forward” after the Phase 5
-handoff and authorized Phase 6 implementation. **Phase 6 Windows setup prototype
-now has an unsigned hosted Windows x64 development build; customer Windows
-acceptance and a qualified Windows 10 runtime remain pending. Stop before Phase 7.** The existing Apple Silicon review app
-remains the Phase 5 development build. Actual shared-runtime Docker-off and OS
-reboot/sign-in acceptance remain pending.
+2026-11-02, Asia/Karachi. The owner instructed “move forward” after the Windows
+build handoff, authorizing Phase 7 Apple Silicon installer work. **Phase 7 native
+Mac app/DMG implementation is in progress; stop before Phase 8.** Windows device
+tests remain deferred by the owner, and the Windows 10 maintained runtime path
+remains unfinished. The existing Apple Silicon review app remains the Phase 5
+build. Actual shared-runtime Docker-off and OS reboot/sign-in acceptance remain
+pending. No valid Developer ID identity is installed on this Mac; development
+builds are ad-hoc signed and not notarized.
 The owner authorized committing and pushing the current
 source state to https://github.com/Maaz-Bin-Haider/financee_offline.git on
 2026-10-28. Remote `origin`, branch `codex/single-company-core`, tracks the same

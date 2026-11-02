@@ -1,0 +1,11 @@
+Financee Offline — Apple Silicon development app
+
+Install the app in Applications, then open it. The app can copy itself into your user Applications folder without a terminal. It includes the matching ARM64 runtime images. Use the official Docker download/requirements link to install Docker with your own consent; Financee does not redistribute Docker Desktop, accept its terms, install Rosetta or change your other Docker projects.
+
+Choose Verify Included Runtime, then select a new empty business folder or repair the existing folder using the same program build. Your business folder contains Config, Data, Backups, Logs and Cache; its PostgreSQL data remains in a recorded Financee-owned Docker volume. Program files stay in the app. No universal password or demo business is provided. Create your own owner and company in first-run onboarding.
+
+The development app is ad-hoc signed, not Developer ID signed or notarized. It is for local owner review, not customer distribution. Do not disable Gatekeeper, remove quarantine or bypass macOS security. Public distribution requires owner-provided Developer ID credentials, notarization and stapled tickets plus fresh-device acceptance.
+
+Quit the app before same-build app repair. Prepare App Removal in setup stops only the verified Financee installation and disables its own optional sign-in entry. Then quit and move the app to Trash yourself. Customer folders, backups, images and data volumes remain retained. Never delete the only backup or manually remove database volumes.
+
+Data-changing manual upgrades are a separate workflow. Windows 10 runtime qualification and Windows device acceptance remain pending. This Apple Silicon build does not require Rosetta and does not support Intel Macs.

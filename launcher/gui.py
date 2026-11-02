@@ -9,7 +9,8 @@ from . import integration
 from .confirmation import RestoreConsent
 
 class Window:
-    def __init__(self,root,program):
+    def __init__(self,root,program,preferences_path=None,on_setup=None,desktop_name=None):
+        self.on_setup=on_setup;self.desktop_name=desktop_name
         self.root=root;self.program=Path(program);self.bootstrap=read(self.program/'bootstrap.json',{})
         self.events=queue.Queue();self.executor=concurrent.futures.ThreadPoolExecutor(max_workers=1);self.controller=None;self.busy=False;self.cancel_confirmation=None;self.window_lock=contextlib.ExitStack()
         title='Financee Offline'+(' — Development Review' if self.bootstrap.get('development') else '')
@@ -41,7 +42,7 @@ class Window:
         ttk.Label(frame,text='Closing this window or your browser keeps Financee running. Stop Financee affects only this installation.',wraplength=680).pack(anchor='w',pady=(12,0))
         if self.bootstrap.get('development'):ttk.Label(frame,text='Development '+read(self.program/'release.json',{}).get('version','')+' • not notarized • installers/platform certification are separate review stages.',wraplength=680).pack(anchor='w',pady=(6,0))
         self.make_menu(actions)
-        preference=self.bootstrap.get('preferences_path')
+        preference=preferences_path or self.bootstrap.get('preferences_path')
         if preference:self.preferences=Path(preference)
         elif sys.platform=='darwin':self.preferences=Path.home()/'Library/Application Support/Financee Offline/installation.json'
         else:self.preferences=Path(os.environ.get('LOCALAPPDATA',str(Path.home())))/'Financee Offline/installation.json'
@@ -58,9 +59,15 @@ class Window:
         file_menu.add_command(label='Open Existing Financee Folder…',command=self.existing)
         file_menu.add_command(label='Create New Empty Installation…',command=self.new)
         file_menu.add_separator();file_menu.add_command(label='Close Maintenance Window',command=self.close)
+        if self.on_setup:
+            file_menu.add_separator();file_menu.add_command(label='Setup / Repair / Prepare Removal…',command=self.setup_window)
         self.action_menu=tk.Menu(menu,tearoff=False);menu.add_cascade(label='Financee',menu=self.action_menu)
         for label,command in actions:self.action_menu.add_command(label=label,command=command,state='disabled')
         self.file_menu=file_menu
+    def setup_window(self):
+        if self.busy:
+            messagebox.showinfo('Operation still running','Wait for the current operation before opening setup.',parent=self.root);return
+        self.on_setup();self.close()
     def menu_state(self,enabled):
         for i in range(9):self.action_menu.entryconfigure(i,state='normal' if enabled else 'disabled')
         for i in (0,1):self.file_menu.entryconfigure(i,state='normal' if self.controller is None and not self.busy else 'disabled')
@@ -196,7 +203,7 @@ class Window:
     def logs(self):self.controller.system.folder(self.controller.installation.root/'Logs')
     def shortcut(self):
         try:
-            target=integration.desktop_shortcut(self.controller.installation)
+            target=integration.desktop_shortcut(self.controller.installation,name=self.desktop_name)
             messagebox.showinfo('Desktop shortcut ready',str(target),parent=self.root)
         except Exception as exc:self.show_error(exc)
     def signin(self):

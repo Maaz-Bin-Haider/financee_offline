@@ -1,7 +1,7 @@
 """Verified, restartable image delivery. The manifest is bundled with setup,
 not downloaded from an untrusted URL. No archive is extracted onto the host.
 """
-import hashlib,json,os,re,shutil,tarfile,tempfile,urllib.parse,urllib.request
+import hashlib,json,os,re,shutil,ssl,tarfile,tempfile,urllib.parse,urllib.request
 from pathlib import Path
 from launcher.storage import LauncherError,read
 
@@ -63,6 +63,11 @@ class Payload:
             d.get('release_sha256')!=digest(self.program/'release.json')):
             raise LauncherError('Setup manifest is incomplete or mismatched. Obtain the matching setup package.')
         self.identity=digest(self.program/'delivery.json')
+        self.ca_file=None
+        if r.get('https_ca_file'):
+            ca=(self.program/r['https_ca_file']).resolve()
+            if not ca.is_relative_to(self.program) or r['https_ca_file'] not in r.get('files',{}):raise LauncherError('The bundled HTTPS trust file is not verified.')
+            self.ca_file=ca
         if not isinstance(r.get('files'),dict) or not {'compose.yml','nginx.conf'}<=r['files'].keys():
             raise LauncherError('Required program resources are not listed in the setup manifest.')
         for name,expected in r['files'].items():
@@ -103,7 +108,7 @@ class Payload:
                 url=self.archive.get('url')
                 if not url:raise LauncherError('This development setup has no published download URL. Choose its matching local runtime .tar file.')
                 progress('Downloading the matching runtime payload. Your business data stays on this device.')
-                opener=opener or urllib.request.build_opener(HTTPSRedirect())
+                opener=opener or urllib.request.build_opener(HTTPSRedirect(),urllib.request.HTTPSHandler(context=ssl.create_default_context(cafile=str(self.ca_file) if self.ca_file else None)))
                 stream=opener.open(https_url(url),timeout=30)
             with os.fdopen(fd,'wb') as out,stream:
                 fd=None;total=0;h=hashlib.sha256()

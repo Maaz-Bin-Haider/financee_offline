@@ -10,7 +10,7 @@ from installer.payload import Payload
 def check(program,output):
     import tkinter
     payload=Payload(program)
-    context=ssl.create_default_context()
+    context=ssl.create_default_context(cafile=str(payload.ca_file) if payload.ca_file else None)
     tcl=tkinter.Tcl()
     result={'format':1,'product':'Financee_Offline','frozen':bool(getattr(sys,'frozen',False)),
             'platform':platform.system(),'native_architecture':windows_native_arch(),

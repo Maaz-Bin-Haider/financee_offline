@@ -11,8 +11,9 @@ from .payload import Payload
 from .windows_host import local_context
 
 class Setup:
-    def __init__(self,program,state,system=None,progress=None):
+    def __init__(self,program,state,system=None,progress=None,context_selector=None):
         self.payload=Payload(program);self.state_path=Path(state);self.system=system or System();self.progress=progress or (lambda text:None)
+        self.select_context=context_selector or local_context
         self.state=read(self.state_path,{})
         if self.state and (self.state.get('format')!=1 or self.state.get('product')!='Financee_Offline'):
             raise LauncherError('The saved setup state is invalid. Existing customer files were preserved.')
@@ -27,7 +28,7 @@ class Setup:
         with lock(self.state_path.with_suffix('.lock')):
             self.record('verifying_payload',cache=str(Path(cache).resolve()))
             path=self.payload.acquire(cache,local,self.progress)
-            docker=docker_path();context=local_context(self.system,docker,self.env)
+            docker=docker_path();context=self.select_context(self.system,docker,self.env)
             self.payload.import_images(path,self.system,docker,context,self.env,self.progress)
             self.record('images_ready',context=context,archive=str(path));return context
     def install(self,customer,preferences,existing=False):
@@ -35,7 +36,7 @@ class Setup:
             # Resume always revalidates the cached bytes, daemon, architecture and images.
             archive=self.state.get('archive')
             if not archive or not self.payload.verified(archive):raise LauncherError('Complete runtime payload verification/import before selecting the business folder.')
-            docker=docker_path();context=local_context(self.system,docker,self.env)
+            docker=docker_path();context=self.select_context(self.system,docker,self.env)
             runtime_ids=self.payload.import_images(archive,self.system,docker,context,self.env,self.progress)
             root=Path(customer).expanduser().resolve()
             previous=self.state.get('customer_directory')

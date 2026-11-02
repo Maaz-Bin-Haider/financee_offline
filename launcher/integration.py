@@ -8,10 +8,11 @@ def app_path():
     if sys.platform=='darwin' and '.app/Contents/MacOS/' in str(exe):return exe.parents[2]
     return exe
 
-def desktop_shortcut(installation,target=None,desktop=None):
+def desktop_shortcut(installation,target=None,desktop=None,name=None):
     target=Path(target or app_path());desktop=Path(desktop or Path.home()/'Desktop')
     desktop.mkdir(parents=True,exist_ok=True)
-    name='Financee Offline Development' if installation.data.get('development',False) else 'Financee Offline'
+    name=name or ('Financee Offline Development' if installation.data.get('development',False) else 'Financee Offline')
+    if not name or Path(name).name!=name or '/' in name or '\\' in name:raise LauncherError('The shortcut name is invalid.')
     if sys.platform=='darwin':
         path=desktop/(name+'.app')
         if path.is_symlink() and path.resolve()==target.resolve():return path
@@ -47,7 +48,8 @@ def signin(installation,enabled,target=None,agent_dir=None):
             with path.open('wb') as f:plistlib.dump({'Label':label,'ProgramArguments':[str(binary)],'RunAtLoad':True},f)
         elif path.exists():
             with path.open('rb') as f:record=plistlib.load(f)
-            if record.get('Label')!=label:raise LauncherError('The sign-in entry did not match Financee and was preserved.')
+            expected=Path(installation.data.get('signin_target',str(target)))/'Contents/MacOS'/Path(installation.data.get('signin_target',str(target))).stem
+            if record.get('Label')!=label or record.get('ProgramArguments')!=[str(expected)]:raise LauncherError('The sign-in entry did not match Financee and was preserved.')
             path.unlink()
     elif os.name=='nt':
         folder=Path(agent_dir or Path(os.environ['APPDATA'])/'Microsoft/Windows/Start Menu/Programs/Startup');path=folder/(label+'.lnk')

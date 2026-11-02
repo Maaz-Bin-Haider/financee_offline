@@ -31,9 +31,9 @@ def export(source,out,url=None):
     if '    build:' in compose:raise SystemExit('Installer must not contain a developer image build path.')
     for before,after in renames.items():compose=compose.replace('image: '+before,'image: '+after)
     (program/'compose.yml').write_text(compose)
-    shutil.copyfile(ROOT/'installer/windows/prerequisites.ps1',program/'prerequisites.ps1')
+    if release['architecture']=='amd64':shutil.copyfile(ROOT/'installer/windows/prerequisites.ps1',program/'prerequisites.ps1')
     (program/'bootstrap.json').write_text(json.dumps({'development':True,'auto_start':True,'docker_context':'desktop-linux'},indent=2)+'\n')
-    release.update(images=images,development=True,setup_version='0.6.0-phase6',setup_revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip())
+    release.update(images=images,development=True,setup_version='0.7.0-phase7' if release['architecture']=='arm64' else '0.6.0-phase6',setup_revision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip())
     release['files']={str(f.relative_to(program)).replace('\\','/'):digest(f) for f in sorted(program.rglob('*')) if f.is_file() and f.name not in ('release.json','delivery.json')}
     (program/'release.json').write_text(json.dumps(release,indent=2)+'\n')
     for image in images:subprocess.run(['docker','image','tag',image['id'],image['reference']],check=True)
