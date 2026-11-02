@@ -24,6 +24,33 @@ class HTTPSRedirect(urllib.request.HTTPRedirectHandler):
         https_url(newurl)
         return super().redirect_request(req,fp,code,msg,headers,newurl)
 
+def native_config_ids(path,references,architecture):
+    """Canonical config digests survive classic/OCI store conversions. They bind
+    image settings and every uncompressed rootfs layer digest, independently of
+    the destination store's manifest/index ID. Read metadata only; never extract.
+    """
+    from pathlib import PurePosixPath
+    try:
+        with tarfile.open(path,'r:') as archive:
+            def body(name):
+                part=PurePosixPath(name)
+                if part.is_absolute() or '..' in part.parts:raise ValueError('path')
+                member=archive.getmember(name)
+                if not member.isfile() or member.size>1024*1024:raise ValueError('metadata')
+                return archive.extractfile(member).read()
+            manifest=json.loads(body('manifest.json'));result={}
+            if not isinstance(manifest,list) or len(manifest)!=len(references):raise ValueError('image count')
+            for entry in manifest:
+                config=body(entry['Config']);value=json.loads(config)
+                if value.get('os')!='linux' or value.get('architecture')!=architecture:raise ValueError('architecture')
+                for ref in entry.get('RepoTags') or []:
+                    if ref in result:raise ValueError('duplicate tag')
+                    result[ref]='sha256:'+hashlib.sha256(config).hexdigest()
+            if set(result)!=set(references):raise ValueError('references')
+            return result
+    except (OSError,tarfile.TarError,KeyError,ValueError,TypeError,AttributeError) as exc:
+        raise LauncherError('Local image contents could not be verified against the native runtime archive.') from exc
+
 class Payload:
     def __init__(self,program):
         self.program=Path(program).resolve();self.release=read(self.program/'release.json',{})
@@ -158,14 +185,31 @@ class Payload:
         ids=system.execute([*base,'image','ls','-q','--no-trunc'],env=env).split()
         values=json.loads(system.execute([*base,'image','inspect',*sorted(set(ids))],env=env)) if ids else []
         existing={ref:v['Id'] for v in values for ref in (v.get('RepoTags') or [])+(v.get('RepoDigests') or [])}
-        for image in self.release['images']:
-            if image['reference'] in existing and existing[image['reference']]!=image['id']:
-                raise LauncherError('A payload image reference already belongs to a different image. Setup did not overwrite it. Use the explicit upgrade workflow.')
-        if not all(existing.get(i['reference'])==i['id'] for i in self.release['images']):
+        expected_configs=native_config_ids(path,[i['reference'] for i in self.release['images']],actual)
+        def prove_local(references):
+            if not references:return
+            cache=Path(path).parent
+            if shutil.disk_usage(cache).free<self.archive['bytes']+64*1024*1024:
+                raise LauncherError('More free cache space is needed to verify Docker image-store conversion. No business was initialized.')
+            fd,name=tempfile.mkstemp(prefix='.financee-image-readback-',suffix='.tar',dir=cache);os.close(fd)
+            try:
+                progress('Verifying imported image contents for this local Docker image store.')
+                system.execute([*base,'image','save','--output',name,*references],env=env,timeout=1800)
+                local=native_config_ids(name,references,actual)
+                if local!={ref:expected_configs[ref] for ref in references}:
+                    raise LauncherError('A payload image reference already belongs to different image contents. Setup did not overwrite it.')
+            finally:Path(name).unlink(missing_ok=True)
+        different=[i['reference'] for i in self.release['images'] if i['reference'] in existing and existing[i['reference']]!=i['id']]
+        prove_local(different)  # Read-only proof before any existing tag can be reused.
+        if any(i['reference'] not in existing for i in self.release['images']):
             progress('Importing verified local runtime images. Other Docker projects remain running.')
             system.execute([*base,'image','load','--input',str(path)],env=env,timeout=1800)
+        resolved={};different=[]
         for image in self.release['images']:
             value=json.loads(system.execute([*base,'image','inspect',image['reference']],env=env))[0]
-            if value['Id']!=image['id'] or value['Os']!='linux' or value['Architecture']!=actual:
-                raise LauncherError('Imported image identities differ from the tested payload. Setup did not initialize a business.')
-        return self.release['images']
+            if value['Os']!='linux' or value['Architecture']!=actual:
+                raise LauncherError('Imported image architecture differs from the tested payload. Setup did not initialize a business.')
+            resolved[image['id']]=value['Id']
+            if value['Id']!=image['id']:different.append(image['reference'])
+        prove_local(different)
+        return resolved

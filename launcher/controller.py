@@ -2,7 +2,7 @@
 No source checkout, Python/Node CLI, registry login, Docker socket in web, or
 normal-start network downloads. Installer payload preparation is separate.
 """
-import contextlib,hashlib,http.client,json,ntpath,os,socket,time
+import contextlib,hashlib,http.client,json,ntpath,os,re,socket,time
 from pathlib import Path
 from .storage import LauncherError,read,atomic,lock
 from .installation import Installation
@@ -18,6 +18,15 @@ class Controller:
         for name,expected in self.release['files'].items():
             file=self.program/name
             if not file.is_file() or hashlib.sha256(file.read_bytes()).hexdigest()!=expected:raise LauncherError('Financee program files failed verification. Use setup repair.')
+        self.image_ids={item['id']:item['id'] for item in self.release['images']}
+        binding=installation.data.get('runtime_images')
+        if binding is not None:
+            ids=binding.get('ids') if isinstance(binding,dict) else None
+            release_id=hashlib.sha256((self.program/'release.json').read_bytes()).hexdigest()
+            if (not isinstance(ids,dict) or binding.get('release_sha256')!=release_id or
+                set(ids)!=set(self.image_ids) or any(not isinstance(v,str) or not re.fullmatch(r'sha256:[a-f0-9]{64}',v) for v in ids.values())):
+                raise LauncherError('Recorded runtime image identities do not match this program release. Use its matching setup repair; no services were changed.')
+            self.image_ids=ids
         self.docker=docker_path();self.context=installation.data['docker_context']
         self.env={k:v for k,v in os.environ.items() if k not in ('DOCKER_HOST','DOCKER_CONTEXT','DOCKER_TLS_VERIFY','DOCKER_CERT_PATH','LD_LIBRARY_PATH','DYLD_LIBRARY_PATH')}
         self.env['BACKUP_DIR']=str(installation.backup_folder)
@@ -53,7 +62,7 @@ class Controller:
         for item in self.release['images']:
             try:value=json.loads(self.command('image','inspect',item['reference']))[0]
             except LauncherError:raise LauncherError('A required Financee runtime image is missing. Run setup repair/import the tested local payload. Normal startup never downloads images.')
-            if value['Id']!=item['id'] or value['Architecture']!=self.release['architecture'] or value['Os']!='linux':raise LauncherError('A cached Financee image differs from the tested payload. Use setup repair before starting.')
+            if value['Id']!=self.image_ids.get(item['id']) or value['Architecture']!=self.release['architecture'] or value['Os']!='linux':raise LauncherError('A cached Financee image differs from the tested payload. Use setup repair before starting.')
     def customer_mount_matches(self,source):
         actual=Path(source).resolve()
         if actual==self.installation.root:return True
@@ -76,7 +85,7 @@ class Controller:
         for value in values:
             labels=value.get('Config',{}).get('Labels',{}) or {};service=labels.get('com.docker.compose.service')
             if service not in SERVICES:raise LauncherError('The selected project contains an unexpected service. No containers were changed.')
-            expected=self.release['service_images'][service]
+            expected=self.image_ids.get(self.release['service_images'][service])
             if value.get('Image')!=expected:raise LauncherError('This installation uses another runtime image version. Use the explicit update or repair workflow; the launcher will not upgrade it automatically.')
             mounts=value.get('Mounts',[])
             if service in ('web','backup') and not any(m.get('Destination')=='/customer' and self.customer_mount_matches(m.get('Source','')) for m in mounts):raise LauncherError('This project belongs to another customer folder. No containers were changed.')

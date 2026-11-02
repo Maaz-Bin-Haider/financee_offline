@@ -56,6 +56,25 @@ class LauncherTests(unittest.TestCase):
             self.assertFalse(self.c.customer_mount_matches('/run/desktop/mnt/host/c/Users/Other/Financee Company'))
             self.c.desktop_runtime=False
             self.assertFalse(self.c.customer_mount_matches('/host_mnt/c/Users/Owner/Financee Company'))
+    def test_proven_destination_image_ids_are_used_for_cache_and_ownership(self):
+        local_id='sha256:'+'a'*64
+        self.install.data['runtime_images']={'release_sha256':hashlib.sha256((self.program/'release.json').read_bytes()).hexdigest(),'ids':{'sha256:app':local_id}}
+        old=self.system.execute
+        def execute(args,**kw):
+            value=old(args,**kw)
+            if 'image' in args and 'inspect' in args:
+                data=json.loads(value);data[0]['Id']=local_id;return json.dumps(data)
+            return value
+        self.system.execute=execute;self.system.containers=[self.container(Image=local_id)]
+        c=Controller(self.install,self.program,self.system);c.health=self.health;c.port_busy=lambda:False
+        self.assertEqual(c.start(False)['build'],'0.5.0-phase5');self.assertFalse(self.mutations())
+    def test_destination_image_binding_for_another_release_is_refused(self):
+        self.install.data['runtime_images']={'release_sha256':'wrong','ids':{'sha256:app':'sha256:'+'a'*64}}
+        with self.assertRaisesRegex(LauncherError,'image identities'):Controller(self.install,self.program,self.system)
+        self.assertFalse(self.system.calls)
+    def test_incomplete_destination_image_binding_is_refused(self):
+        self.install.data['runtime_images']={'release_sha256':hashlib.sha256((self.program/'release.json').read_bytes()).hexdigest(),'ids':{}}
+        with self.assertRaisesRegex(LauncherError,'image identities'):Controller(self.install,self.program,self.system)
     def test_distinct_installations_random_credentials_and_empty_setup(self):
         other=Installation.create(self.root/'Other',18782,'test')
         a=env_values(self.install.root/'Config/runtime.env');b=env_values(other.root/'Config/runtime.env')

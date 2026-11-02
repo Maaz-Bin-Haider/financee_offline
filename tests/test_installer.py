@@ -12,7 +12,8 @@ from launcher.installation import Installation
 from launcher.system import System,docker_path
 
 class Runtime:
-    def __init__(self,images):
+    def __init__(self,images,configs=None):
+        self.configs=configs or {};self.convert_ids=False
         self.images=images;self.calls=[];self.endpoint='npipe:////./pipe/dockerDesktopLinuxEngine';self.arch='x86_64';self.mode='linux';self.cached={};self.loaded=False;self.off=False
     def execute(self,args,**kw):
         self.calls.append(args);parts=args[3:] if args[1:3]==['--context','desktop-linux'] else args[1:]
@@ -22,7 +23,18 @@ class Runtime:
         if parts[:2]==['compose','version']:return '2.40.0'
         if parts[:2]==['image','ls']:return '\n'.join(self.cached.values())
         if parts[:2]==['image','load']:
-            self.loaded=True;self.cached={i['reference']:i['id'] for i in self.images};return ''
+            self.loaded=True;self.cached={i['reference']:('sha256:'+hashlib.sha256(('converted '+i['id']).encode()).hexdigest() if self.convert_ids else i['id']) for i in self.images};return ''
+        if parts[:2]==['image','save']:
+            output=Path(parts[3]);references=parts[4:];manifest=[]
+            with tarfile.open(output,'w') as tar:
+                def member(name,body):
+                    item=tarfile.TarInfo(name);item.size=len(body);tar.addfile(item,io.BytesIO(body))
+                for ref in references:
+                    if ref not in self.configs:raise LauncherError('unverifiable image contents')
+                    data=self.configs[ref];name=hashlib.sha256(data).hexdigest()+'.json';member(name,data)
+                    manifest.append({'Config':name,'RepoTags':[ref],'Layers':[]})
+                member('manifest.json',json.dumps(manifest).encode())
+            return ''
         if parts[:2]==['image','inspect']:
             names=parts[2:];result=[]
             for name in names:
@@ -43,7 +55,7 @@ class InstallerTests(unittest.TestCase):
         self.archive=self.root/'images.tar';self.make_archive(self.archive)
         release={'format':1,'product':'Financee_Offline','version':'0.5.0-phase5','schema':2,'architecture':'amd64','images':self.images,'files':{n:digest(self.program/n) for n in ('compose.yml','nginx.conf')},'service_images':dict(zip(('db','redis','web','nginx','backup'),[i['id'] for i in self.images]+[self.images[2]['id']]))}
         atomic(self.program/'release.json',release);self.delivery={'format':1,'product':'Financee_Offline','architecture':'amd64','release_sha256':digest(self.program/'release.json'),'archive':{'filename':'images.tar','bytes':self.archive.stat().st_size,'sha256':digest(self.archive)}};atomic(self.program/'delivery.json',self.delivery)
-        self.payload=Payload(self.program);self.runtime=Runtime(self.images)
+        self.payload=Payload(self.program);self.runtime=Runtime(self.images,{i['reference']:config for i,config in zip(self.images,self.configs.values())})
     def tearDown(self):self.tmp.cleanup()
     def make_archive(self,path,arch=None,extra=False):
         manifest=[]
@@ -86,6 +98,19 @@ class InstallerTests(unittest.TestCase):
         with self.assertRaisesRegex(LauncherError,'contents'):self.payload.verify_archive(self.archive)
     def test_exact_archive_import_and_post_load_identities(self):
         self.import_payload();self.assertTrue(self.runtime.loaded);self.assertEqual(self.runtime.cached,{i['reference']:i['id'] for i in self.images})
+    def test_classic_to_containerd_id_conversion_requires_content_proof(self):
+        self.runtime.convert_ids=True;resolved=self.import_payload()
+        self.assertTrue(self.runtime.loaded)
+        self.assertEqual(resolved,{i['id']:self.runtime.cached[i['reference']] for i in self.images})
+        self.assertTrue(all(key!=value for key,value in resolved.items()))
+        self.assertTrue(any(c[3:5]==['image','save'] for c in self.runtime.calls))
+    def test_repeat_import_accepts_proven_destination_ids_without_reloading(self):
+        self.runtime.convert_ids=True;first=self.import_payload();self.runtime.loaded=False
+        self.assertEqual(first,self.import_payload());self.assertFalse(self.runtime.loaded)
+    def test_changed_content_after_import_is_refused(self):
+        self.runtime.convert_ids=True
+        self.runtime.configs[self.images[0]['reference']]=json.dumps({'architecture':'amd64','os':'linux','unexpected':True}).encode()
+        with self.assertRaisesRegex(LauncherError,'overwrite'):self.import_payload()
     def test_matching_cache_is_reused_without_download(self):
         path=self.payload.acquire(self.root/'cache',self.archive)
         with patch('urllib.request.build_opener',side_effect=AssertionError('network')):self.assertEqual(path,self.payload.acquire(self.root/'cache'))
@@ -109,6 +134,7 @@ class InstallerTests(unittest.TestCase):
         self.assertFalse(any('info' in c for c in self.runtime.calls))
     def test_foreign_tag_not_replaced(self):
         self.runtime.cached={self.images[0]['reference']:'sha256:'+'f'*64}
+        self.runtime.configs[self.images[0]['reference']]=json.dumps({'architecture':'amd64','os':'linux','foreign':True}).encode()
         with self.assertRaisesRegex(LauncherError,'overwrite'):self.import_payload()
         self.assertFalse(self.runtime.loaded)
     def test_unavailable_daemon_not_treated_as_missing_images(self):

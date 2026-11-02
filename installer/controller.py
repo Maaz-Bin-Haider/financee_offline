@@ -36,7 +36,7 @@ class Setup:
             archive=self.state.get('archive')
             if not archive or not self.payload.verified(archive):raise LauncherError('Complete runtime payload verification/import before selecting the business folder.')
             docker=docker_path();context=local_context(self.system,docker,self.env)
-            self.payload.import_images(archive,self.system,docker,context,self.env,self.progress)
+            runtime_ids=self.payload.import_images(archive,self.system,docker,context,self.env,self.progress)
             root=Path(customer).expanduser().resolve()
             previous=self.state.get('customer_directory')
             if previous and Path(previous).resolve()!=root:
@@ -57,6 +57,7 @@ class Setup:
             release_id=self.payload.delivery['release_sha256']
             if installation.data.get('installed_program') not in (None,release_id):
                 raise LauncherError('This customer installation belongs to another program release. Use its launcher or the explicit upgrade workflow.')
+            installation.data['runtime_images']={'release_sha256':release_id,'ids':runtime_ids};installation.save()
             c=Controller(installation,self.payload.program,self.system,self.progress)
             c.start(open_browser=False)
             installation.data['installed_program']=release_id;installation.save()
