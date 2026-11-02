@@ -12,6 +12,10 @@ def atomic(path,value):
     try:
         with os.fdopen(fd,'w',encoding='utf-8',newline='\n') as f:json.dump(value,f,indent=2);f.write('\n');f.flush();os.fsync(f.fileno())
         os.replace(name,path)
+        if os.name!='nt':
+            directory=os.open(path.parent,os.O_RDONLY)
+            try:os.fsync(directory)
+            finally:os.close(directory)
     finally:
         if os.path.exists(name):os.unlink(name)
 

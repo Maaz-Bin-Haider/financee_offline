@@ -109,13 +109,14 @@ class Upgrade:
             # Re-check manifests/images/ownership after confirmation and before stop.
             checked=self.prepare(Path(prepared['archive']).parent,prepared['archive'])
             if checked['confirmation']!=confirmation:raise LauncherError('Upgrade inputs changed after confirmation.')
-            old=self.controller(self.previous);token=uuid.uuid4().hex;folder=root/'Cache/upgrades'/token;folder.mkdir(parents=True)
+            old=self.controller(self.previous);token=uuid.uuid4().hex;folder=root/'Cache/upgrades'/token
+            if not folder.resolve().is_relative_to(root) or any(p.is_symlink() for p in (root/'Cache',root/'Cache/upgrades')):raise LauncherError('Upgrade staging must stay inside the customer Cache folder.')
+            folder.mkdir(parents=True)
             required=sum(f.stat().st_size for p in (self.previous,self.payload.program) for f in Path(p).rglob('*') if f.is_file())+64*1024*1024
             if shutil.disk_usage(folder).free<required:raise LauncherError('Not enough space to retain both program releases.')
-            if not folder.resolve().is_relative_to(root) or any(p.is_symlink() for p in (root/'Cache',root/'Cache/upgrades')):raise LauncherError('Upgrade staging must stay inside the customer Cache folder.')
             self.snapshot(self.previous,folder/'previous-program');self.snapshot(self.payload.program,folder/'target-program')
             old_data=read(root/'Config/launcher.json');target_data=copy.deepcopy(old_data);release_id=digest(folder/'target-program/release.json')
-            target_data.update(installed_program=release_id,runtime_images={'release_sha256':release_id,'ids':checked['runtime_ids']})
+            target_data.update(development=bool(self.payload.release.get('development')),installed_program=release_id,runtime_images={'release_sha256':release_id,'ids':checked['runtime_ids']})
             journal={'format':1,'product':'Financee_Offline','instance_id':old_data['id'],'id':token,'old_active':read(root/'Config/active.json'),'old_installation':old_data,'target_installation':target_data,'old_restore_journal':read(root/'Config/restore-journal.json'),'previous_program':str((folder/'previous-program').relative_to(root)),'target_program':str((folder/'target-program').relative_to(root)),'previous_release_sha256':digest(folder/'previous-program/release.json'),'target_release_sha256':release_id,'credentials':{name:digest(root/'Config'/name) for name in ('runtime.env','compose.env')},'backup_folder':str(old.installation.backup_folder),'rescue':None,'rescue_sha256':None}
             self.record(journal,'staged')
             try:
@@ -178,8 +179,9 @@ class Upgrade:
     def recover(self):
         root=self.installation.root
         with lock(root/'Config/launcher-window.lock'),lock(root/'Config/controller.lock'):
+            journal=read(self.path,{})
+            if journal.get('format')==1 and journal.get('product')=='Financee_Offline' and journal.get('instance_id')==self.installation.data['id'] and journal.get('stage') in ('committed','rolled_back'):return journal
             journal=self.load_journal()
-            if journal['stage'] in TERMINAL:return journal
             return self._recover(journal)
     def start_services(self,c):
         c.compose('run','--rm','--no-deps','--pull','never','-T','web','python','manage.py','collectstatic','--noinput',timeout=120)
