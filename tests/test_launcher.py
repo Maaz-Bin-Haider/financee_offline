@@ -152,6 +152,7 @@ class LauncherTests(unittest.TestCase):
         self.system.containers=[self.container(Image='sha256:old')]
         with self.assertRaisesRegex(LauncherError,'another runtime image'):self.c.start(False)
         self.assertFalse(self.mutations())
+    @unittest.skipIf(sys.platform=='win32','This macOS fixture requires POSIX paths; Windows mount aliases have separate coverage.')
     def test_mac_desktop_mount_alias_matches_only_confirmed_runtime(self):
         source='/host_mnt'+str(self.install.root);self.assertFalse(self.c.customer_mount_matches(source))
         self.c.desktop_runtime=True;self.assertTrue(self.c.customer_mount_matches(source))
