@@ -42,16 +42,20 @@ def check_policy(source,target,policy):
 def union_ownership(old,new):
     """Recovery alone may stop a mixture of these two exact owned releases."""
     old.context_local();ids=old.command('ps','-aq','--filter','label=com.docker.compose.project='+old.installation.project).split()
-    if not ids:return
+    if not ids:return set()
+    running=set()
     for value in json.loads(old.command('inspect',*ids)):
         labels=value.get('Config',{}).get('Labels') or {};service=labels.get('com.docker.compose.service')
         if labels.get('com.docker.compose.project')!=old.installation.project or service not in SERVICES:raise LauncherError('Upgrade recovery found an unexpected project service.')
         allowed={c.image_ids[c.release['service_images'][service]] for c in (old,new)}
         if value.get('Image') not in allowed:raise LauncherError('Upgrade recovery found a foreign image. No resources were changed.')
+        if value.get('State',{}).get('Running'):running.add(service)
         mounts=value.get('Mounts',[])
         if service in ('web','backup') and not any(m.get('Destination')=='/customer' and old.customer_mount_matches(m.get('Source','')) for m in mounts):raise LauncherError('Upgrade recovery customer mount differs.')
         if service=='db' and not any(m.get('Name')==old.installation.volume and m.get('Destination')=='/var/lib/postgresql/data' for m in mounts):raise LauncherError('Upgrade recovery database volume differs.')
         if service=='nginx' and value.get('HostConfig',{}).get('PortBindings',{}).get('80/tcp',[])!=[{'HostIp':'127.0.0.1','HostPort':str(old.installation.port)}]:raise LauncherError('Upgrade recovery loopback binding differs.')
+
+    return running
 
 class Upgrade:
     def __init__(self,customer,target,previous=None,system=None,progress=None):
@@ -185,7 +189,8 @@ class Upgrade:
         journal=self.load_journal();root=self.installation.root
         if journal['stage'] in TERMINAL:return journal
         old=self.controller(root/journal['previous_program'],journal['old_installation']);new=self.controller(root/journal['target_program'],journal['target_installation'])
-        old.ensure_runtime();new.ensure_runtime();old.images_ready();new.images_ready();union_ownership(old,new);old.verify_storage();old.check_port()
+        old.ensure_runtime();new.ensure_runtime();old.images_ready();new.images_ready();running=union_ownership(old,new);old.verify_storage()
+        if old.port_busy() and 'nginx' not in running:raise LauncherError('An unverified service occupies the recovery port. Nothing was stopped.')
         # A crashed host can leave its one-off migration/restore container alive.
         name=old.installation.project+'_upgrade_'+journal['id'][:12]
         ids=old.command('ps','-aq','--filter','name=^/'+name+'$').split()

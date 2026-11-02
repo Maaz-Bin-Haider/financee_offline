@@ -67,3 +67,22 @@ class UpgradeBoundaryTests(unittest.TestCase):
         self.assertEqual(old.command.call_count,2)
 
 if __name__=='__main__':unittest.main()
+
+class UpgradeRecoveryOwnershipTests(unittest.TestCase):
+    def controllers(self):
+        old=Mock();new=Mock();old.installation.project='financee_offline_fixture';old.installation.port=18769;old.installation.volume='financee_offline_fixture_database'
+        for c in (old,new):c.release={'service_images':{k:k for k in ('db','redis','web','backup','nginx')}};c.image_ids={k:k for k in ('db','redis','web','backup','nginx')}
+        old.customer_mount_matches.side_effect=lambda path:path=='/customer-fixture'
+        return old,new
+    def value(self,service):return {'Config':{'Labels':{'com.docker.compose.project':'financee_offline_fixture','com.docker.compose.service':service}},'Image':service,'State':{'Running':True},'Mounts':[],'HostConfig':{'PortBindings':{'80/tcp':[{'HostIp':'127.0.0.1','HostPort':'18769'}]}}}
+    def test_verified_own_proxy_is_returned_without_requiring_web_health(self):
+        old,new=self.controllers();old.command.side_effect=['id',json.dumps([self.value('nginx')])]
+        self.assertEqual(union_ownership(old,new),{'nginx'})
+    def test_foreign_folder_volume_and_lan_binding_are_refused(self):
+        for service in ('web','db','nginx'):
+            old,new=self.controllers();v=self.value(service)
+            if service=='web':v['Mounts']=[{'Destination':'/customer','Source':'/foreign'}]
+            if service=='db':v['Mounts']=[{'Destination':'/var/lib/postgresql/data','Name':'foreign_volume'}]
+            if service=='nginx':v['HostConfig']['PortBindings']['80/tcp'][0]['HostIp']='0.0.0.0'
+            old.command.side_effect=['id',json.dumps([v])]
+            with self.subTest(service=service),self.assertRaises(LauncherError):union_ownership(old,new)

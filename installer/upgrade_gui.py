@@ -39,7 +39,7 @@ class UpgradeWindow:
         if path:self.customer.set(path);self.prepared=None
     def choose_previous(self):
         if self.busy:return
-        path=filedialog.askdirectory(title='Choose the previous Financee app or installed program folder')
+        path=(filedialog.askopenfilename(title='Choose the previous Financee app',filetypes=[('Financee application','*.app')]) if sys.platform=='darwin' else filedialog.askdirectory(title='Choose the previous installed Financee program folder'))
         if path:self.previous.set(path);self.prepared=None
     def program_path(self):
         path=Path(self.previous.get())
@@ -68,7 +68,8 @@ class UpgradeWindow:
         def done(value):
             self.upgrade=u;self.prepared=value;self.status.set('Verified '+value['from_version']+' → '+value['to_version']+'. Apply when ready.')
             self.append('Business: '+value['customer_directory']+'\nProtected rescue folder: '+value['backup_directory'])
-        self.task(lambda:u.prepare(Path(self.customer.get())/'Cache/upgrade-images'/u.payload.identity,self.archive),done)
+        cache=Path(self.customer.get())/'Cache/upgrade-images'/u.payload.identity
+        self.task(lambda:u.prepare(cache,self.archive),done)
     def apply(self):
         if not self.prepared:messagebox.showinfo('Verify first','Choose Verify / Prepare Upgrade first.',parent=self.root);return
         reviewed=self.prepared
