@@ -1,7 +1,7 @@
 """Installer update mode; all verification and recovery run off the UI thread."""
 import concurrent.futures,queue,sys,tkinter as tk
 from pathlib import Path
-from tkinter import filedialog,messagebox,simpledialog,ttk
+from tkinter import filedialog,messagebox,ttk
 from launcher.storage import LauncherError,atomic,read
 from .upgrade import Upgrade
 
@@ -74,8 +74,6 @@ class UpgradeWindow:
         if not self.prepared:messagebox.showinfo('Verify first','Choose Verify / Prepare Upgrade first.',parent=self.root);return
         reviewed=self.prepared
         if not messagebox.askyesno('Upgrade this business?',reviewed['from_version']+' → '+reviewed['to_version']+'\n\n'+reviewed['customer_directory']+'\n\nA protected rescue ZIP and the previous database, attachments and runtime will be retained. Financee will be unavailable during verification. Continue?',parent=self.root):return
-        text=simpledialog.askstring('Confirm manual upgrade','Type UPGRADE to apply the verified release to this business.',parent=self.root)
-        if text!='UPGRADE':return
         self.prepared=None
         self.task(lambda:self.upgrade.apply(reviewed,reviewed['confirmation']),self.complete)
     def complete(self,journal):

@@ -88,5 +88,5 @@ def main():
    result={'source_revision':u.payload.release.get('source_revision'),'previous_version':old_payload.release['version'],'target_version':u.payload.release['version'],'schema':2,'synthetic_populated_business':True,'interrupted_host_exit_checkpoints_recovered':crashes,'real_candidate_and_startup_failure_recovery':faults,'candidate_business_requests_gated_until_commit':read(root/'request-gate-verified.json',{}).get('blocked',False),'all_business_auth_permissions_settings_history_rows_sequences_and_media_preserved':True,'SQL_definitions_verified':190,'sessions_expired_after_success':True,'runtime_credentials_preserved':True,'previous_database_media_program_images_and_rescues_retained':True,'committed_recovery_idempotent_no_downgrade':True,'core_tests':38,'project':i.project,'private_root':str(root),'review_resources_unchanged':states()==before_states and before_files=={p:digest(Path(p)) for p in before_files}}
    assert result['review_resources_unchanged'];atomic(a.output,result);print(json.dumps(result,indent=2),flush=True)
   finally:
-   if controller:controller.ownership();controller.compose('down');assert controller.volume_exists()
+   if controller:controller.ensure_runtime();controller.ownership();controller.compose('down');assert controller.volume_exists()
 if __name__=='__main__':main()
