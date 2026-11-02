@@ -2,7 +2,7 @@
 No source checkout, Python/Node CLI, registry login, Docker socket in web, or
 normal-start network downloads. Installer payload preparation is separate.
 """
-import contextlib,hashlib,http.client,json,os,socket,time
+import contextlib,hashlib,http.client,json,ntpath,os,socket,time
 from pathlib import Path
 from .storage import LauncherError,read,atomic,lock
 from .installation import Installation
@@ -61,6 +61,13 @@ class Controller:
         # apply this translation to another daemon or an arbitrary local path.
         if self.desktop_runtime and self.platform_name=='macos-arm64' and source.startswith('/host_mnt/'):
             return Path(source[len('/host_mnt'):]).resolve()==self.installation.root
+        if self.desktop_runtime and self.platform_name=='windows-amd64':
+            for prefix in ('/run/desktop/mnt/host/','/host_mnt/'):
+                if source.startswith(prefix):
+                    tail=source[len(prefix):]
+                    if len(tail)>2 and tail[0].isalpha() and tail[1]=='/':
+                        translated=tail[0]+':/'+tail[2:]
+                        return ntpath.normcase(ntpath.normpath(translated))==ntpath.normcase(ntpath.normpath(str(self.installation.root)))
         return False
     def ownership(self):
         ids=self.command('ps','-aq','--filter','label=com.docker.compose.project='+self.installation.project).split()

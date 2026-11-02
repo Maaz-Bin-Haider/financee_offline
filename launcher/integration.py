@@ -1,5 +1,5 @@
 """Explicit user-selected shortcuts/sign-in hooks; no automatic opt-in."""
-import os,platform,plistlib,subprocess,sys
+import ntpath,os,platform,plistlib,subprocess,sys
 from pathlib import Path
 from .storage import LauncherError
 
@@ -27,6 +27,15 @@ def windows_link(path,target):
     subprocess.run(['powershell.exe','-NoProfile','-NonInteractive','-Command',code],env=env,check=True,creationflags=subprocess.CREATE_NO_WINDOW)
     return path
 
+def windows_remove_link(path,target):
+    env=dict(os.environ,FINANCEE_LINK=str(path))
+    code="$s=New-Object -ComObject WScript.Shell; $l=$s.CreateShortcut($env:FINANCEE_LINK); [Console]::WriteLine($l.TargetPath)"
+    result=subprocess.run(['powershell.exe','-NoProfile','-NonInteractive','-Command',code],env=env,check=True,capture_output=True,text=True,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+    normalize=lambda value:ntpath.normcase(ntpath.normpath(value))
+    if normalize(result.stdout.strip())!=normalize(str(target)):
+        raise LauncherError('The sign-in shortcut points to another program and was preserved.')
+    path.unlink()
+
 def signin(installation,enabled,target=None,agent_dir=None):
     target=Path(target or app_path());label='com.financee.offline.'+installation.data['id']
     if sys.platform=='darwin':
@@ -43,6 +52,10 @@ def signin(installation,enabled,target=None,agent_dir=None):
     elif os.name=='nt':
         folder=Path(agent_dir or Path(os.environ['APPDATA'])/'Microsoft/Windows/Start Menu/Programs/Startup');path=folder/(label+'.lnk')
         if enabled:folder.mkdir(parents=True,exist_ok=True);windows_link(path,target)
-        elif path.exists():path.unlink()
+        elif path.exists():
+            recorded=installation.data.get('signin_target')
+            if not recorded:raise LauncherError('The sign-in target is not recorded. Its shortcut was preserved; repair it before uninstalling.')
+            windows_remove_link(path,recorded)
     else:raise LauncherError('Sign-in startup requires a supported packaged build.')
+    if enabled:installation.data['signin_target']=str(target.resolve())
     installation.data['start_at_signin']=bool(enabled);installation.save()

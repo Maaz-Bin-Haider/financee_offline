@@ -76,7 +76,7 @@ class Window:
         self.location.set(str(installation.root));self.wizard.pack_forget();self.controls.pack(fill='x',after=self.bar);self.signin_button.pack(anchor='w',after=self.controls,pady=(8,0));self.at_signin.set(installation.data.get('start_at_signin',False));self.menu_state(True);self.refresh()
     def context(self):
         system=System();docker=docker_path()
-        for name in ('desktop-linux','default') if sys.platform=='darwin' else ('default','desktop-linux'):
+        for name in ('desktop-linux','default'):
             try:
                 endpoint=json.loads(system.execute([docker,'context','inspect',name,'--format','{{json .Endpoints.docker.Host}}']))
                 if endpoint.startswith(('unix://','npipe:////./pipe/')):return name

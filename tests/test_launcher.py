@@ -46,6 +46,16 @@ class LauncherTests(unittest.TestCase):
     def mutations(self):return [c for c in self.system.calls if any(v in c for v in ('stop','up','run','exec'))]
     def container(self,service='web',**changes):
         value={'Image':'sha256:app','Config':{'Labels':{'com.docker.compose.service':service}},'Mounts':[{'Destination':'/customer','Source':str(self.install.root)}]};value.update(changes);return value
+    def test_windows_desktop_mount_alias_requires_exact_recorded_drive_and_folder(self):
+        from pathlib import PureWindowsPath
+        self.c.platform_name='windows-amd64';self.c.desktop_runtime=True
+        with patch.object(self.install,'root',PureWindowsPath('C:/Users/Owner/Financee Company')):
+            self.assertTrue(self.c.customer_mount_matches('/run/desktop/mnt/host/c/Users/Owner/Financee Company'))
+            self.assertTrue(self.c.customer_mount_matches('/host_mnt/c/Users/Owner/Financee Company'))
+            self.assertFalse(self.c.customer_mount_matches('/run/desktop/mnt/host/d/Users/Owner/Financee Company'))
+            self.assertFalse(self.c.customer_mount_matches('/run/desktop/mnt/host/c/Users/Other/Financee Company'))
+            self.c.desktop_runtime=False
+            self.assertFalse(self.c.customer_mount_matches('/host_mnt/c/Users/Owner/Financee Company'))
     def test_distinct_installations_random_credentials_and_empty_setup(self):
         other=Installation.create(self.root/'Other',18782,'test')
         a=env_values(self.install.root/'Config/runtime.env');b=env_values(other.root/'Config/runtime.env')

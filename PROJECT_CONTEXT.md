@@ -1,9 +1,12 @@
 # Financee Offline context
 
-2026-10-28, Asia/Karachi. Owner authorized Phase 5. **The local Apple Silicon
-Phase 5 implementation is ready for owner review; stop before Phase 6.** Full
-hardware acceptance remains pending for Windows, actual shared-runtime Docker-off
-and OS reboot/sign-in. The owner authorized committing and pushing the current
+2026-11-02, Asia/Karachi. The owner instructed “move forward” after the Phase 5
+handoff and authorized Phase 6 implementation. **Phase 6 Windows setup prototype
+is in progress; native Windows build/acceptance and a qualified Windows 10 runtime
+remain pending. Stop before Phase 7.** The existing Apple Silicon review app
+remains the Phase 5 development build. Actual shared-runtime Docker-off and OS
+reboot/sign-in acceptance remain pending.
+The owner authorized committing and pushing the current
 source state to https://github.com/Maaz-Bin-Haider/financee_offline.git on
 2026-10-28. Remote `origin`, branch `codex/single-company-core`, tracks the same
 remote branch. The Phase 5 handoff commit is 03a22c3f9755e9c805fe222c5795ee1985b7d3e3.
@@ -112,8 +115,17 @@ no review restore occurred. Source Git HEAD/status remain unchanged. Actual glob
 Docker-off/reboot and Windows target tests are not claimed. See docs/PHASE5_REVIEW.md
 and PHASE5_RESULTS.json. Generated apps/config/ZIPs/receipts remain ignored.
 
-Remaining gates: owner Phase 5 review; Phases 6/7
-real Windows10/11 x64 and signed/notarized Apple Silicon installers; Phase 8 safe
+Phase 6 adds explicit Windows prerequisite diagnostics/WSL consent and update
+requests, persistent setup state, verified image archive download/import, same-release
+repair and conservative data-preserving uninstall preparation. Inno Setup/native
+PyInstaller recipes and a clean-checkout staging/export path are present. Windows
+10 is explicitly refused by this development prototype until a maintained runtime
+pair is implemented/qualified; the dedicated Engine-in-WSL candidate is not yet
+implemented. No native Windows EXE, UAC/reboot, compiler or installer acceptance
+result is claimed. No new publication/push is authorized by the phase instruction.
+
+Remaining gates: Phase 6 native Windows10/11 x64 implementation/acceptance and
+owner review; Phase 7 signed/notarized Apple Silicon installers; Phase 8 safe
 manual installer upgrades/recovery; Phase 9 release CI/distribution with explicit
 owner authorization. No Intel Mac/Windows ARM package in v1. Current fonts cover
 catalogue currency symbols, not every possible writing system. CSV is Excel-readable;
