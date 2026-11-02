@@ -109,7 +109,7 @@ class Window:
             if self.controller:self.start()
         except Exception as exc:self.show_error(exc)
     def task(self,fn,done=None):
-        if self.busy:return
+        if self.busy or self.closed:return
         self.busy=True;self.menu_state(False);self.bar.start(12)
         for button in self.buttons:button.state(['disabled'])
         self.signin_button.state(['disabled'])
@@ -133,6 +133,7 @@ class Window:
         if self.controller and not self.busy:
             request=self.controller.installation.root/'Cache/launcher-open-request.json'
             if request.exists():request.unlink();self.start()
+        if self.closed:return
         try:self.root.after(150,self.poll)
         except tk.TclError:pass
     def show_error(self,error):

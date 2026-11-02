@@ -46,7 +46,7 @@ class MacSetupWindow:
     def append(self,text):
         self.output.configure(state='normal');self.output.insert('end',text+'\n');self.output.see('end');self.output.configure(state='disabled')
     def task(self,work,done=None):
-        if self.busy:return
+        if self.busy or self.closed:return
         self.busy=True;self.bar.start();self.consent_button.state(['disabled']);self.desktop_button.state(['disabled'])
         for button in self.buttons:button.state(['disabled'])
         for index in range(8):self.menu.entryconfigure(index,state='disabled')
@@ -65,6 +65,7 @@ class MacSetupWindow:
                 if kind=='error':self.status.set('Needs attention');self.append(value);messagebox.showerror('Financee Setup needs attention',value,parent=self.root)
                 elif value[1]:value[1](value[0])
         except queue.Empty:pass
+        if self.closed:return
         try:self.root.after(150,self.poll)
         except tk.TclError:pass
     def copy_app(self):
