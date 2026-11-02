@@ -1,3 +1,5 @@
+from pathlib import Path
+from django.conf import settings
 from django.contrib.auth import get_user_model, login
 from django.db import connection, transaction
 from django.http import JsonResponse
@@ -6,6 +8,8 @@ from django.views.decorators.http import require_http_methods, require_GET
 from financee.security import rate_limit
 from .forms import SetupForm
 from .models import GeneralSettings
+
+BUILD_VERSION = (Path(settings.BASE_DIR) / "VERSION").read_text().strip()
 
 @require_http_methods(['GET','POST'])
 @rate_limit('onboarding', limit=15, window=60, methods={'POST'})
@@ -34,6 +38,5 @@ def health(request):
     with connection.cursor() as cur:
         cur.execute('SELECT version FROM offline_schema_version WHERE id=true')
         row = cur.fetchone()
-    from django.conf import settings
-    return JsonResponse({'installation_id':getattr(settings,'OFFLINE_INSTALLATION_ID',None),'generation':getattr(settings,'OFFLINE_GENERATION','development'),'product':'Financee_Offline','build':'0.5.0-phase5','schema':row[0] if row else None,
+    return JsonResponse({'installation_id':getattr(settings,'OFFLINE_INSTALLATION_ID',None),'generation':getattr(settings,'OFFLINE_GENERATION','development'),'product':'Financee_Offline','build':BUILD_VERSION,'schema':row[0] if row else None,
                          'setup_complete':GeneralSettings.objects.exists()})
