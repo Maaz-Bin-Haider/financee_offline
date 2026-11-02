@@ -11,6 +11,7 @@ from launcher.system import windows_native_arch
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--program',required=True,type=Path);p.add_argument('--archive',required=True,type=Path);p.add_argument('--iscc',required=True,type=Path);a=p.parse_args()
     if platform.system()!='Windows' or windows_native_arch() not in ('amd64','x86_64') or struct.calcsize('P')!=8 or os.environ.get('PROCESSOR_ARCHITEW6432','').upper()=='ARM64':raise SystemExit('Build on native Windows x64 with 64-bit Python; cross-freezing/emulation is not a Windows acceptance result.')
+    if subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip():raise SystemExit('Commit the reviewed source first; frozen build provenance requires a clean checkout.')
     payload=Payload(a.program)
     if payload.release['architecture']!='amd64':raise SystemExit('Windows requires a native Linux AMD64 payload.')
     payload.verify_archive(a.archive)
@@ -42,7 +43,7 @@ def main():
     (program/'delivery.json').write_text(json.dumps(delivery,indent=2)+'\n')
     for name,entry in [('Financee Offline','launcher/entry.py'),('Financee Offline Setup','installer/entry.py')]:
         subprocess.run([sys.executable,'-m','PyInstaller','--noconfirm','--windowed','--onedir','--noupx','--name',name,'--paths',str(ROOT),'--add-data',str(program)+os.pathsep+'program','--distpath',str(out/'frozen'),'--workpath',str(out/'work'/name),'--specpath',str(out/'spec'),str(ROOT/entry)],cwd=ROOT,check=True)
-    subprocess.run([str(a.iscc.resolve()),'/DStageDir='+str(out/'frozen'),'/DOutputDir='+str(out/'installer'),str(ROOT/'installer/windows/financee.iss')],check=True)
+    subprocess.run([str(a.iscc.resolve()),'/DStageDir='+str(out/'frozen'),'/DOutputDir='+str(out/'installer'),'/DProgramIdentity='+digest(program/'release.json'),str(ROOT/'installer/windows/financee.iss')],check=True)
     receipt={'setup_version':'0.6.0-phase6','engine_version':release['version'],'architecture':'windows-amd64','source_revision':release['launcher_revision'],'development':True,'signed':False,'native_customer_acceptance':'pending','installers':[{ 'filename':str(f),'sha256':digest(f),'bytes':f.stat().st_size} for f in (out/'installer').glob('*.exe')]}
     (out/'build-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt,indent=2))
 if __name__=='__main__':main()

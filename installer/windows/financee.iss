@@ -5,6 +5,9 @@
 #ifndef OutputDir
   #error OutputDir is required
 #endif
+#ifndef ProgramIdentity
+  #error ProgramIdentity is required
+#endif
 #define SetupVersion "0.6.0-phase6"
 [Setup]
 AppId={{CA5605DC-2941-48B4-BA03-C5080F24DCD9}
@@ -41,15 +44,18 @@ Name: "{userprograms}\Financee Offline\Financee Offline Setup"; Filename: "{app}
 Name: "{userdesktop}\Financee Offline"; Filename: "{app}\launcher\Financee Offline.exe"; Tasks: desktopicon
 [Registry]
 Root: HKCU; Subkey: "Software\Financee\Offline"; ValueType: string; ValueName: InstallerVersion; ValueData: "{#SetupVersion}"; Flags: uninsdeletevalue
+Root: HKCU; Subkey: "Software\Financee\Offline"; ValueType: string; ValueName: ProgramIdentity; ValueData: "{#ProgramIdentity}"; Flags: uninsdeletevalue
 [Run]
 Filename: "{app}\setup\Financee Offline Setup.exe"; Description: "Check prerequisites and finish Financee setup"; Flags: postinstall nowait skipifsilent
 [Code]
 function InitializeSetup(): Boolean;
-var Previous: String;
+var Previous, Identity: String;
 begin
   Result := True;
   if RegQueryStringValue(HKCU, 'Software\Financee\Offline', 'InstallerVersion', Previous) then
-    if Previous <> '{#SetupVersion}' then begin
+    if (Previous <> '{#SetupVersion}') or
+       (not RegQueryStringValue(HKCU, 'Software\Financee\Offline', 'ProgramIdentity', Identity)) or
+       (Identity <> '{#ProgramIdentity}') then begin
       MsgBox('A different Financee release is installed. Use its data-preserving upgrade workflow. Existing program files and business data were preserved.', mbError, MB_OK);
       Result := False;
     end;

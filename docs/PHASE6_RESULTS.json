@@ -1,0 +1,96 @@
+{
+  "phase": 6,
+  "date": "2026-11-02",
+  "timezone": "Asia/Karachi",
+  "status": "Windows source prototype; phase incomplete pending Windows 10 runtime implementation/qualification and native Windows build/acceptance",
+  "authorization": "Owner move forward after Phase 5 handoff",
+  "installer_core_revision": "6cb2bc87d3ced194ef5f883d15312905f3f083b0",
+  "setup_version": "0.6.0-phase6",
+  "engine_version": "0.5.0-phase5",
+  "schema": 2,
+  "host_checks": {
+    "installer_and_prerequisites": 44,
+    "launcher": 37,
+    "total": 81,
+    "result": "pass",
+    "command": "python -m unittest tests.test_installer tests.test_launcher"
+  },
+  "actual_shared_engine_smoke": {
+    "kind": "real macOS ARM64 shared-engine smoke; NOT Windows certification",
+    "archive_sha256": "37342e2a68808e6eccd7367238ff1306b73e296355a4b36020c27bd9b252f406",
+    "archive_bytes": 494825472,
+    "native_images_verified": 4,
+    "new_empty_counts": "0|0|0",
+    "reopened_setup_reused_identity_credentials_generation": true,
+    "same_release_repair_reused_container_ids": true,
+    "uninstall_preparation_stopped_only_owned_services": true,
+    "customer_data_and_named_volumes_retained": true,
+    "temporary_containers_and_networks_released": true,
+    "review_containers_states_images_config_credentials_media_unchanged": true,
+    "review_business_fingerprint": "not queried: review stack was already stopped; preserved its state",
+    "project": "financee_offline_46116b62b17b",
+    "published": false
+  },
+  "local_arm64_payload": {
+    "directory": ".runtime/phase6-6cb2bc8-payload",
+    "bytes": 494825472,
+    "sha256": "37342e2a68808e6eccd7367238ff1306b73e296355a4b36020c27bd9b252f406",
+    "release_sha256": "4e0705d583a3aa2ce4ed2dd780ec62bfc96e6df979db3f2d13fc828dc6af1efe",
+    "images": [
+      {
+        "reference": "financee-offline-payload:arm64-ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d",
+        "id": "sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d"
+      },
+      {
+        "reference": "financee-offline-payload:arm64-e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2",
+        "id": "sha256:e7723ff73d963f5cc6d9c4643ea3d989527a402a319239054e9472a7fb9219a2"
+      },
+      {
+        "reference": "financee-offline-payload:arm64-40b14f234aaf0f41aa35341f47200ce1ba7a847997905ae0619bace283a6d94c",
+        "id": "sha256:40b14f234aaf0f41aa35341f47200ce1ba7a847997905ae0619bace283a6d94c"
+      },
+      {
+        "reference": "financee-offline-payload:arm64-65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10",
+        "id": "sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10"
+      }
+    ],
+    "architecture": "linux/arm64",
+    "source_revision": "6cb2bc87d3ced194ef5f883d15312905f3f083b0",
+    "customer_data_included": false,
+    "uploaded": false
+  },
+  "windows_artifact": null,
+  "native_windows_builder_on_mac": "refused as designed; not a Windows build result",
+  "native_windows_api_uac_inno_reboot_tests": "not run; native Windows machine unavailable in this session",
+  "review_state": {
+    "observed_main_services": "db/redis/web/nginx already exited; backup running",
+    "containers_states_images_configuration_credentials_media": "unchanged across shared-engine smoke",
+    "business_database_fingerprint": "not queried while review was stopped",
+    "restore_performed": false
+  },
+  "source_repositories": {
+    "Financee_Multitenant_Production": {
+      "head": "0ea97a2253f0ed12213a24832393e223eed71e21",
+      "clean": true,
+      "modified_or_operated": false
+    },
+    "Accounting-Plus-Inventory-System": {
+      "head": "ea1f0194f2e4d2b0ec6e120086b29276c4d99365",
+      "clean": true,
+      "modified_or_operated": false
+    }
+  },
+  "remaining": [
+    "Windows 10 maintained runtime pair: dedicated Engine-in-WSL candidate is not yet implemented or qualified",
+    "Native AMD64 payload, Windows freeze and Inno compilation",
+    "Real Windows 10/11 installation, UAC decline, WSL setup/update, restart/resume and OS servicing eligibility",
+    "Real Windows mount/filesystem behavior, missing-image load, offline reboot, backup/restore, repair/uninstall/reinstall and other-project isolation",
+    "Owner signing credentials and approved download hosting for release",
+    "Owner review before Phase 7; Phase 8 data-changing upgrades remain separate"
+  ],
+  "publication": {
+    "new_source_commits_pushed": false,
+    "installer_or_archive_uploaded": false,
+    "customer_data_uploaded": false
+  }
+}

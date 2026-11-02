@@ -52,3 +52,13 @@ rescue protection and session expiry. It removes only candidates it created.
 image in a networkless disposable container and compares every table/sequence
 fingerprint after ARM64 → emulated Linux AMD64 → ARM64. It is a logical portability
 test, not native Windows/macOS installation certification.
+
+## Phase 6 installer
+
+`python -m unittest tests.test_installer tests.test_launcher` runs host-only
+installer/archive/resume/data-preservation and launcher guards without changing
+Docker/Windows/WSL. `tests/test_installer_integration.py --payload PATH` requires a
+verified native ARM64 exported payload and operates only a fresh disposable
+Financee-owned installation; it retains its volumes and preserves the offline
+review stack's current state. This Mac smoke is not Windows certification.
+See `docs/PHASE6_REVIEW.md` for exact limits and native Windows acceptance gates.

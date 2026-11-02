@@ -46,3 +46,11 @@ from installed program files and retained when services stop.
 
 [Approved plan](IMPLEMENTATION_PLAN.md) · [Product spec](OFFLINE_PRODUCT_SPEC.md) ·
 [Project context](PROJECT_CONTEXT.md) · [Source provenance](SOURCE_PROVENANCE.md)
+
+## Windows setup prototype (Phase 6)
+
+Phase 6 source implementation and shared-engine checks are available; no native
+Windows installer has been built/certified on this Mac. See
+[the Phase 6 review and Windows build instructions](docs/PHASE6_REVIEW.md).
+Windows 10 runtime qualification remains required and pending. The existing Mac
+review app remains the Phase 5 build. Stop before Phase 7.

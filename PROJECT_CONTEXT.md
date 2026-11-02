@@ -122,7 +122,16 @@ PyInstaller recipes and a clean-checkout staging/export path are present. Window
 10 is explicitly refused by this development prototype until a maintained runtime
 pair is implemented/qualified; the dedicated Engine-in-WSL candidate is not yet
 implemented. No native Windows EXE, UAC/reboot, compiler or installer acceptance
-result is claimed. No new publication/push is authorized by the phase instruction.
+result is claimed. 44 installer/prerequisite checks and 37 launcher guards pass
+(81 total). A real Mac ARM64 shared-engine smoke verifies four exported native
+images, empty setup, repeat setup/repair with unchanged identity/keys/generation/
+container IDs, and data-retaining uninstall preparation. This does not certify
+Windows. Review db/redis/web/nginx were already exited, backup running; tests
+preserved those states, images/config/credentials/media. No stopped-review live
+business fingerprint was queried. Temporary test containers/networks were removed,
+volumes retained. See docs/PHASE6_REVIEW.md and PHASE6_RESULTS.json for exact local
+payload/source evidence and build instructions. Core source commit 6cb2bc8.
+No new publication/push is authorized by the phase instruction.
 
 Remaining gates: Phase 6 native Windows10/11 x64 implementation/acceptance and
 owner review; Phase 7 signed/notarized Apple Silicon installers; Phase 8 safe
