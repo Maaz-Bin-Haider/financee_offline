@@ -2,17 +2,18 @@
   "phase": 6,
   "date": "2026-11-02",
   "timezone": "Asia/Karachi",
-  "status": "Windows source prototype; phase incomplete pending Windows 10 runtime implementation/qualification and native Windows build/acceptance",
-  "authorization": "Owner move forward after Phase 5 handoff",
-  "installer_core_revision": "6cb2bc87d3ced194ef5f883d15312905f3f083b0",
+  "status": "Unsigned native Windows development build produced; customer device tests deferred by owner. Phase 6 remains incomplete for maintained Windows 10 runtime and target acceptance.",
+  "authorization": "Owner confirmed no Windows test machine and instructed build now, test later; hosted development build chosen as implementation route.",
+  "installer_core_revision": "60dc9a3f3d033b59f37441dcab3ab161683e7f2a",
   "setup_version": "0.6.0-phase6",
   "engine_version": "0.5.0-phase5",
   "schema": 2,
   "host_checks": {
-    "installer_and_prerequisites": 44,
-    "launcher": 37,
-    "total": 81,
-    "result": "pass",
+    "installer_and_prerequisites": 47,
+    "launcher": 42,
+    "total": 89,
+    "linux_and_mac": "89 pass",
+    "windows_server_2022": "88 pass; one POSIX-only Mac path fixture skipped; separate Windows mount case active",
     "command": "python -m unittest tests.test_installer tests.test_launcher"
   },
   "actual_shared_engine_smoke": {
@@ -28,8 +29,10 @@
     "temporary_containers_and_networks_released": true,
     "review_containers_states_images_config_credentials_media_unchanged": true,
     "review_business_fingerprint": "not queried: review stack was already stopped; preserved its state",
-    "project": "financee_offline_46116b62b17b",
-    "published": false
+    "project": "financee_offline_edf094293433",
+    "published": false,
+    "controller_revision": "60dc9a3f3d033b59f37441dcab3ab161683e7f2a",
+    "destination_image_ids_bound_to_program_release": true
   },
   "local_arm64_payload": {
     "directory": ".runtime/phase6-6cb2bc8-payload",
@@ -59,9 +62,102 @@
     "customer_data_included": false,
     "uploaded": false
   },
-  "windows_artifact": null,
+  "windows_artifact": {
+    "source_revision": "60dc9a3f3d033b59f37441dcab3ab161683e7f2a",
+    "run_url": "https://github.com/Maaz-Bin-Haider/financee_offline/actions/runs/41422916045",
+    "run_id": 41422916045,
+    "conclusion": "success",
+    "build_host": "native Windows Server 2022 x64",
+    "setup_version": "0.6.0-phase6",
+    "engine_version": "0.5.0-phase5",
+    "installers": [
+      {
+        "sha256": "287b6b411d7397fe536a08e68273771da46baa8f3867071ccb9b7c7218417cbb",
+        "bytes": 20107129,
+        "filename": "Financee-Offline-Windows-x64-Development-Setup.exe"
+      }
+    ],
+    "frozen_bundle_checks": [
+      {
+        "format": 1,
+        "product": "Financee_Offline",
+        "frozen": true,
+        "platform": "Windows",
+        "native_architecture": "amd64",
+        "python": "3.12.10",
+        "tcl": "8.6.15",
+        "program_files_verified": true,
+        "release_sha256": "50d2ade5441bb7183d3cacbd98bea580d2cab69b10022683d7a60e860e607da8",
+        "payload_architecture": "amd64",
+        "tls_context_loaded": true,
+        "source_revision": "60dc9a3f3d033b59f37441dcab3ab161683e7f2a",
+        "customer_installation_tested": false,
+        "docker_or_wsl_modified": false
+      },
+      {
+        "format": 1,
+        "product": "Financee_Offline",
+        "frozen": true,
+        "platform": "Windows",
+        "native_architecture": "amd64",
+        "python": "3.12.10",
+        "tcl": "8.6.15",
+        "program_files_verified": true,
+        "release_sha256": "50d2ade5441bb7183d3cacbd98bea580d2cab69b10022683d7a60e860e607da8",
+        "payload_architecture": "amd64",
+        "tls_context_loaded": true,
+        "source_revision": "60dc9a3f3d033b59f37441dcab3ab161683e7f2a",
+        "customer_installation_tested": false,
+        "docker_or_wsl_modified": false
+      }
+    ],
+    "files": [
+      {
+        "name": "build-receipt.json",
+        "bytes": 2060,
+        "sha256": "69031e35ec138e0330944d2db600fdeb9d3e067bb4edf406fa31f68752312fe1"
+      },
+      {
+        "name": "financee-offline-runtime-amd64.tar",
+        "bytes": 911109632,
+        "sha256": "61a551f25f56ddfc037dc7cd12582f899ef7ae847570ee84acec13beecc21d5c"
+      },
+      {
+        "name": "Financee-Offline-Windows-x64-Development-Setup.exe",
+        "bytes": 20107129,
+        "sha256": "287b6b411d7397fe536a08e68273771da46baa8f3867071ccb9b7c7218417cbb"
+      },
+      {
+        "name": "program-release.json",
+        "bytes": 5173,
+        "sha256": "50d2ade5441bb7183d3cacbd98bea580d2cab69b10022683d7a60e860e607da8"
+      },
+      {
+        "name": "READ-ME-FIRST.txt",
+        "bytes": 1398,
+        "sha256": "bf2cb1deaf578524a21196fa88198a6af7dcb5c97382ecae73fe1c4e32fe104d"
+      },
+      {
+        "name": "runtime-delivery.json",
+        "bytes": 356,
+        "sha256": "f6d6f1dfbcb1afd42372b185679332702a62e07e09690fb8bfe5e6a595a519d5"
+      },
+      {
+        "name": "SHA256SUMS.txt",
+        "bytes": 568,
+        "sha256": "0b72a8171cfd6ac1e9f141edf8581646e26655b25c47a8d5c5399a72ae795d73"
+      }
+    ],
+    "artifact_id": 13130114137,
+    "temporary_artifact_expires_utc": "2026-11-09T09:45:45Z",
+    "public_release_created": false
+  },
   "native_windows_builder_on_mac": "refused as designed; not a Windows build result",
-  "native_windows_api_uac_inno_reboot_tests": "not run; native Windows machine unavailable in this session",
+  "native_windows_api_uac_inno_reboot_tests": {
+    "PyInstaller_and_Inno_compilation": "pass on Windows Server 2022",
+    "two_frozen_native_architecture_program_hash_Tcl_TLS_checks": "pass",
+    "Windows_10_11_customer_install_UAC_WSL_reboot_restore_repair_uninstall": "not run; owner deferred until a device is available"
+  },
   "review_state": {
     "observed_main_services": "db/redis/web/nginx already exited; backup running",
     "containers_states_images_configuration_credentials_media": "unchanged across shared-engine smoke",
@@ -82,15 +178,42 @@
   },
   "remaining": [
     "Windows 10 maintained runtime pair: dedicated Engine-in-WSL candidate is not yet implemented or qualified",
-    "Native AMD64 payload, Windows freeze and Inno compilation",
     "Real Windows 10/11 installation, UAC decline, WSL setup/update, restart/resume and OS servicing eligibility",
     "Real Windows mount/filesystem behavior, missing-image load, offline reboot, backup/restore, repair/uninstall/reinstall and other-project isolation",
     "Owner signing credentials and approved download hosting for release",
     "Owner review before Phase 7; Phase 8 data-changing upgrades remain separate"
   ],
   "publication": {
-    "new_source_commits_pushed": false,
-    "installer_or_archive_uploaded": false,
+    "new_source_commits_pushed": true,
+    "development_Actions_artifacts_uploaded": true,
+    "artifact_retention_days": 7,
+    "public_installer_release_created": false,
     "customer_data_uploaded": false
+  },
+  "initial_installer_core_revision": "6cb2bc87d3ced194ef5f883d15312905f3f083b0",
+  "amd64_engine_checks": {
+    "django_core": 38,
+    "system_checks": "pass",
+    "migration_drift": "none",
+    "host": "isolated Ubuntu 24.04 AMD64 GitHub build runner"
+  },
+  "cross_store_probe": {
+    "kind": "real classic-to-containerd canonical content proof on a unique native zero-layer probe",
+    "passed": true,
+    "source_config_id": "sha256:0c33555939dc74238cbe9763b298e38e122497f4c300c6310e1915678cb0648d",
+    "destination_id": "sha256:569cf8889ead9eb9895987498941c0aa3e0374a44bb09e49079683761c99177c",
+    "repeat_reused": true,
+    "containers_executed": false
+  },
+  "local_windows_delivery": {
+    "zip": "dist/Financee-Offline-Windows-x64-Development-60dc9a3.zip",
+    "directory": "dist/windows-development-60dc9a3",
+    "zip_bytes": 931227330,
+    "zip_sha256": "3bcf950b1e190a53508777a2fbd6379310f861a4b89a7c5c7704517aaac5464a",
+    "github_artifact_digest_matches": true,
+    "files_verified": 7,
+    "native_frozen_bundle_checks": 2,
+    "download_and_verification": "pass",
+    "retained_locally_for_later_testing": true
   }
 }

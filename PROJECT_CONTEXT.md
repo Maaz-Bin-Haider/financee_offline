@@ -2,8 +2,8 @@
 
 2026-11-02, Asia/Karachi. The owner instructed “move forward” after the Phase 5
 handoff and authorized Phase 6 implementation. **Phase 6 Windows setup prototype
-is in progress; native Windows build/acceptance and a qualified Windows 10 runtime
-remain pending. Stop before Phase 7.** The existing Apple Silicon review app
+now has an unsigned hosted Windows x64 development build; customer Windows
+acceptance and a qualified Windows 10 runtime remain pending. Stop before Phase 7.** The existing Apple Silicon review app
 remains the Phase 5 development build. Actual shared-runtime Docker-off and OS
 reboot/sign-in acceptance remain pending.
 The owner authorized committing and pushing the current
@@ -121,9 +121,10 @@ repair and conservative data-preserving uninstall preparation. Inno Setup/native
 PyInstaller recipes and a clean-checkout staging/export path are present. Windows
 10 is explicitly refused by this development prototype until a maintained runtime
 pair is implemented/qualified; the dedicated Engine-in-WSL candidate is not yet
-implemented. No native Windows EXE, UAC/reboot, compiler or installer acceptance
-result is claimed. 44 installer/prerequisite checks and 37 launcher guards pass
-(81 total). A real Mac ARM64 shared-engine smoke verifies four exported native
+implemented. Hosted Windows PyInstaller/Inno compilation now passes; customer
+UAC/reboot/installer acceptance remains pending. 47 installer/prerequisite checks
+and 42 launcher guards pass (89 total); Windows passes 88 with one POSIX Mac path
+fixture skipped. The AMD64 engine passes 38 Django tests and system/migration checks. A real Mac ARM64 shared-engine smoke verifies four exported native
 images, empty setup, repeat setup/repair with unchanged identity/keys/generation/
 container IDs, and data-retaining uninstall preparation. This does not certify
 Windows. Review db/redis/web/nginx were already exited, backup running; tests
@@ -132,10 +133,23 @@ business fingerprint was queried. Temporary test containers/networks were remove
 volumes retained. See docs/PHASE6_REVIEW.md and PHASE6_RESULTS.json for exact local
 payload/source evidence and build instructions. Core source commit 6cb2bc8.
 The owner then confirmed that a Windows test machine is unavailable and instructed
-building now with device tests deferred. A manually dispatched hosted Linux AMD64
-payload + Windows x64 PyInstaller/Inno development build is being prepared. The
-build source/workflow will be pushed only to financee_offline; no public release,
-customer upload, production action or Phase 7 work is part of that build.
+building now with device tests deferred. A manual-only hosted Linux AMD64 payload + Windows x64 PyInstaller/Inno build
+succeeded at source 60dc9a3f3d033b59f37441dcab3ab161683e7f2a, run 41422916045.
+Both frozen programs pass native AMD64/Tcl/TLS/program-resource checks. Setup
+verifies canonical image contents across classic/containerd stores and records
+release-bound destination IDs; a real native zero-layer proof and repeated full
+Mac disposable setup/repair/stop pass. Program startup retains exact local-ID
+checks. Build source/workflow were pushed only to financee_offline; development
+artifacts are temporary Actions outputs, not a release. No customer upload,
+production action or Phase 7 work is part of this build. Local delivery paths and
+hashes are in docs/PHASE6_RESULTS.json. Saved/verified complete local ZIP:
+dist/Financee-Offline-Windows-x64-Development-60dc9a3.zip (931,227,330 bytes),
+SHA-256 3bcf950b1e190a53508777a2fbd6379310f861a4b89a7c5c7704517aaac5464a.
+It includes the setup EXE, matching AMD64 runtime tar and future test instructions;
+all seven files, ZIP CRCs, source/bundle provenance and GitHub artifact digest pass.
+The owner explicitly deferred real Windows device testing. Phase 6 is not complete;
+Windows 10 maintained runtime implementation and all customer acceptance remain
+pending. No signed/customer-certified release is claimed.
 
 Remaining gates: Phase 6 native Windows10/11 x64 implementation/acceptance and
 owner review; Phase 7 signed/notarized Apple Silicon installers; Phase 8 safe

@@ -49,8 +49,14 @@ from installed program files and retained when services stop.
 
 ## Windows setup prototype (Phase 6)
 
-Phase 6 source implementation and shared-engine checks are available; no native
-Windows installer has been built/certified on this Mac. See
+An unsigned Windows x64 development installer and matching AMD64 runtime archive
+have been built on a hosted Windows runner. Customer device testing remains pending. See
 [the Phase 6 review and Windows build instructions](docs/PHASE6_REVIEW.md).
 Windows 10 runtime qualification remains required and pending. The existing Mac
 review app remains the Phase 5 build. Stop before Phase 7.
+
+Saved local Windows delivery: `dist/Financee-Offline-Windows-x64-Development-60dc9a3.zip`
+(about 931 MB), with the installer, matching runtime images and test instructions.
+It is unsigned development software; Windows 10 runtime setup and real Windows
+10/11 device acceptance remain pending. Build/source `60dc9a3`,
+[successful development build](https://github.com/Maaz-Bin-Haider/financee_offline/actions/runs/41422916045).

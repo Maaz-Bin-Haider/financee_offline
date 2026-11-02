@@ -1,8 +1,9 @@
 # Phase 6 Windows setup prototype
 
 2026-11-02, Asia/Karachi. Owner authorized Phase 6 by instructing “move forward”
-after the Phase 5 handoff. This is a **source prototype with shared-engine test
-evidence**, not a built or certified Windows installer. Stop before Phase 7.
+after the Phase 5 handoff. An **unsigned Windows x64 development installer has now been built** on a
+hosted Windows Server 2022 runner. Customer Windows 10/11 acceptance remains
+pending. Stop before Phase 7.
 
 ## What is implemented
 
@@ -49,13 +50,15 @@ setup prototype version is 0.6.0-phase6. Accounting code/SQL/schema did not chan
 
 ## Verification and limits
 
-`python -m unittest tests.test_installer tests.test_launcher` passes **81 checks**
-(44 installer/prerequisite cases and 37 launcher guards). These use real temporary
+`python -m unittest tests.test_installer tests.test_launcher` passes **89 checks**
+(47 installer/prerequisite cases and 42 launcher guards). These use real temporary
 archives/configuration and fake Windows/runtime responses. They cover classic/OCI
 archives, wrong native config and descriptor hashes, failed/oversized downloads,
 HTTP redirect refusal, disk pressure, foreign images/remote endpoints, reboot-state
 persistence, interrupted first start, repair, retained data and replaced startup
-shortcuts. They are not proof of Windows API/UAC/compiler behavior.
+shortcuts. The hosted Windows run passes 88 cases and skips one POSIX-only Mac path fixture.
+Separate Windows mount coverage remains active. These guards do not certify
+customer UAC/WSL/reboot behavior.
 
 The real staging/export pipeline also produced a four-image native ARM64 archive.
 `tests/test_installer_integration.py` exercises the shared setup engine against a
@@ -76,11 +79,15 @@ Phase 5 “left running” evidence as the current state. The existing desktop s
 can start the Phase 5 review build normally; it was not rebuilt in this phase.
 
 Exact local payload hash, source revision and receipts are in PHASE6_RESULTS.json.
-No Windows EXE has been generated on this Mac. The Windows builder intentionally
-refuses this host. No Inno compilation, native Windows UI, UAC/WSL installation,
-Windows reboot/resume, servicing eligibility, Windows filesystem/mount behavior,
-real uninstall, Authenticode signature or Windows offline operation is certified.
-No image/archive/installer was uploaded and Phase 6 commits remain local.
+The Windows EXE was compiled on a hosted native Windows x64 runner, then made
+available as a seven-day development build artifact. The Windows builder still
+refuses cross-freezing on this Mac. PyInstaller/Inno compilation and both frozen
+headless bundle checks pass. Native customer UI, UAC/WSL installation, Windows
+reboot/resume, servicing eligibility, Windows filesystem/mount behavior, actual
+uninstall, Authenticode signing and Windows offline use remain unverified.
+The owner authorized building now with device testing deferred; build source and
+the manual-only workflow were pushed to financee_offline. No GitHub release or
+customer-data upload was performed.
 
 ## Build on a dedicated native Windows x64 machine
 
@@ -157,7 +164,52 @@ is a manual-only build: an isolated Linux AMD64 payload job followed by a native
 Windows x64 freeze/Inno job. It cannot deploy, write repository contents or publish
 a release. Only program/image payloads and public build receipts are artifacts;
 customer data, runtime credentials and live backup ZIPs are excluded. Artifacts
-have seven-day retention and will also be downloaded locally. Both frozen programs
+have seven-day retention and have also been downloaded and verified locally. Both frozen programs
 must pass headless program hash, native architecture, Tcl and TLS-context checks.
 A Windows Server build runner does not prove Windows 10/11 customer acceptance.
-Final build results will supersede the prototype's earlier “not built” statement.
+The successful corrected build is
+[run 41422916045](https://github.com/Maaz-Bin-Haider/financee_offline/actions/runs/41422916045),
+source `60dc9a3f3d033b59f37441dcab3ab161683e7f2a`. It passes 89 Linux host guards,
+38 fresh-database Django tests, system/migration checks and 88 Windows host cases
+with one POSIX-only fixture skipped. Both frozen programs verify their bundled
+program hashes, native AMD64 architecture, Tcl 8.6.15 and TLS context using Python
+3.12.10/PyInstaller 6.22.3. Inno Setup 6 compiles the EXE. Build receipts, exact hashes
+and local paths are recorded in PHASE6_RESULTS.json.
+
+The earlier build from `6d61963` is superseded and is not the delivery artifact.
+A real Docker Desktop probe exposed classic-image-store to containerd ID changes.
+Setup now compares canonical config hashes, which include the rootfs layer digests,
+using a read-only temporary local image export whenever store IDs differ. It
+refuses different image contents before overwriting a tag, then records the proven
+destination IDs bound to the program release hash. Startup/ownership checks still
+require those exact local IDs and perform no export, download or content relaxation.
+Setup needs cache space for the source archive plus a temporary read-back archive.
+Real zero-layer import/reuse and the disposable full setup/repair/stop smoke pass
+with this logic. This is not a Windows Desktop install/reboot test.
+
+The complete development ZIP includes the setup EXE, matching AMD64 runtime tar,
+read-first instructions, SHA256SUMS and public build receipts. Keep them together
+for later testing. `scripts/verify_windows_delivery.py` verifies local file hashes
+and exact build/bundle provenance without running an EXE or importing images.
+The ZIP is unsigned development software. Windows 10 runtime/business setup is
+still blocked pending the maintained runtime implementation and qualification.
+
+
+## Saved local delivery
+
+Complete ZIP: `dist/Financee-Offline-Windows-x64-Development-60dc9a3.zip`
+(931,227,330 bytes). SHA-256:
+`3bcf950b1e190a53508777a2fbd6379310f861a4b89a7c5c7704517aaac5464a`.
+It matches GitHub's artifact digest. ZIP CRCs, all seven component files and exact
+source/bundle provenance verify locally. Extracted files remain in
+`dist/windows-development-60dc9a3`. These local copies do not expire with the
+seven-day Actions artifact. All generated files stay ignored and out of Git.
+
+The setup EXE is 20,107,129 bytes, SHA-256
+`287b6b411d7397fe536a08e68273771da46baa8f3867071ccb9b7c7218417cbb`.
+The matching runtime tar is 911,109,632 bytes, SHA-256
+`61a551f25f56ddfc037dc7cd12582f899ef7ae847570ee84acec13beecc21d5c`.
+Use this corrected source-60dc9a3 delivery for future disposable-device testing;
+keep the EXE and runtime together. Installation, reboot, repair/uninstall and
+backup/restore acceptance remain deferred as the owner requested. Phase 6 is not
+marked complete, and Phase 7 has not begun.
