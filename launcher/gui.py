@@ -45,7 +45,7 @@ class Window:
         preference=preferences_path or self.bootstrap.get('preferences_path')
         if preference:self.preferences=Path(preference)
         elif sys.platform=='darwin':self.preferences=Path.home()/'Library/Application Support/Financee Offline/installation.json'
-        else:self.preferences=Path(os.environ.get('LOCALAPPDATA',str(Path.home())))/'Financee Offline/installation.json'
+        else:self.preferences=Path(os.environ.get('LOCALAPPDATA',str(Path.home())))/self.bootstrap.get('preferences_namespace','Financee Offline')/'installation.json'
         customer=self.bootstrap.get('default_customer') or read(self.preferences,{}).get('customer_directory')
         if customer:
             try:self.attach(Installation.adopt(customer,context=self.bootstrap.get('docker_context','desktop-linux' if sys.platform=='darwin' else 'default')))

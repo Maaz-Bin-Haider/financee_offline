@@ -28,6 +28,8 @@ def main():
     if set(services)!={'db','redis','web','backup','nginx'}:raise SystemExit('Unexpected Compose service/image contract.')
     a.output.mkdir(parents=True);(a.output/'compose.yml').write_text(source);shutil.copyfile(ROOT/'runtime/nginx.conf',a.output/'nginx.conf')
     notice=a.output/'notices';notice.mkdir();target='macos' if a.architecture=='arm64' else 'windows';shutil.copyfile(ROOT/('installer/'+target+'/development-notice.txt'),notice/(target+'-development.txt'))
+    policy=ROOT/'upgrades'/(version+'.json')
+    if policy.is_file():shutil.copyfile(policy,a.output/'upgrade-policy.json')
     release={'format':1,'product':'Financee_Offline','version':version,'schema':2,'architecture':a.architecture,'images':images,'service_images':services,'development':True,'engine_revision':engine_revision,'source_revision':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'files':{str(f.relative_to(a.output)).replace('\\','/'):digest(f) for f in a.output.rglob('*') if f.is_file()}}
     (a.output/'release.json').write_text(json.dumps(release,indent=2)+'\n');print(json.dumps({'program':str(a.output.resolve()),'architecture':a.architecture,'images':len(images),'built_or_pulled':False},indent=2))
 if __name__=='__main__':main()

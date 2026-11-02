@@ -55,6 +55,7 @@ class Setup:
                         except OSError:continue
                 else:raise LauncherError('No local Financee port is available. No installation was initialized.')
                 installation=Installation.create(root,port,context)
+            if read(root/'Config/upgrade-journal.json',{}).get('stage') not in (None,'committed','rolled_back'):raise LauncherError('Recover the interrupted upgrade before setup repair.')
             release_id=self.payload.delivery['release_sha256']
             if installation.data.get('installed_program') not in (None,release_id):
                 raise LauncherError('This customer installation belongs to another program release. Use its launcher or the explicit upgrade workflow.')

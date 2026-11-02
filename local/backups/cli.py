@@ -5,7 +5,7 @@ from . import config
 from .files import read,lock,Busy
 
 def main():
-    p=argparse.ArgumentParser(description=__doc__);p.add_argument('command',choices=['backup','inspect','restore','recover','commit','worker','status'])
+    p=argparse.ArgumentParser(description=__doc__);p.add_argument('command',choices=['backup','inspect','restore','recover','commit','worker','status','upgrade-check'])
     p.add_argument('archive',nargs='?');p.add_argument('--confirm-sha');a=p.parse_args();engine=Engine()
     if a.command=='worker':
         def terminate(*args):raise KeyboardInterrupt
@@ -32,6 +32,9 @@ def main():
         except KeyboardInterrupt:return
     elif a.command=='backup':print(engine.backup())
     elif a.command=='inspect':print(json.dumps(engine.inspect(a.archive),indent=2))
+    elif a.command=='upgrade-check':
+        from .upgrade import verify
+        print(json.dumps(verify(engine,a.archive,a.confirm_sha),indent=2))
     elif a.command=='restore':print(json.dumps(engine.restore(a.archive,a.confirm_sha),indent=2))
     elif a.command in ('recover','commit'):print(json.dumps(engine.recover(commit=a.command=='commit'),indent=2))
     else:print(json.dumps(engine.status(),indent=2))

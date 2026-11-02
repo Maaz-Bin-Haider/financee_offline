@@ -1,5 +1,5 @@
 """Native Windows setup entry; no hidden prerequisite or image installation."""
-import argparse,os,sys
+import argparse,os,sys,subprocess
 from pathlib import Path
 
 def main():
@@ -8,9 +8,12 @@ def main():
     if os.name!='nt':raise LauncherError('Financee Windows Setup must run on native Windows x64.')
     hold_program_mutex()
     program=Path(getattr(sys,'_MEIPASS',Path(__file__).resolve().parents[1]))/'program'
-    base=Path(os.environ['LOCALAPPDATA'])/'Financee Offline'
+    from launcher.storage import read
+    namespace=read(program/'bootstrap.json',{}).get('preferences_namespace','Financee Offline')
+    if Path(namespace).name!=namespace:raise LauncherError('Invalid preferences namespace.')
+    base=Path(os.environ['LOCALAPPDATA'])/namespace
     preferences=base/'installation.json'
-    parser=argparse.ArgumentParser();parser.add_argument('--prepare-uninstall',action='store_true');parser.add_argument('--bundle-check-output',type=Path);args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--prepare-uninstall',action='store_true');parser.add_argument('--upgrade',action='store_true');parser.add_argument('--bundle-check-output',type=Path);args=parser.parse_args()
     if args.bundle_check_output:
         from installer.bundle_check import check
         check(program,args.bundle_check_output);return
@@ -21,11 +24,20 @@ def main():
     from installer.gui import SetupWindow
     root=tk.Tk()
     launcher=Path(sys.executable).parent.parent/'launcher/Financee Offline.exe'
-    try:SetupWindow(root,program,base/'setup.json',preferences,launcher)
+    handoff=[]
+    try:
+        from installer.upgrade import pending
+        selected=read(preferences,{})
+        if args.upgrade or (selected.get('customer_directory') and pending(selected['customer_directory'])):
+            from installer.upgrade_gui import UpgradeWindow
+            UpgradeWindow(root,program,None,preferences,base/'setup.json',on_done=lambda:handoff.append('launcher'))
+        else:SetupWindow(root,program,base/'setup.json',preferences,launcher,on_upgrade=lambda:handoff.append('upgrade'))
     except Exception as exc:
         from tkinter import messagebox
         messagebox.showerror('Financee Setup needs attention',str(exc),parent=root);root.destroy();return 1
-    root.mainloop();return 0
+    root.mainloop()
+    if handoff:subprocess.Popen([str(launcher)] if handoff[-1]=='launcher' else [sys.executable,'--upgrade'])
+    return 0
 if __name__=='__main__':
     try:sys.exit(main() or 0)
     except Exception as exc:

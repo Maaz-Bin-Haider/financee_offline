@@ -39,6 +39,8 @@ class MacSetupWindow:
         self.output=tk.Text(body,height=8,wrap='word',state='disabled');self.output.pack(fill='both',expand=True)
         menu=tk.Menu(root);root.configure(menu=menu);self.menu=tk.Menu(menu,tearoff=False);menu.add_cascade(label='Setup',menu=self.menu)
         for title,callback in self.actions:self.menu.add_command(label=title,command=callback)
+        if 'upgrade-policy.json' in self.setup.payload.release['files']:
+            self.menu.add_command(label='Upgrade Existing Business…',command=self.upgrade)
         self.menu.add_separator();self.menu.add_checkbutton(label='Docker Setup Reviewed',variable=self.consent);self.menu.add_checkbutton(label='Create Desktop Icon After Setup',variable=self.desktop)
         self.menu.add_separator();self.menu.add_command(label='Quit Setup',command=self.close)
         if self.setup.state:self.append('Saved setup: '+str(self.setup.state.get('phase'))+'\nBusiness folder: '+str(self.setup.state.get('customer_directory','not selected')))
@@ -110,6 +112,9 @@ class MacSetupWindow:
             messagebox.showinfo('Install app first','Install this app in Applications before opening your business.',parent=self.root);return
         if not self.preferences.is_file():messagebox.showinfo('Choose business folder','Finish setup or open the existing business folder first.',parent=self.root);return
         self.handoff_started=True;self.launch(self.app,False);self.close()
+    def upgrade(self):
+        if self.busy or self.handoff_started:return
+        self.require_installed();self.handoff_started=True;self.launch(self.app,False,True);self.close()
     def remove(self):
         if not messagebox.askyesno('Prepare App Removal','Stop this verified Financee installation and remove its optional sign-in entry? Business folders, backups and data volumes are retained. After this finishes, quit and move the app to Trash yourself.',parent=self.root):return
         self.task(lambda:prepare_uninstall(self.setup.payload.program,self.preferences,self.setup.state_path.parent/'removal-preserved.json'),lambda value:self.status.set('Financee stopped; data retained. Quit this app, then move it to Trash when ready.'))

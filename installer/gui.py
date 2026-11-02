@@ -7,7 +7,8 @@ from .controller import Setup
 from .windows_host import probe,assess,request_wsl_install,DOCKER_URL,WSL_URL,wait_runtime
 
 class SetupWindow:
-    def __init__(self,root,program,state,preferences,launcher):
+    def __init__(self,root,program,state,preferences,launcher,on_upgrade=None):
+        self.on_upgrade=on_upgrade
         self.root=root;self.preferences=preferences;self.launcher=launcher;self.queue=queue.Queue();self.worker=concurrent.futures.ThreadPoolExecutor(max_workers=1);self.busy=False;self.snapshot=None;self.context_ready=False
         self.setup=Setup(program,state,progress=lambda t:self.queue.put(('progress',t)))
         root.title('Financee Offline Setup — Windows Development');root.geometry('800x710');root.minsize(760,650);root.protocol('WM_DELETE_WINDOW',self.close)
@@ -31,6 +32,8 @@ class SetupWindow:
         row=ttk.Frame(body);row.pack(fill='x',pady=8)
         button(row,'New Empty Business Folder…',lambda:self.select(False));button(row,'Repair / Open Existing Folder…',lambda:self.select(True));button(row,'Open Financee',self.open_launcher)
         ttk.Label(body,text='Keep backup copies on another drive. Uninstall preserves your business folder, backups and runtime data. Setup repair uses the same release; data-changing upgrades have a separate workflow.',wraplength=730).pack(anchor='w',pady=8)
+        if on_upgrade:
+            row=ttk.Frame(body);row.pack(fill='x');button(row,'Upgrade Existing Business…',self.upgrade)
         self.output=tk.Text(body,wrap='word',state='disabled',height=12);self.output.pack(fill='both',expand=True)
         if self.setup.state:self.append('Saved stage: '+str(self.setup.state.get('phase'))+'\nCustomer folder: '+str(self.setup.state.get('customer_directory','not selected')))
         root.after(100,self.poll);root.after(200,self.check)
@@ -98,6 +101,9 @@ class SetupWindow:
         if not self.launcher.is_file():
             messagebox.showerror('Launcher missing','Repair the installed program files with the same setup release.',parent=self.root);return
         subprocess.Popen([str(self.launcher)])
+    def upgrade(self):
+        if self.busy:return
+        self.on_upgrade();self.close()
     def close(self):
         if self.busy:messagebox.showinfo('Setup still running','Wait for verification or import to finish before closing.',parent=self.root);return
-        self.worker.shutdown(wait=False);self.root.destroy()
+        self.worker.shutdown(wait=True);self.root.quit();self.root.destroy()

@@ -23,7 +23,7 @@ def main():
         return
     if os.name=='nt' and getattr(sys,'frozen',False):
         from launcher.storage import read
-        preferences=Path(os.environ['LOCALAPPDATA'])/'Financee Offline/installation.json'
+        preferences=Path(os.environ['LOCALAPPDATA'])/read(program/'bootstrap.json',{}).get('preferences_namespace','Financee Offline')/'installation.json'
         setup=Path(sys.executable).parent.parent/'setup/Financee Offline Setup.exe'
         if not read(preferences,{}).get('customer_directory') and setup.is_file():
             subprocess.Popen([str(setup)]);return

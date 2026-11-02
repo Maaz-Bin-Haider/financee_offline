@@ -184,6 +184,7 @@ class Engine:
                 self.update(state='complete',message='Incomplete recovery rolled back. Previous generation is active.')
             atomic(self.control/'restore-journal.json',journal);return journal
     def due(self,now=None):
+        if read(self.control/'upgrade-journal.json',{}).get('stage') not in (None,'committed','rolled_back'):return False
         if config.pending(self.root):return False
         active=config.active(self.root)
         with contextlib.closing(database.connect(active['database'])) as c:

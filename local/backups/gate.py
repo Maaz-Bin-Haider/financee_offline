@@ -11,10 +11,12 @@ class MaintenanceMiddleware:
         root=getattr(settings,'OFFLINE_CUSTOMER_ROOT','')
         if not root:return self.get_response(request)
         journal=read(Path(root)/'Config/restore-journal.json',{})
+        upgrade=read(Path(root)/'Config/upgrade-journal.json',{})
+        upgrade_pending=upgrade.get('stage') not in (None,'committed','rolled_back')
         pending=journal.get('stage') not in (None,'committed','rolled_back','failed_before_switch')
         configured=read(Path(root)/'Config/active.json',{})
         stale=getattr(settings,'OFFLINE_GENERATION',configured.get('generation'))!=configured.get('generation')
-        if (pending or stale) and request.path!='/health/':return self.unavailable('Recovery is being verified. Please wait or reopen Financee maintenance.')
+        if (pending or stale or upgrade_pending) and request.path!='/health/':return self.unavailable('Recovery is being verified. Please wait or reopen Financee maintenance.')
         stack=ExitStack()
         try:
             folder=Path(root)/'Config/maintenance'

@@ -131,6 +131,8 @@ class Controller:
             time.sleep(.5)
         raise LauncherError('Financee startup verification failed. Data was preserved. Use the maintenance window or open local logs.')
     def _start(self):
+        journal=read(self.installation.root/'Config/upgrade-journal.json',{})
+        if journal.get('stage') not in (None,'committed','rolled_back'):raise LauncherError('An interrupted upgrade needs recovery. Reopen the new installer and choose Recover Interrupted Upgrade; data was preserved.')
         self.step('Checking the local runtime and Financee installation.');self.ensure_runtime();self.images_ready();self.ownership();self.verify_storage()
         healthy=self.check_port()
         if healthy and (healthy.get('build')!=self.release['version'] or healthy.get('schema')!=self.release['schema']):raise LauncherError('The running Financee version differs from this launcher. Use the matching launcher or explicit update workflow.')
@@ -183,6 +185,7 @@ class Controller:
             self.ensure_runtime();self.images_ready();self.ownership()
             self.step('Validating the selected backup.');return json.loads(self.tool('inspect','/restore-input/archive.zip',archive=path))
     def restore(self,path,digest):
+        if read(self.installation.root/'Config/upgrade-journal.json',{}).get('stage') not in (None,'committed','rolled_back'):raise LauncherError('Recover the interrupted upgrade before restoring a backup.')
         with lock(self.installation.root/'Config/controller.lock'):
             self.ensure_runtime();self.images_ready();self.ownership();self.check_port()
             info=json.loads(self.tool('inspect','/restore-input/archive.zip',archive=path))
