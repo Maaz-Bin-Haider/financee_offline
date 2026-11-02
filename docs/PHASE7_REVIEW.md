@@ -168,7 +168,8 @@ Gatekeeper. Failed submissions retain logs. It accepts only an owner-configured
 keychain profile name; no password/private key is requested or written. Invoking
 it uploads program artifacts to Apple and requires separate owner release inputs;
 it is never called by normal setup/startup. No Apple submission, public release or
-artifact upload was performed in this phase. Phase 7 source commits remain local.
+artifact upload was performed in this phase. The owner subsequently authorized pushing source; the completed Phase 7 checkpoint
+`9eb706f` was pushed to `origin/codex/single-company-core`. No installers were uploaded.
 
 Still pending: real fresh supported Macs,
 Docker-absent setup/consent, true offline cold start after OS reboot/sign-in,

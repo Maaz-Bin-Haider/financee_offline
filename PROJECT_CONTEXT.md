@@ -1,9 +1,22 @@
 # Financee Offline context
 
+2026-11-02: The owner instructed “move forward and push”, then “continue”.
+Phase 7 source/evidence was pushed to origin/codex/single-company-core at
+9eb706f1492828b1f186cfdeb5a425a5b527cd02. Phase 8 manual upgrade/failure recovery
+is now authorized and in progress. Stop at its review gate before Phase 9;
+no publication or live review upgrade is authorized. Current engine development
+version is 0.8.0-phase8, schema 2. Targeted native upgrade validation is pending.
+The policy accepts only 0.5.0-phase5/0.7.0-phase7 schema-2 sources, rejects any
+pending migration/downgrade, and preserves all business rows/sequences/media
+apart from deliberately expired sessions. This is not arbitrary schema-change
+support. Paired candidates/rescues and immutable previous program snapshots
+are retained. Side-by-side versioned apps preserve old executables. Windows
+native upgrade builds/device tests and signing remain release gates.
+
 2026-11-02, Asia/Karachi. The owner instructed “move forward” after the Windows
 build handoff, authorizing Phase 7 Apple Silicon installer work. **Phase 7 native
 Mac app/DMG development build is locally verified, including native UI; signing/
-release acceptance remain pending. Stop before Phase 8.** Windows device
+release acceptance remain pending. Phase 8 is authorized below.** Windows device
 tests remain deferred by the owner, and the Windows 10 maintained runtime path
 remains unfinished. The existing Apple Silicon review app remains the Phase 5
 build. Actual shared-runtime Docker-off and OS reboot/sign-in acceptance remain

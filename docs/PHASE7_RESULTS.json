@@ -184,9 +184,10 @@
     "Apple_submission_performed": false,
     "security_bypass_performed": false,
     "public_release_created": false,
-    "source_pushed": false,
+    "source_pushed": true,
     "artifact_uploaded": false,
-    "gatekeeper_assessed_source_revision": "352b538d787677df94a7fd11c58d4c9853df139e"
+    "gatekeeper_assessed_source_revision": "352b538d787677df94a7fd11c58d4c9853df139e",
+    "source_push_checkpoint": "9eb706f1492828b1f186cfdeb5a425a5b527cd02"
   },
   "remaining": [
     "Owner-provided Developer ID signing identity/keychain notary profile; actual notarization and stapled tickets",

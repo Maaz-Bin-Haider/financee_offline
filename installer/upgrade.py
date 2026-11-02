@@ -108,6 +108,7 @@ class Upgrade:
             old=self.controller(self.previous);token=uuid.uuid4().hex;folder=root/'Cache/upgrades'/token;folder.mkdir(parents=True)
             required=sum(f.stat().st_size for p in (self.previous,self.payload.program) for f in Path(p).rglob('*') if f.is_file())+64*1024*1024
             if shutil.disk_usage(folder).free<required:raise LauncherError('Not enough space to retain both program releases.')
+            if not folder.resolve().is_relative_to(root) or any(p.is_symlink() for p in (root/'Cache',root/'Cache/upgrades')):raise LauncherError('Upgrade staging must stay inside the customer Cache folder.')
             self.snapshot(self.previous,folder/'previous-program');self.snapshot(self.payload.program,folder/'target-program')
             old_data=read(root/'Config/launcher.json');target_data=copy.deepcopy(old_data);release_id=digest(folder/'target-program/release.json')
             target_data.update(installed_program=release_id,runtime_images={'release_sha256':release_id,'ids':checked['runtime_ids']})
@@ -155,7 +156,9 @@ class Upgrade:
         for key,hash_key,leaf in [('previous_program','previous_release_sha256','previous-program'),('target_program','target_release_sha256','target-program')]:
             expected=Path('Cache/upgrades')/j['id']/leaf
             if Path(j.get(key,''))!=expected:raise LauncherError('Upgrade recovery program path is invalid.')
-            p=self.installation.root/expected;verify_program(p)
+            p=self.installation.root/expected
+            if not p.resolve().is_relative_to(self.installation.root):raise LauncherError('Upgrade recovery staging escaped the customer folder.')
+            verify_program(p)
             if digest(p/'release.json')!=j[hash_key]:raise LauncherError('Upgrade recovery program identity changed.')
         if read(self.installation.root/'Config/launcher.json') not in (j['old_installation'],j['target_installation']):raise LauncherError('Installation identity changed after the upgrade. Automatic recovery was stopped.')
         for active in (j['old_active'],j.get('new_active',j['old_active'])):

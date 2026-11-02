@@ -59,6 +59,10 @@ class UpgradeWindow:
         if not self.customer.get():raise LauncherError('Choose the existing business folder.')
         return Upgrade(self.customer.get(),self.program,self.program_path() if previous else None,progress=lambda t:self.events.put(('progress',t)))
     def verify(self):
+        if self.archive is None:
+            selected=filedialog.askopenfilename(title='Choose the matching new-release runtime archive',filetypes=[('Financee runtime','*.tar')])
+            if not selected:return
+            self.archive=Path(selected)
         try:u=self.make_upgrade()
         except Exception as exc:messagebox.showerror('Choose the existing business',str(exc),parent=self.root);return
         def done(value):
