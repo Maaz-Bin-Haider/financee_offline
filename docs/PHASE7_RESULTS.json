@@ -2,27 +2,27 @@
   "phase": 7,
   "date": "2026-11-02",
   "timezone": "Asia/Karachi",
-  "status": "Apple Silicon development DMG built and headless/native backend verified; UI unlock and Developer ID/notarization/customer acceptance pending; stop before Phase 8",
-  "source_revision": "bec7a2a2880548b8ab91c8462a5acc2311caa67a",
+  "status": "Apple Silicon development DMG, standalone/headless integration and native UI verified on this Mac; Developer ID/notarization/fresh-device acceptance pending; stop before Phase 8",
+  "source_revision": "352b538d787677df94a7fd11c58d4c9853df139e",
   "setup_version": "0.7.0-phase7",
-  "engine_version": "0.5.0-phase5",
+  "engine_version": "0.7.0-phase7",
   "schema": 2,
   "dmg": {
-    "path": "dist/Financee-Offline-Apple-Silicon-Development-bec7a2a.dmg",
-    "bytes": 497563709,
-    "sha256": "1c32839da08604d62108744a4a7a37c60c1a3d3d9e6a0565ab48207d18bc7791",
+    "path": "dist/Financee-Offline-Apple-Silicon-Development-352b538.dmg",
+    "bytes": 497522060,
+    "sha256": "f9cbffd79758fadd9bde2b4913b4eb0179fa669771db4414dbc204dc4df722e8",
     "customer_profile_embedded": false,
     "image_archive_bundled": true,
     "signing": "ad-hoc development; not Developer ID",
     "notarized": false
   },
   "runtime": {
-    "bytes": 494825472,
-    "sha256": "5a34b376aa510cc84d9239ec9a488bb6085d87508e134a32c6987de619c78b54",
+    "bytes": 494759424,
+    "sha256": "7ade1400ea687db979734d5fb7be13765999b3ae86644184a8ec94ad185ad9ad",
     "images": 4,
     "architecture": "linux/arm64",
-    "engine_image_id": "sha256:40b14f234aaf0f41aa35341f47200ce1ba7a847997905ae0619bace283a6d94c",
-    "engine_core_revision": "f9b00f7163e18b218ab478e2d0471c74f65910d1"
+    "engine_image_id": "sha256:f77b83c95e023e189e734a15c34e5d08365716bf858d030abf5f30439cdea1a7",
+    "engine_core_revision": "352b538d787677df94a7fd11c58d4c9853df139e"
   },
   "host_checks": {
     "mac_installer": 17,
@@ -31,9 +31,9 @@
     "result": "pass"
   },
   "standalone_and_dmg_verification": {
-    "source_revision": "bec7a2a2880548b8ab91c8462a5acc2311caa67a",
+    "source_revision": "352b538d787677df94a7fd11c58d4c9853df139e",
     "copied_app_without_developer_environment": {
-      "bundle_tree_sha256": "d73b041053b471319b938f3830a84b68c8f9b4438c95bc3d165c33bbe01a3eb7",
+      "bundle_tree_sha256": "e22a6f214a35fe5b3ae2232c40be7ed32f10e46dd41ff44279a276242ee17f9f",
       "mach_o_files": 5,
       "native_arm64_only": true,
       "symlinks_stay_in_app": true,
@@ -47,24 +47,24 @@
         "python": "3.12.14",
         "tcl": "9.0.4",
         "program_files_verified": true,
-        "release_sha256": "2e681e95dcf954c94d7215917cfe233e111f938da1096f11de694d28d0d235de",
+        "release_sha256": "e07b4250c513d277423ef660e77571e2f35f21a975292782379e0a972cf13ae6",
         "payload_architecture": "arm64",
         "tls_context_loaded": true,
-        "source_revision": "bec7a2a2880548b8ab91c8462a5acc2311caa67a",
+        "source_revision": "352b538d787677df94a7fd11c58d4c9853df139e",
         "customer_installation_tested": false,
         "docker_or_wsl_modified": false
       },
       "payload_check": {
         "verified": true,
-        "sha256": "5a34b376aa510cc84d9239ec9a488bb6085d87508e134a32c6987de619c78b54",
-        "bytes": 494825472,
+        "sha256": "7ade1400ea687db979734d5fb7be13765999b3ae86644184a8ec94ad185ad9ad",
+        "bytes": 494759424,
         "architecture": "arm64",
         "images": 4,
         "docker_modified": false
       }
     },
     "read_only_dmg_app_verified": {
-      "bundle_tree_sha256": "d73b041053b471319b938f3830a84b68c8f9b4438c95bc3d165c33bbe01a3eb7",
+      "bundle_tree_sha256": "e22a6f214a35fe5b3ae2232c40be7ed32f10e46dd41ff44279a276242ee17f9f",
       "mach_o_files": 5,
       "native_arm64_only": true,
       "symlinks_stay_in_app": true,
@@ -78,31 +78,31 @@
         "python": "3.12.14",
         "tcl": "9.0.4",
         "program_files_verified": true,
-        "release_sha256": "2e681e95dcf954c94d7215917cfe233e111f938da1096f11de694d28d0d235de",
+        "release_sha256": "e07b4250c513d277423ef660e77571e2f35f21a975292782379e0a972cf13ae6",
         "payload_architecture": "arm64",
         "tls_context_loaded": true,
-        "source_revision": "bec7a2a2880548b8ab91c8462a5acc2311caa67a",
+        "source_revision": "352b538d787677df94a7fd11c58d4c9853df139e",
         "customer_installation_tested": false,
         "docker_or_wsl_modified": false
       },
       "payload_check": {
         "verified": true,
-        "sha256": "5a34b376aa510cc84d9239ec9a488bb6085d87508e134a32c6987de619c78b54",
-        "bytes": 494825472,
+        "sha256": "7ade1400ea687db979734d5fb7be13765999b3ae86644184a8ec94ad185ad9ad",
+        "bytes": 494759424,
         "architecture": "arm64",
         "images": 4,
         "docker_modified": false
       }
     },
-    "dmg_sha256": "1c32839da08604d62108744a4a7a37c60c1a3d3d9e6a0565ab48207d18bc7791",
-    "dmg_bytes": 497563709,
+    "dmg_sha256": "f9cbffd79758fadd9bde2b4913b4eb0179fa669771db4414dbc204dc4df722e8",
+    "dmg_bytes": 497522060,
     "codesign": "verified",
     "customer_installation_tested": false,
     "docker_modified": false,
     "notarization": "not claimed by this verification"
   },
   "native_copy_setup_repair_removal_integration": {
-    "source_revision": "bec7a2a2880548b8ab91c8462a5acc2311caa67a",
+    "source_revision": "352b538d787677df94a7fd11c58d4c9853df139e",
     "actual_native_app_copy_signature_verified": true,
     "running_app_repair_refused": true,
     "same_build_program_and_setup_repair_reused_data_credentials_generation_containers": true,
@@ -117,7 +117,7 @@
     "review_states_images_configuration_credentials_media_unchanged": true,
     "review_database_fingerprint": "not queried; main review services were already stopped",
     "native_UI_tested": false,
-    "project": "financee_offline_a6ea202993cd"
+    "project": "financee_offline_a0108789bb24"
   },
   "real_host_prerequisites": {
     "observed": {
@@ -136,8 +136,43 @@
     }
   },
   "native_UI": {
-    "tested": false,
-    "reason": "Mac locked; manual unlock requested through the pending question"
+    "source_revision": "352b538d787677df94a7fd11c58d4c9853df139e",
+    "tested": true,
+    "actual_installed_path": "~/Applications/Financee Offline Mac Development.app",
+    "native_self_copy_and_signature_verified": true,
+    "mac_prerequisites_passed": true,
+    "included_runtime_verified": true,
+    "native_folder_cancel_no_customer_selection_or_preferences": true,
+    "fresh_owner_company_journal_counts": "0|0|0",
+    "health": {
+      "installation_id": "9df805b1989149a4aa5c21b157410782",
+      "generation": "initial",
+      "product": "Financee_Offline",
+      "build": "0.7.0-phase7",
+      "schema": 2,
+      "setup_complete": false
+    },
+    "default_browser_onboarding_and_correct_backup_guidance": true,
+    "owner_credentials_entered": false,
+    "setup_maintenance_setup_handoff": true,
+    "source_and_installed_processes_exited_cleanly": true,
+    "program_lock_released": true,
+    "duplicate_launch_guard": "Observer reused an exited process handle and launched a duplicate. Guard alert dismissed; new setup process remained healthy. Fresh binding verified setup.",
+    "native_removal_cancel_preserved_health_containers_credentials_generation": true,
+    "native_removal_confirmed_stopped_only_test_stack": true,
+    "customer_files_credentials_active_generation_database_volume_and_app_retained": true,
+    "optional_signin_and_desktop_left_off": true,
+    "test_containers_networks_removed": true,
+    "review_states_images_config_credentials_media_unchanged": true,
+    "review_database_fingerprint": "not queried; main services already stopped",
+    "screenshots": [
+      "phase7-removal-complete.jpg",
+      "phase7-removal-confirmation.jpg",
+      "phase7-onboarding.png",
+      "phase7-maintenance.jpg"
+    ],
+    "project": "financee_offline_9df805b19891",
+    "final_loopback_test_port_released": true
   },
   "distribution": {
     "valid_signing_identities_observed": 0,
@@ -150,14 +185,15 @@
     "security_bypass_performed": false,
     "public_release_created": false,
     "source_pushed": false,
-    "artifact_uploaded": false
+    "artifact_uploaded": false,
+    "gatekeeper_assessed_source_revision": "352b538d787677df94a7fd11c58d4c9853df139e"
   },
   "remaining": [
-    "Native UI install/setup/cancellation checks after manual unlock",
     "Owner-provided Developer ID signing identity/keychain notary profile; actual notarization and stapled tickets",
     "Fresh supported Apple Silicon devices, absent Docker prerequisite setup, real offline reboot/sign-in, repair/removal/reinstall acceptance",
     "Windows device testing deferred by owner; Windows 10 maintained runtime implementation/qualification still unfinished",
-    "Owner review before Phase 8 data-changing upgrades"
+    "Owner review before Phase 8 data-changing upgrades",
+    "Company/owner completion intentionally left to owner; no credentials entered by automation"
   ],
   "source_repositories": {
     "Financee_Multitenant_Production": {
@@ -170,5 +206,36 @@
       "clean": true,
       "modified_or_operated": false
     }
-  }
+  },
+  "core_checks": {
+    "source_revision": "352b538d787677df94a7fd11c58d4c9853df139e",
+    "project": "financee_offline_a0108789bb24",
+    "core_tests": 38,
+    "django_system_check": "pass",
+    "migration_drift": "none",
+    "result": "pass",
+    "review_not_operated": true
+  },
+  "corrections_verified": [
+    "Explicit Tk loop exit, executor shutdown and closed-window polling/handoff guards",
+    "Onboarding accurately describes the implemented local daily backups",
+    "Health endpoint reads the packaged VERSION instead of an old hard-coded build",
+    "Docker build context excludes generated installers, test/customer folders, credentials and tool environments"
+  ],
+  "engine_image_cleanliness": {
+    "VERSION_and_health_build_match": "0.7.0-phase7",
+    "generated_installers_customer_folders_git_runtime_env_absent": true,
+    "earlier_phase5_image_and_review_resources_preserved": true
+  },
+  "financial_SQL_and_schema": {
+    "source_SQL_and_migrations_unchanged_since_phase5": true,
+    "schema": 2,
+    "SQL_contract_unchanged": true,
+    "new_DB_190_definition_comparison_repeated": false
+  },
+  "superseded_local_artifacts": {
+    "bec7a2a": "Retained under .runtime/phase7-native-ui/superseded; replaced by 352b538",
+    "5242730": "Retained in .runtime/phase7-ui-build; startup version mismatch caught before handoff"
+  },
+  "temporary_port_reservation_released": true
 }

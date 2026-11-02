@@ -53,7 +53,7 @@ An unsigned Windows x64 development installer and matching AMD64 runtime archive
 have been built on a hosted Windows runner. Customer device testing remains pending. See
 [the Phase 6 review and Windows build instructions](docs/PHASE6_REVIEW.md).
 Windows 10 runtime qualification remains required and pending. The existing Mac
-review app remains the Phase 5 build. Stop before Phase 7.
+review app remains the Phase 5 build. Phase 7 development work is described below.
 
 Saved local Windows delivery: `dist/Financee-Offline-Windows-x64-Development-60dc9a3.zip`
 (about 931 MB), with the installer, matching runtime images and test instructions.
@@ -63,9 +63,10 @@ It is unsigned development software; Windows 10 runtime setup and real Windows
 
 ## Apple Silicon development installer (Phase 7)
 
-Saved local DMG: `dist/Financee-Offline-Apple-Silicon-Development-bec7a2a.dmg`
+Saved local DMG: `dist/Financee-Offline-Apple-Silicon-Development-352b538.dmg`
 (about 498 MB), including the native app and matching offline runtime images.
 [Phase 7 review, install/removal steps and evidence](docs/PHASE7_REVIEW.md).
-It is ad-hoc signed, not notarized or customer-certified. Native UI testing awaits
-manual Mac unlock; signing and fresh-device/reboot acceptance remain pending.
+Native self-copy, empty setup, handoff, cancellation and data-retaining removal
+checks pass on this Mac, along with 106 host and 38 core checks. It is ad-hoc
+signed; Developer ID/notarization and fresh-device/reboot acceptance remain pending.
 No production resources or review business data were changed. Stop before Phase 8.

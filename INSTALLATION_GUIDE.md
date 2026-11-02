@@ -7,7 +7,7 @@ universal administrator password or demo business.
 ## Apple Silicon Mac
 
 The self-contained DMG is saved locally at:
-`dist/Financee-Offline-Apple-Silicon-Development-bec7a2a.dmg`.
+`dist/Financee-Offline-Apple-Silicon-Development-352b538.dmg`.
 It contains the native app, matching offline runtime images and instructions.
 See [Phase 7 review](docs/PHASE7_REVIEW.md) for exact hashes, verification and gates.
 
@@ -29,8 +29,9 @@ its own optional sign-in entry. Quit, then move the app to Trash yourself. The
 business folder, backups and data volumes are retained. Data-changing upgrades
 are a separate unfinished workflow; do not replace another program build blindly.
 
-Native copy/setup/repair/frozen-health checks pass on this Mac using a private
-fixture. Visible native UI testing still awaits manual Mac unlock. Developer ID,
+Native copy/setup/repair/frozen-health checks pass using private fixtures. Visible
+self-copy, empty first startup, setup/maintenance handoff, chooser/removal
+cancellation and data-retaining removal pass on this Mac. Developer ID,
 notarization and real fresh-device/offline reboot/sign-in acceptance remain pending.
 
 ## Windows x64

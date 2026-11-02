@@ -9,14 +9,16 @@ remains unfinished. Those gates have not been silently waived.
 
 ## Local build and review
 
-DMG: `dist/Financee-Offline-Apple-Silicon-Development-bec7a2a.dmg`
-(497,563,709 bytes), SHA-256:
-`1c32839da08604d62108744a4a7a37c60c1a3d3d9e6a0565ab48207d18bc7791`.
+DMG: `dist/Financee-Offline-Apple-Silicon-Development-352b538.dmg`
+(497,522,060 bytes), SHA-256:
+`f9cbffd79758fadd9bde2b4913b4eb0179fa669771db4414dbc204dc4df722e8`.
 
-Native app source: `bec7a2a2880548b8ab91c8462a5acc2311caa67a`.
-Setup version `0.7.0-phase7`; engine `0.5.0-phase5`, schema 2.
-The engine remains the previously tested cached ARM64 image; no accounting,
-financial SQL, Django schema or live review data was changed in this phase.
+Native app source: `352b538d787677df94a7fd11c58d4c9853df139e`.
+Setup and engine version `0.7.0-phase7`, schema 2. The final engine and native
+app both use source `352b538`; image identity is pinned in the payload receipt.
+The engine corrects onboarding backup guidance and reads its health build from
+the packaged VERSION. Accounting, financial SQL, Django schema and live review
+data remain unchanged. The Phase 5 review app/image remain preserved separately.
 The exact app tree/runtime/DMG hashes and test receipts are in PHASE7_RESULTS.json.
 All generated apps, payloads, test customer folders and DMGs stay ignored.
 
@@ -96,9 +98,53 @@ foreign/different app build is preserved rather than implicitly upgraded.
   review business fingerprint was queried while its main services were stopped.
 - Real host prerequisites passed on macOS 26.5.2 ARM64, 24 GB RAM, hypervisor
   available, no Rosetta translation. This certifies neither an 8 GB device nor
-  every supported macOS release. The Mac was locked during UI availability checks;
-  native install/setup/cancellation dialogs have **not** been clicked or visually
-  certified. A manual unlock request remains pending.
+  every supported macOS release. After the owner unlocked the Mac, the actual
+  native setup and maintenance flows were exercised as described below.
+
+## Native UI and final corrections
+
+The owner unlocked the Mac and authorized continued testing. Native menus and
+folder dialogs performed self-copy into `~/Applications`, prerequisites, Docker
+review acknowledgement, included archive verification, new-empty folder selection
+and first startup. Cancelling the chooser created no customer selection or
+preferences. The final disposable installation reached `ready`; its health reports
+`0.7.0-phase7`, schema 2, setup incomplete, with owner/company/journal counts
+`0|0|0`. The default browser opened `/setup/` and showed the corrected daily-backup
+guidance. No company form or owner password was entered or submitted.
+
+Setup → maintenance → Setup succeeded. Exited-process observation once opened a
+second instance; its duplicate-launch alert was dismissed, while the actual new
+Setup process remained healthy. A fresh UI binding verified that window. Final
+source/installed processes exited normally and the lifetime lock was free.
+
+Cancelling the native removal prompt preserved running container IDs, health,
+credentials and active generation. Confirming removal preparation stopped only
+the disposable stack; the native window visibly reported data retained. The app
+then quit normally. Test containers/networks were removed without deleting any
+volumes, customer files or apps. Desktop/sign-in options stayed off. Private
+fixture tests also verify same-build repair and optional integration ownership.
+
+Native testing exposed stale onboarding text and incomplete loop teardown. The
+final app explicitly exits Tk loops, joins completed workers and stops polling
+closed windows. A startup attempt also caught a hard-coded old health build;
+health now reads the packaged VERSION. The 38 core tests, Django system check and
+migration-drift check pass on a separate disposable installation using the final
+image. Original SQL definitions/migrations and the source SQL contract are
+unchanged; the full 190-definition database comparison was not repeated here.
+
+An intermediate engine build included generated installer files. Before staging
+or upload, `.dockerignore` was expanded to exclude generated installers,
+customer/config/data folders, secrets and developer environments. The final
+engine root was checked for those exclusions and matching VERSION/health build.
+The previous Phase 5 engine tag and review container images were preserved.
+
+Final receipts are in `.runtime/phase7-final-build`: `build-receipt.json`,
+`verification.json`, `integration-results.json`, `core-checks.json`,
+`native-ui-results.json` and `native-ui/` screenshots. Earlier `bec7a2a` and
+`5242730` builds are retained as superseded diagnostics and are not the final
+handoff. Temporary port reservations and test browser tabs were closed. Review
+container IDs/states/images and config/credential/media hashes match the baseline;
+both source repositories remain clean at their recorded HEADs.
 
 ## Signing/notarization and remaining gates
 
@@ -124,7 +170,7 @@ it uploads program artifacts to Apple and requires separate owner release inputs
 it is never called by normal setup/startup. No Apple submission, public release or
 artifact upload was performed in this phase. Phase 7 source commits remain local.
 
-Still pending: native UI testing after manual unlock; real fresh supported Macs,
+Still pending: real fresh supported Macs,
 Docker-absent setup/consent, true offline cold start after OS reboot/sign-in,
 Developer ID/notarization/stapled-ticket acceptance, real user repair/removal/
 reinstall, and owner review. Phase 8 data-changing upgrades have not started.
