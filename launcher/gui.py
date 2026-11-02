@@ -12,7 +12,7 @@ class Window:
     def __init__(self,root,program,preferences_path=None,on_setup=None,desktop_name=None):
         self.on_setup=on_setup;self.desktop_name=desktop_name
         self.root=root;self.program=Path(program);self.bootstrap=read(self.program/'bootstrap.json',{})
-        self.events=queue.Queue();self.executor=concurrent.futures.ThreadPoolExecutor(max_workers=1);self.controller=None;self.busy=False;self.cancel_confirmation=None;self.window_lock=contextlib.ExitStack()
+        self.events=queue.Queue();self.executor=concurrent.futures.ThreadPoolExecutor(max_workers=1);self.controller=None;self.busy=False;self.closed=False;self.handoff_started=False;self.cancel_confirmation=None;self.window_lock=contextlib.ExitStack()
         title='Financee Offline'+(' — Development Review' if self.bootstrap.get('development') else '')
         root.title(title);height=max(680,min(740,root.winfo_screenheight()-100))
         left=max(20,(root.winfo_screenwidth()-780)//2);top=max(25,(root.winfo_screenheight()-height-50)//2)
@@ -65,9 +65,10 @@ class Window:
         for label,command in actions:self.action_menu.add_command(label=label,command=command,state='disabled')
         self.file_menu=file_menu
     def setup_window(self):
+        if self.handoff_started or self.closed:return
         if self.busy:
             messagebox.showinfo('Operation still running','Wait for the current operation before opening setup.',parent=self.root);return
-        self.on_setup();self.close()
+        self.handoff_started=True;self.on_setup();self.close()
     def menu_state(self,enabled):
         for i in range(9):self.action_menu.entryconfigure(i,state='normal' if enabled else 'disabled')
         for i in (0,1):self.file_menu.entryconfigure(i,state='normal' if self.controller is None and not self.busy else 'disabled')
@@ -210,6 +211,7 @@ class Window:
         try:integration.signin(self.controller.installation,self.at_signin.get())
         except Exception as exc:self.at_signin.set(not self.at_signin.get());self.show_error(exc)
     def close(self):
+        if self.closed:return
         if self.cancel_confirmation:self.cancel_confirmation();return
         if self.busy:messagebox.showinfo('Operation still running','Please wait for the current operation to finish before closing this window.',parent=self.root);return
-        self.window_lock.close();self.executor.shutdown(wait=False);self.root.destroy()
+        self.closed=True;self.executor.shutdown(wait=True);self.window_lock.close();self.root.quit();self.root.destroy()

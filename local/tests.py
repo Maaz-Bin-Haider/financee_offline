@@ -27,7 +27,7 @@ class OnboardingTests(TestCase):
     @override_settings(OFFLINE_INSTALLATION_ID='0123456789abcdef0123456789abcdef',OFFLINE_GENERATION='initial')
     def test_health_identifies_installation_without_auth_or_secrets(self):
         value=self.client.get('/health/').json()
-        self.assertEqual(value,dict(product='Financee_Offline',installation_id='0123456789abcdef0123456789abcdef',generation='initial',schema=2,build='0.5.0-phase5',setup_complete=False))
+        self.assertEqual(value,dict(product='Financee_Offline',installation_id='0123456789abcdef0123456789abcdef',generation='initial',schema=2,build='0.7.0-phase7',setup_complete=False))
     def test_empty_business_and_no_universal_owner(self):
         self.assertEqual(get_user_model().objects.count(),0)
         self.assertEqual(GeneralSettings.objects.count(),0)

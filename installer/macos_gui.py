@@ -11,7 +11,7 @@ from . import macos_host as host
 class MacSetupWindow:
     def __init__(self,root,program,state,preferences,app,payload_file,launch,program_state=None):
         self.root=root;self.app=Path(app);self.preferences=Path(preferences);self.payload_file=Path(payload_file);self.launch=launch
-        self.events=queue.Queue();self.worker=concurrent.futures.ThreadPoolExecutor(max_workers=1);self.busy=False;self.prepared=False
+        self.events=queue.Queue();self.worker=concurrent.futures.ThreadPoolExecutor(max_workers=1);self.busy=False;self.prepared=False;self.closed=False;self.handoff_started=False
         self.program_state=Path(program_state or Path(state).parent)
         self.setup=Setup(program,state,progress=lambda text:self.events.put(('progress',text)),context_selector=host.local_context)
         try:host.require_installed(app);self.installed=True
@@ -70,7 +70,8 @@ class MacSetupWindow:
     def copy_app(self):
         if self.installed:messagebox.showinfo('App is installed','This app is already in Applications. Continue with the Mac and runtime checks.',parent=self.root);return
         def done(target):
-            self.launch(target,True);self.close()
+            if self.handoff_started:return
+            self.handoff_started=True;self.launch(target,True);self.close()
         self.task(lambda:host.install_app(self.app,Path.home()/'Applications',self.program_state,System()),done)
     def check(self):
         def done(value):
@@ -103,13 +104,15 @@ class MacSetupWindow:
             self.status.set('Financee is ready. Open it to complete company/currency/owner setup or sign in.');self.open()
         self.task(lambda:self.setup.install(chosen,self.preferences,existing),done)
     def open(self):
+        if self.handoff_started:return
         if not self.installed:
             messagebox.showinfo('Install app first','Install this app in Applications before opening your business.',parent=self.root);return
         if not self.preferences.is_file():messagebox.showinfo('Choose business folder','Finish setup or open the existing business folder first.',parent=self.root);return
-        self.launch(self.app,False);self.close()
+        self.handoff_started=True;self.launch(self.app,False);self.close()
     def remove(self):
         if not messagebox.askyesno('Prepare App Removal','Stop this verified Financee installation and remove its optional sign-in entry? Business folders, backups and data volumes are retained. After this finishes, quit and move the app to Trash yourself.',parent=self.root):return
         self.task(lambda:prepare_uninstall(self.setup.payload.program,self.preferences,self.setup.state_path.parent/'removal-preserved.json'),lambda value:self.status.set('Financee stopped; data retained. Quit this app, then move it to Trash when ready.'))
     def close(self):
+        if self.closed:return
         if self.busy:messagebox.showinfo('Operation running','Wait for the current operation to finish before closing.',parent=self.root);return
-        self.worker.shutdown(wait=False);self.root.destroy()
+        self.closed=True;self.worker.shutdown(wait=True);self.root.quit();self.root.destroy()
