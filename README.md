@@ -60,3 +60,12 @@ Saved local Windows delivery: `dist/Financee-Offline-Windows-x64-Development-60d
 It is unsigned development software; Windows 10 runtime setup and real Windows
 10/11 device acceptance remain pending. Build/source `60dc9a3`,
 [successful development build](https://github.com/Maaz-Bin-Haider/financee_offline/actions/runs/41422916045).
+
+## Apple Silicon development installer (Phase 7)
+
+Saved local DMG: `dist/Financee-Offline-Apple-Silicon-Development-bec7a2a.dmg`
+(about 498 MB), including the native app and matching offline runtime images.
+[Phase 7 review, install/removal steps and evidence](docs/PHASE7_REVIEW.md).
+It is ad-hoc signed, not notarized or customer-certified. Native UI testing awaits
+manual Mac unlock; signing and fresh-device/reboot acceptance remain pending.
+No production resources or review business data were changed. Stop before Phase 8.

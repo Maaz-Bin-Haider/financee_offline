@@ -2,11 +2,12 @@
 
 2026-11-02, Asia/Karachi. The owner instructed “move forward” after the Windows
 build handoff, authorizing Phase 7 Apple Silicon installer work. **Phase 7 native
-Mac app/DMG implementation is in progress; stop before Phase 8.** Windows device
+Mac app/DMG development build is locally verified; native UI and signing/release
+acceptance remain pending. Stop before Phase 8.** Windows device
 tests remain deferred by the owner, and the Windows 10 maintained runtime path
 remains unfinished. The existing Apple Silicon review app remains the Phase 5
 build. Actual shared-runtime Docker-off and OS reboot/sign-in acceptance remain
-pending. No valid Developer ID identity is installed on this Mac; development
+pending. No valid Developer ID identity was available for this build; development
 builds are ad-hoc signed and not notarized.
 The owner authorized committing and pushing the current
 source state to https://github.com/Maaz-Bin-Haider/financee_offline.git on
@@ -160,3 +161,37 @@ owner authorization. No Intel Mac/Windows ARM package in v1. Current fonts cover
 catalogue currency symbols, not every possible writing system. CSV is Excel-readable;
 no new native XLSX writer or Excel-app verification is claimed. Keep customer data,
 media, secrets, logs, ZIPs and installer payloads out of Git. Never operate sources.
+
+
+Phase 7 local development build is now available: source
+bec7a2a2880548b8ab91c8462a5acc2311caa67a, setup 0.7.0-phase7, engine 0.5.0-phase5/
+schema 2. Complete local DMG:
+dist/Financee-Offline-Apple-Silicon-Development-bec7a2a.dmg (497,563,709 bytes),
+SHA-256 1c32839da08604d62108744a4a7a37c60c1a3d3d9e6a0565ab48207d18bc7791.
+It includes an unbound native ARM64 app plus all four verified ARM64 images;
+no customer profile, credentials, business data or Docker Desktop is bundled.
+App-copy/same-build repair preserve foreign/running apps and customer folders.
+A native Mac setup/maintenance entry reuses the shared verified engine, with
+private development preferences, explicit Docker consent, included-runtime import,
+optional desktop/sign-in hooks and conservative removal preparation.
+
+106 host guards pass. The relocated app and read-only DMG pass program/runtime
+hashes, bundled Tcl/TLS, five ARM64 Mach-O files, contained symlinks and relocatable
+library checks with developer environment removed. A missing interpreter TLS
+rejection-policy resource was found/fixed without changing validation policy.
+Real native app copy, same-build program/setup repair, frozen installed health,
+empty counts 0|0|0 and data-retaining removal preparation pass on a private
+UUID-owned stack. Private alias/sign-in fixtures verify; no actual sign-in hook
+was enabled. Temporary test containers/networks removed, volumes/files retained.
+Review states/images/config/credentials/media remain unchanged; no live review
+business fingerprint was queried with main services already stopped.
+
+Mac native UI tests are pending because the Mac is locked; manual unlock was
+requested. No valid Developer ID identity was found. Ad-hoc signatures verify,
+but Gatekeeper rejects this development artifact (exit 3); the notarization helper
+refuses it before any submission. Developer ID/hardened runtime/notarytool/stapler
+recipes exist but actual signing/notarization and fresh-device/offline reboot/
+sign-in/real removal/reinstall acceptance remain gates. No public release, Apple
+submission, artifact upload or source push occurred in Phase 7. Keep Phase 7 local
+for review and stop before Phase 8. Exact evidence: docs/PHASE7_REVIEW.md and
+PHASE7_RESULTS.json. Windows 10 runtime work/device acceptance is still pending.

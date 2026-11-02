@@ -62,3 +62,14 @@ verified native ARM64 exported payload and operates only a fresh disposable
 Financee-owned installation; it retains its volumes and preserves the offline
 review stack's current state. This Mac smoke is not Windows certification.
 See `docs/PHASE6_REVIEW.md` for exact limits and native Windows acceptance gates.
+
+## Phase 7 Mac installer
+
+`python -m unittest tests.test_macos_installer tests.test_installer tests.test_launcher`
+runs 106 host guards against private fixtures. The native Mac integration script
+`test_macos_installer_integration.py --app APP` copies a real app into private
+Applications, exercises a new UUID-owned empty installation and same-build repair,
+checks installed frozen health, then prepares removal and releases only its test
+containers/networks. It keeps all data volumes and the observed review state.
+It does not test a visible native dialog, enable actual OS sign-in, restore review,
+restart Docker globally, reboot macOS or clear signing/notarization gates.
