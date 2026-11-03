@@ -259,3 +259,12 @@ was performed in this native Mac validation. Phase9 has not started. Source push
 authorization persists; previous remote checkpoint d3f118b was verified. Native evidence is recorded in this source checkpoint; no program change or
 DMG rebuild was needed. Installers, customer records and runtime secrets remain
 local and ignored. Exact handoff: docs/PHASE8_REVIEW.md and RESULTS.json.
+
+2026-11-03 continuation: preparing Windows Phase8 validation. The existing public
+repo workflow now defaults to native Windows guards/GUI imports ONLY, with no
+artifact upload, Docker/WSL mutation or installer execution. Full Linux payload
+and Windows packaging jobs require explicit upload_development_artifacts=true.
+Owner's no-public-artifact rule still applies; source push permission persists.
+Existing workflow action/dependency pins are retained. Package notices now
+describe the 0.8 side-by-side upgrade/recovery flow. Source/CI validation is not
+Windows customer install/UAC/reboot/upgrade acceptance. Stop before Phase9.

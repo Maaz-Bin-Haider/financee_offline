@@ -1,5 +1,5 @@
 """Upgrade policy, ownership and interruption guards; no live runtime mutations."""
-import copy,json,tempfile,unittest
+import copy,json,os,tempfile,unittest
 from pathlib import Path
 from unittest.mock import Mock,patch
 from installer.upgrade import check_policy,verify_program,pending,union_ownership,Upgrade
@@ -53,7 +53,11 @@ class UpgradeBoundaryTests(unittest.TestCase):
         with self.assertRaisesRegex(LauncherError,'interrupted upgrade'):c._start()
         c.ensure_runtime.assert_not_called()
     def test_snapshot_refuses_links(self):
-        (self.program/'link').symlink_to(self.root/'other');u=object.__new__(Upgrade)
+        try:(self.program/'link').symlink_to(self.root/'other')
+        except OSError as exc:
+            if os.name=='nt' and getattr(exc,'winerror',None)==1314:self.skipTest('This Windows account lacks symbolic-link creation privilege.')
+            raise
+        u=object.__new__(Upgrade)
         with self.assertRaises(LauncherError):u.snapshot(self.program,self.root/'copy')
     def test_changed_confirmation_does_not_open_runtime(self):
         u=object.__new__(Upgrade);u.consent=Mock(return_value='current');u.prepare=Mock()
@@ -66,7 +70,6 @@ class UpgradeBoundaryTests(unittest.TestCase):
         with self.assertRaisesRegex(LauncherError,'foreign image'):union_ownership(old,new)
         self.assertEqual(old.command.call_count,2)
 
-if __name__=='__main__':unittest.main()
 
 class UpgradeRecoveryOwnershipTests(unittest.TestCase):
     def controllers(self):
@@ -86,3 +89,5 @@ class UpgradeRecoveryOwnershipTests(unittest.TestCase):
             if service=='nginx':v['HostConfig']['PortBindings']['80/tcp'][0]['HostIp']='0.0.0.0'
             old.command.side_effect=['id',json.dumps([v])]
             with self.subTest(service=service),self.assertRaises(LauncherError):union_ownership(old,new)
+
+if __name__=='__main__':unittest.main()

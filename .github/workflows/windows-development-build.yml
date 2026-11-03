@@ -1,14 +1,36 @@
 name: Windows development build (not a release)
-run-name: Unsigned Windows x64 development build — ${{ github.sha }}
+run-name: Windows validation — artifacts=${{ inputs.upload_development_artifacts }} — ${{ github.sha }}
 on:
   workflow_dispatch:
+    inputs:
+      upload_development_artifacts:
+        description: 'Build and upload public development payload/installer artifacts (owner approval required)'
+        type: boolean
+        required: true
+        default: false
 permissions:
   contents: read
 concurrency:
   group: windows-development-build
   cancel-in-progress: false
 jobs:
+  windows-validation:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - name: Native Windows setup, launcher and upgrade guards
+        run: python -m unittest tests.test_installer tests.test_launcher tests.test_upgrade
+      - name: Import actual Windows GUI and upgrade modules without launching or changing the host
+        run: python -c "import platform,struct,tkinter; import installer.entry,installer.gui,installer.upgrade_gui,launcher.entry; from launcher.system import windows_native_arch; assert platform.system()=='Windows' and struct.calcsize('P')==8 and windows_native_arch()=='amd64'; print('Native Windows x64 GUI/upgrade imports passed; no installer or runtime was started.')"
   linux-payload:
+    if: ${{ inputs.upload_development_artifacts }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -19,7 +41,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Host setup and launcher guards
-        run: python -m unittest tests.test_installer tests.test_launcher
+        run: python -m unittest tests.test_installer tests.test_launcher tests.test_upgrade
       - name: Cache exact AMD64 dependency images on this disposable runner
         shell: bash
         run: |
@@ -64,7 +86,8 @@ jobs:
           compression-level: 0
           retention-days: 7
   windows-package:
-    needs: linux-payload
+    if: ${{ inputs.upload_development_artifacts }}
+    needs: [windows-validation, linux-payload]
     runs-on: windows-2022
     timeout-minutes: 30
     steps:
@@ -82,7 +105,7 @@ jobs:
       - name: Install pinned native build dependencies
         run: python -m pip install -r installer/windows/requirements-build.txt
       - name: Windows host guards (no Docker or WSL mutation)
-        run: python -m unittest tests.test_installer tests.test_launcher
+        run: python -m unittest tests.test_installer tests.test_launcher tests.test_upgrade
       - name: Freeze both Windows programs, check bundles and compile Inno setup
         shell: pwsh
         run: |

@@ -38,6 +38,17 @@ There is no universal login or sample business data. Keep independent backup
 copies. If Windows asks for a restart, save work, restart manually and reopen
 Financee Setup from the Start menu to continue.
 
+Version 0.8 uses a separate development install folder and Start menu group;
+keep the previous app for recovery. For an existing schema-2 0.5/0.7 business,
+close old maintenance and turn off its optional sign-in startup first. In the
+new setup choose Upgrade Existing Business, select the exact business and old
+program folder, verify the matching new runtime and confirm the displayed
+versions/folder. Protected rescue and old DB/media/program resources are retained.
+Only reviewed same-schema upgrades are supported; downgrades and unreviewed
+migrations are refused. Reopen the matching new setup and choose Recover
+Interrupted Upgrade after a failed/interrupted attempt. Native Windows upgrade
+and recovery acceptance are pending; use disposable data only.
+
 This is an untrusted-by-Windows unsigned development artifact. Do not disable
 Windows security protections or treat compilation as installation certification.
 No public release was created. The included SHA256SUMS.txt checks local file

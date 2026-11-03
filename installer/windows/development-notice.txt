@@ -9,3 +9,5 @@ Docker Desktop and Windows/WSL prompts require your own review and consent. Fina
 Your business data and backups stay in the separate customer folder you choose. Uninstall stops verified Financee services and removes program files; customer folders, backups, containers, images and data volumes are retained. Keep additional backup copies on another device.
 
 Installer technology: Inno Setup, Copyright (C) 1997-2026 Jordan Russell; Portions Copyright (C) 2000-2026 Martijn Laan. https://jrsoftware.org/ . Upstream licensing notices are retained by the compiler. Commercial users are requested by upstream to purchase a commercial license. No compiler is redistributed in this source repository.
+
+Version 0.8 development installs beside the previous version. Manual Upgrade in Setup accepts only reviewed schema-2 0.5/0.7 sources and retains a paired rescue ZIP, previous program/images and old DB/media. Close old maintenance and disable its optional sign-in startup before applying; enable startup in the new app only after success. Interrupted upgrades use Recover Interrupted Upgrade in the matching new setup. Native Windows upgrade/device acceptance is pending.
