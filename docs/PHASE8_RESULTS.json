@@ -247,5 +247,31 @@
     "original_container_ids_states_image_ids_config_credentials_media_match_phase7_baseline": true,
     "review_DB_not_queried_or_upgraded": true
   },
-  "headless_validation_date": "2026-11-02"
+  "headless_validation_date": "2026-11-02",
+  "windows_host_validation": {
+    "date": "2026-11-03",
+    "run_id": 41670366030,
+    "url": "https://github.com/Maaz-Bin-Haider/financee_offline/actions/runs/41670366030",
+    "source_revision": "11ac354bec78eaf58a960d67108e26fb29567bd0",
+    "host": "Windows Server 2022 10.0.20348 Datacenter",
+    "python": "3.12.10 x64",
+    "tests_run": 103,
+    "passed": 102,
+    "skipped": 1,
+    "skip_reason": "Existing Mac Desktop mount-alias fixture requires POSIX paths; Windows aliases have separate coverage",
+    "actual_native_Windows_GUI_and_upgrade_imports": "pass",
+    "linux_payload_job": "skipped",
+    "windows_package_job": "skipped",
+    "uploaded_artifact_count": 0,
+    "Docker_or_WSL_changed": false,
+    "installer_compiled_or_executed": false,
+    "conclusion": "success"
+  },
+  "windows_build_policy": {
+    "manual_input": "upload_development_artifacts",
+    "default": false,
+    "validation_only_has_no_upload_steps": true,
+    "public_upload_requires_explicit_owner_approval": true,
+    "full_installer_build": "pending approval for seven-day public development artifacts"
+  }
 }

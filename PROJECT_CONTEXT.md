@@ -268,3 +268,15 @@ Owner's no-public-artifact rule still applies; source push permission persists.
 Existing workflow action/dependency pins are retained. Package notices now
 describe the 0.8 side-by-side upgrade/recovery flow. Source/CI validation is not
 Windows customer install/UAC/reboot/upgrade acceptance. Stop before Phase9.
+
+Windows artifact-free validation PASSED 2026-11-03: run 41670366030, source
+11ac354bec78eaf58a960d67108e26fb29567bd0. Native Windows Server2022 x64 Python
+3.12.10: 103 tests, 102 pass and one existing Mac/POSIX alias fixture skipped;
+Windows GUI/upgrade imports pass. Both packaging jobs skipped and run artifact
+API count=0. Local Mac 120 host guards pass. No frozen installer built in this
+run. Full Windows0.8 build is concretely prepared behind the workflow input
+upload_development_artifacts=true, which creates seven-day PUBLIC runtime and
+installer artifacts in this public repo. Owner’s OFFLINE_PRODUCT_SPEC.md public
+artifact gate applies; explicit permission for that upload is still required.
+Do not dispatch true without it. Original Windows device testing remains deferred,
+Windows10 maintained runtime unfinished; no signing/public release authorization.

@@ -143,3 +143,33 @@ The DMG is ad-hoc signed, not Developer ID signed/notarized. Gatekeeper rejects 
 as expected (exit 3); the notary helper refuses it before upload. No bypass occurred.
 Fresh-device, true offline OS reboot/sign-in, Windows target testing and owner
 signing/notary inputs remain distribution gates. Phase 9 has not started.
+
+## Windows validation continuation — 2026-11-03
+
+Source `11ac354bec78eaf58a960d67108e26fb29567bd0` passed the existing manual
+workflow’s new artifact-free mode on native Windows Server 2022 x64, Python
+3.12.10. [Run 41670366030](https://github.com/Maaz-Bin-Haider/financee_offline/actions/runs/41670366030)
+ran 103 guards: 102 passed, one existing Mac-only POSIX path fixture skipped.
+Actual Windows setup/launcher/upgrade GUI modules imported successfully. The
+POSIX symlink fixture runs when privilege is available, and can skip specifically
+on Windows error 1314; it was not skipped on this runner. Local Mac guards also
+remain 120/120 passing. No business SQL or runtime behavior changed.
+
+The manual workflow now defaults `upload_development_artifacts` to false. That
+mode runs only Windows host checks/imports; both Linux-payload and Windows-package
+jobs were skipped. GitHub’s run-artifact API confirmed zero uploads. Existing
+action/dependency pins remain unchanged. No Docker/WSL, installer or customer
+workflow was started. This is native host validation, not a compiled installer
+or Windows 10/11 customer acceptance.
+
+The full existing pipeline is prepared behind the explicit boolean true: build
+and verify the native AMD64 Linux payload, transfer it through a seven-day
+GitHub artifact, freeze both native Windows executables, verify their bundles,
+compile Inno Setup, and upload the unsigned development delivery for seven days.
+The repository is PUBLIC. This would publicly upload payload/installer files;
+the owner’s no-public-artifact requirement in OFFLINE_PRODUCT_SPEC.md therefore
+requires explicit permission before that mode is dispatched. Source pushes alone
+are not publication approval. No full Phase 8 build has been dispatched yet.
+The collected package’s read-first instructions now explain the 0.8 side-by-side
+upgrade/recovery flow. Windows customer install/UAC/reboot/repair/recovery tests,
+Windows 10 maintained runtime qualification and signing remain pending.

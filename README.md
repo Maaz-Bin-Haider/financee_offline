@@ -84,3 +84,9 @@ unreviewed migrations or downgrades. [Phase 8 tests and review steps](docs/PHASE
 candidate/startup failure recovery pass on disposable data. Final native Mac
 confirmation, cancellation, upgrade/login handoff and safe stop/exit pass on this
 host. Windows/native reboot and signing/notarization acceptance remain pending. Stop before Phase 9. No installer was published.
+
+Windows source validation also passes on a native x64 runner: 102 guards passed
+and one Mac-only fixture skipped; GUI/upgrade imports passed. The manual workflow
+defaults to no artifact uploads. The complete Windows 0.8 packaging run requires
+explicit permission for its seven-day public development artifacts; it has not
+been run. See [the native validation run](https://github.com/Maaz-Bin-Haider/financee_offline/actions/runs/41670366030).
