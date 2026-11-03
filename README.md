@@ -81,6 +81,6 @@ rescue and previous data/runtime, verifies a separate candidate and refuses
 unreviewed migrations or downgrades. [Phase 8 tests and review steps](docs/PHASE8_REVIEW.md).
 
 120 host checks, 38 post-upgrade core tests, five forced host exits and real
-candidate/startup failure recovery pass on disposable data. The final native
-confirmation awaits Mac unlock; Windows/native reboot and signing/notarization
-acceptance remain pending. Stop before Phase 9. No installer was published.
+candidate/startup failure recovery pass on disposable data. Final native Mac
+confirmation, cancellation, upgrade/login handoff and safe stop/exit pass on this
+host. Windows/native reboot and signing/notarization acceptance remain pending. Stop before Phase 9. No installer was published.

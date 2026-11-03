@@ -1,11 +1,10 @@
 # Phase 8 manual upgrades and failure recovery
 
-2026-11-02. The owner authorized “move forward and push”, then “continue”.
+2026-11-02; native acceptance completed 2026-11-03. The owner authorized “move forward and push”, then “continue”.
 Phase 7 source checkpoint `9eb706f` and Phase 8 checkpoint `113887c` were pushed
 to `origin/codex/single-company-core`; remote HEAD was independently verified.
-Phase 8 now has a local,
-headless-verified manual-upgrade build. Stop for review before Phase 9.
-Final native confirmation/handoff testing is waiting for manual Mac unlock.
+Phase 8 now has a local manual-upgrade build verified headless and through
+the final native Mac UI. Stop for review before Phase 9.
 No installer publication, Apple upload or upgrade of the review business occurred.
 
 ## Review build and supported upgrade
@@ -95,13 +94,22 @@ commit; health remains available. Completed recovery is a read-only no-op.
   program/payload hashes, five native ARM64 Mach-O files, contained symlinks,
   relocatable libraries and bundled Python/Tcl/TLS without developer paths.
   Final engine cleanliness and matching packaged VERSION/health were checked.
-- An earlier native build self-copied into Applications, opened the upgrade
-  window, displayed the verified 0.7 → 0.8 summary and passed native cancellation
-  with unchanged release/health/config/generation/credential hashes. A redundant
-  second typed dialog was unreliable through automation and was removed; the
-  final build keeps one concrete native Yes/No confirmation with reviewed-input
-  binding. Its final confirmation → upgrade → maintenance/browser handoff is
-  **pending manual unlock**, not claimed as passed.
+- On 2026-11-03 the final `b12e676` app self-copied into Applications beside
+  the old app, verified the marked populated 0.7 business, and passed native
+  cancellation with unchanged container IDs, health, configuration, generation
+  and credential hashes. The single native Yes/No confirmation then applied the
+  upgrade and opened the new maintenance window and default-browser login page.
+  No credentials were entered through GUI automation. Independent comparison
+  confirmed every non-session business/auth/permission/settings/history table,
+  sequence and media hash matched; all 190 SQL definitions passed and old
+  sessions expired. Protected rescue and old data/program generations remained.
+- Native Stop affected only this test installation. Closing maintenance exited
+  the app and released both program/customer locks. Its temporary containers and
+  networks were removed with the database volume, app, files and rescue ZIPs
+  retained. Test-only preferences were archived after checking the persisted
+  upgraded-business selection, leaving the installed app ready for fresh setup.
+  The prior redundant typed dialog was removed; explicit native confirmation
+  remains bound to the reviewed source/target versions and exact folder.
 
 Testing found and corrected a recovery-port check that mistook the deliberately
 stopped web process behind the verified owned proxy for a foreign port collision.
@@ -112,7 +120,7 @@ runtime detection before inspecting ownership; the final runs clean up normally.
 Source/financial SQL/migrations were not weakened to make tests pass.
 
 Exact receipts: `docs/PHASE8_RESULTS.json` and ignored
-`.runtime/phase8-delivery-build/{build-receipt,verification,upgrade-from-0.5,upgrade-from-0.7,distribution-checks}.json`.
+`.runtime/phase8-delivery-build/{build-receipt,verification,upgrade-from-0.5,upgrade-from-0.7,distribution-checks,native-ui-results}.json` and `native-ui/` screenshots.
 Earlier builds/failed-attempt data are retained as diagnostics. Both reference
 repositories remain clean at their recorded HEADs; review container states/images,
 configuration/credentials/media remain unchanged. No review restore/upgrade or
@@ -120,10 +128,11 @@ live business fingerprint query was performed.
 
 ## Remaining gates
 
-The Mac is locked; the pending question requests manual unlock for the final
-native check. Its disposable fixture is recorded in `.runtime/phase8-native-ui.json`.
-Do not select `.runtime/review`. No company/owner credentials were entered through
-GUI automation; synthetic test account creation was confined to marked fixtures.
+Native Mac acceptance is complete for this existing-Docker host. Its retained
+fixture is recorded in `.runtime/phase8-native-ui.json`, and its archived test
+preferences are in `.runtime/phase8-delivery-build/native-ui/test-app-state`.
+No review upgrade or company/owner credential entry through GUI automation took
+place. Synthetic test account creation remained confined to marked fixtures.
 
 The common Windows upgrade window and a separate development app identity/path
 are implemented in source. No Phase 8 native Windows build or Windows customer

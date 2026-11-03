@@ -1,7 +1,7 @@
 {
   "phase": 8,
-  "date": "2026-11-02",
-  "status": "Same-schema manual upgrade and failure recovery verified on disposable data; final native confirmation waits for manual Mac unlock; stop before Phase 9",
+  "date": "2026-11-03",
+  "status": "Manual schema-2 upgrades and failure recovery verified headless and through final native Mac UI; Windows/platform/signing gates remain; stop before Phase 9",
   "artifact_source_revision": "b12e676ee93e40a3dfab2f3dafa76287bce5773e",
   "engine_revision": "8076287f6f2ba38f80eb647bc1465884f38542ea",
   "engine_image_id": "sha256:a5fc7755ca707f57d218a327471d82d185e0538721c5cfd36b488dab9e005c81",
@@ -168,14 +168,40 @@
     "test_containers_and_networks_removed_data_volume_retained": true
   },
   "native_UI": {
-    "earlier_build": "0bfae68094af13fba0e9e4c8570bd06ea64e1e32",
-    "versioned_app_self_copy": true,
-    "upgrade_window_and_verified_summary": true,
-    "native_cancel_preserved_previous_release_and_credentials": true,
-    "final_b12e676_confirmation_and_upgrade_handoff": "pending manual Mac unlock",
-    "text_confirmation": "Removed the unnecessary second typed prompt; one native confirmation retains exact versions/folder and reviewed-input binding",
-    "credentials_entered_by_UI_automation": false,
-    "fixture_services_stopped_data_retained_while_waiting_for_unlock": true
+    "date": "2026-11-03",
+    "artifact_source_revision": "b12e676ee93e40a3dfab2f3dafa76287bce5773e",
+    "native_self_copy_signature_verified": true,
+    "native_preflight_and_cancel_no_mutation": true,
+    "native_confirmation_apply_maintenance_browser_login_handoff": true,
+    "populated_business_rows_sequences_auth_permissions_settings_history_and_media_unchanged": true,
+    "runtime_credentials_preserved": true,
+    "financial_SQL_definitions_verified": 190,
+    "sessions_expired": true,
+    "rescue_previous_DB_media_program_images_retained": true,
+    "signin_and_desktop_options_off": true,
+    "user_credentials_entered": false,
+    "project": "financee_offline_901836bddaa0",
+    "health": {
+      "installation_id": "901836bddaa0473786171ebabfb46854",
+      "generation": "ad8a6cacc6c84db0933e69176c16998b",
+      "product": "Financee_Offline",
+      "build": "0.8.0-phase8",
+      "schema": 2,
+      "setup_complete": true
+    },
+    "native_stop_only_own_installation": true,
+    "native_window_exit_and_program_customer_locks_released": true,
+    "test_containers_networks_removed_data_volume_and_app_retained": true,
+    "original_review_baseline_unchanged": true,
+    "screenshots": [
+      "phase8-native-login.png",
+      "phase8-native-upgrade-complete.jpg",
+      "phase8-final-confirmation.jpg",
+      "phase8-clean-setup.jpg"
+    ],
+    "upgrade_persisted_correct_business_selection_before_teardown": true,
+    "test_preferences_archived_for_diagnostics_next_launch_unbound": true,
+    "fresh_setup_after_test_preference_archival_visually_verified": true
   },
   "distribution": {
     "gatekeeper_exit": 3,
@@ -199,7 +225,6 @@
   },
   "limitations": [
     "This policy accepts schema 2 only; future/schema-changing migrations require their own reviewed policy and checks",
-    "Final native GUI confirmation and handoff waits for manual Mac unlock",
     "Windows Phase8 source is implemented; native Phase8 build/device tests remain pending",
     "Developer ID/notarization and real fresh-device/offline OS reboot/sign-in acceptance remain pending",
     "Windows10 maintained runtime strategy remains unfinished",
@@ -221,5 +246,6 @@
   "review_preservation": {
     "original_container_ids_states_image_ids_config_credentials_media_match_phase7_baseline": true,
     "review_DB_not_queried_or_upgraded": true
-  }
+  },
+  "headless_validation_date": "2026-11-02"
 }

@@ -75,7 +75,9 @@ choose Recover Interrupted Upgrade. Data-changing schema upgrades and image-only
 downgrades are refused by this release’s schema-2 policy.
 
 See [Phase 8 evidence](docs/PHASE8_REVIEW.md) for supported 0.5/0.7 source versions,
-checks and remaining gates. Final native Mac confirmation awaits manual unlock;
+checks and remaining gates. Native Mac confirmation, cancellation, populated
+upgrade/login handoff and safe stop/exit passed on 2026-11-03. The test-only app
+preferences were archived; the installed development app opens fresh setup.
 Windows Phase 8 building/device tests and signed customer delivery remain pending.
 No universal test login is shipped. New-empty-business setup asks you to create
 your own company/currency/owner credentials.

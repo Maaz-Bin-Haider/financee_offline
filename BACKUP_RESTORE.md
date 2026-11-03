@@ -30,6 +30,6 @@ reviewed schema-2 sources 0.5/0.7 only and refuses unreviewed migrations/downgra
 Keep the previous app and rescue ZIP. A failed upgrade returns to the previous
 runtime paired with its retained DB/media; an old image alone is not a downgrade.
 A successful upgrade cannot silently discard later transactions by rolling back.
-Final native upgrade confirmation awaits Mac unlock; Windows/native reboot and
-signing acceptance remain pending. Never run restore/upgrade tests on the stable
+Native Mac upgrade confirmation, cancellation, login handoff and safe stop/exit
+pass. Windows/native reboot and signing acceptance remain pending. Never run restore/upgrade tests on the stable
 review business or either reference system.
